@@ -1,0 +1,1338 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: #ffffff;
+  color: #37352f;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Dark Mode - Minimal Notion-like Dark Theme */
+body.dark-mode {
+  background: #191919;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .card {
+  background: #202020;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: #191919;
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode input:hover,
+body.dark-mode textarea:hover,
+body.dark-mode select:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: #191919;
+}
+
+body.dark-mode button {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode button:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .btn-primary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #191919;
+  border: none;
+}
+
+body.dark-mode .btn-primary:hover {
+  background: #ffffff;
+}
+
+body.dark-mode table th {
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode table td {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark mode for Kanban board */
+body.dark-mode .kanban-column {
+  background: #202020 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .kanban-column.drag-over {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+body.dark-mode .kanban-empty {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Dark mode for Calendar */
+body.dark-mode .react-calendar {
+  background: #202020;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .react-calendar__tile {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .react-calendar__tile:enabled:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .react-calendar__tile--active {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #191919 !important;
+}
+
+body.dark-mode .react-calendar__navigation button {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .react-calendar__navigation button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .react-calendar__month-view__weekdays {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+body.dark-mode .react-calendar__month-view__days__day--weekend {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Dark mode for Pagination */
+body.dark-mode .pagination-container {
+  background: #202020;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .pagination-container button {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .pagination-container button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .pagination-container button:disabled {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Dark mode for Charts */
+body.dark-mode .recharts-text {
+  fill: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-mode .recharts-cartesian-axis-line,
+body.dark-mode .recharts-cartesian-grid-horizontal line,
+body.dark-mode .recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .recharts-legend-item-text {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Dark mode for Notifications */
+body.dark-mode .notification-dropdown {
+  background: #202020;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .notification-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .notification-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Dark mode for Modals/Dialogs */
+body.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Dark mode for empty states */
+body.dark-mode .empty-state {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Dark mode for badges */
+body.dark-mode .badge {
+  opacity: 1;
+}
+
+/* Dark mode for links */
+body.dark-mode a {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode a:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Dark mode for gradient cards */
+body.dark-mode .card[style*="linear-gradient"] {
+  opacity: 0.95;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Dark mode for loading skeleton */
+body.dark-mode .skeleton {
+  background: linear-gradient(90deg, #202020 25%, #2a2a2a 50%, #202020 75%);
+  background-size: 200% 100%;
+}
+
+/* Dark mode scrollbar */
+body.dark-mode ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #191919;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 60px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  font-weight: 400;
+  background: transparent;
+  color: #37352f;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+}
+
+button:hover {
+  background: rgba(55, 53, 47, 0.08);
+}
+
+button:active {
+  background: rgba(55, 53, 47, 0.16);
+}
+
+.btn-primary {
+  background: #37352f;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #2f2e2a;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  border-radius: 3px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  background: #ffffff;
+  color: #37352f;
+}
+
+input:hover, textarea:hover, select:hover {
+  background: rgba(55, 53, 47, 0.03);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: rgba(55, 53, 47, 0.32);
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(55, 53, 47, 0.09);
+  margin-bottom: 16px;
+  transition: all 0.15s ease;
+}
+
+.card:hover {
+  border-color: rgba(55, 53, 47, 0.16);
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #37352f;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #37352f;
+  line-height: 1.3;
+}
+
+table {
+  font-size: 14px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th {
+  font-weight: 500;
+  color: rgba(55, 53, 47, 0.65);
+  text-transform: none;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table tbody tr:hover {
+  background: rgba(55, 53, 47, 0.03);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+body.dark-mode .skeleton {
+  background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Dark mode for Login/Register pages */
+body.dark-mode .login-container,
+body.dark-mode .register-container {
+  background: #191919 !important;
+}
+
+body.dark-mode .login-container h1,
+body.dark-mode .register-container h1 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .login-container p,
+body.dark-mode .register-container p {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-mode .login-container label,
+body.dark-mode .register-container label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-mode .login-container input,
+body.dark-mode .register-container input {
+  background: #202020 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.dark-mode .login-container input::placeholder,
+body.dark-mode .register-container input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+body.dark-mode .login-container button[type="submit"],
+body.dark-mode .register-container button[type="submit"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #191919 !important;
+}
+
+body.dark-mode .login-container button[type="submit"]:hover,
+body.dark-mode .register-container button[type="submit"]:hover {
+  background: #ffffff !important;
+}
+
+body.dark-mode .login-container button[type="button"],
+body.dark-mode .register-container button[type="button"] {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.dark-mode .login-container button[type="button"]:hover,
+body.dark-mode .register-container button[type="button"]:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .login-container a,
+body.dark-mode .register-container a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Action Buttons - Minimal Style */
+.btn-edit {
+  background: transparent;
+  color: #37352f;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-edit:hover {
+  background: rgba(55, 53, 47, 0.08);
+}
+
+.btn-delete {
+  background: transparent;
+  color: #eb5757;
+  border: 1px solid rgba(235, 87, 87, 0.3);
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-delete:hover {
+  background: rgba(235, 87, 87, 0.1);
+}
+
+body.dark-mode .btn-edit {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .btn-edit:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .btn-delete {
+  color: #eb5757;
+  border-color: rgba(235, 87, 87, 0.3);
+}
+
+body.dark-mode .btn-delete:hover {
+  background: rgba(235, 87, 87, 0.1);
+}
+
+/* Status Badges - Minimal */
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-active {
+  background: rgba(46, 170, 220, 0.1);
+  color: #2eaadc;
+}
+
+.status-completed {
+  background: rgba(46, 170, 220, 0.1);
+  color: #2eaadc;
+}
+
+.status-on-hold {
+  background: rgba(255, 212, 38, 0.1);
+  color: #ffd426;
+}
+
+.status-cancelled {
+  background: rgba(235, 87, 87, 0.1);
+  color: #eb5757;
+}
+
+.priority-low {
+  background: rgba(46, 170, 220, 0.1);
+  color: #2eaadc;
+}
+
+.priority-medium {
+  background: rgba(255, 212, 38, 0.1);
+  color: #ffd426;
+}
+
+.priority-high {
+  background: rgba(255, 163, 68, 0.1);
+  color: #ffa344;
+}
+
+.priority-urgent {
+  background: rgba(235, 87, 87, 0.1);
+  color: #eb5757;
+}
+
+body.dark-mode .status-badge {
+  opacity: 1;
+}
+
+/* View Toggle Buttons */
+.view-toggle {
+  background: transparent;
+  color: rgba(55, 53, 47, 0.65);
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-right: 8px;
+}
+
+.view-toggle.active {
+  background: #37352f;
+  color: white;
+  border-color: #37352f;
+}
+
+.view-toggle:hover:not(.active) {
+  background: rgba(55, 53, 47, 0.08);
+}
+
+body.dark-mode .view-toggle {
+  color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .view-toggle.active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #191919;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .view-toggle:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Kanban Columns */
+.kanban-column {
+  background: #fafafa;
+  border: 1px solid rgba(55, 53, 47, 0.09);
+  padding: 16px;
+  border-radius: 3px;
+  min-height: 400px;
+  transition: all 0.15s ease;
+}
+
+.kanban-column.drag-over {
+  background: rgba(55, 53, 47, 0.03);
+  border-color: rgba(55, 53, 47, 0.3);
+  border-style: dashed;
+}
+
+.kanban-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(55, 53, 47, 0.4);
+  border: 2px dashed rgba(55, 53, 47, 0.16);
+  border-radius: 3px;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+body.dark-mode .kanban-column {
+  background: #202020;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .kanban-column.drag-over {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .kanban-empty {
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: rgba(55, 53, 47, 0.4);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+body.dark-mode .empty-state {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Form Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Task/Project Cards */
+.item-card {
+  transition: all 0.15s ease;
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Column Headers */
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.column-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #37352f;
+  margin: 0;
+}
+
+.column-count {
+  background: rgba(55, 53, 47, 0.08);
+  color: #37352f;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+body.dark-mode .column-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .column-count {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Page Subtitles - Dark Mode Fix */
+.page-subtitle {
+  font-size: 14px;
+  color: rgba(55, 53, 47, 0.65);
+  margin: 0;
+}
+
+body.dark-mode .page-subtitle {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Dashboard Stats Cards - Dark Mode Fix */
+body.dark-mode .card .stat-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-mode .card .stat-value {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .card .stat-description {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Notification Dropdown - Fixed Positioning */
+.notification-dropdown {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: white;
+  border-radius: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+body.dark-mode .notification-dropdown {
+  background: #202020;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+.notification-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+body.dark-mode .notification-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.notification-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #37352f;
+}
+
+body.dark-mode .notification-header h3 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Collapsible Sidebar */
+.sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid rgba(55, 53, 47, 0.12);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease, background 0.2s ease;
+  position: relative;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02);
+}
+
+.sidebar.collapsed {
+  width: 60px;
+  padding: 24px 8px;
+}
+
+.sidebar-header {
+  margin-bottom: 24px;
+  padding: 0 12px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 0 4px;
+}
+
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-title {
+  opacity: 0;
+}
+
+.sidebar-subtitle {
+  font-size: 12px;
+  color: rgba(55, 53, 47, 0.5);
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-subtitle {
+  opacity: 0;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 24px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+  transition: all 0.15s ease;
+  background: #ffffff;
+  border: 1px solid rgba(55, 53, 47, 0.2);
+  color: #37352f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-toggle:hover {
+  background: #f5f5f5;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(55, 53, 47, 0.3);
+}
+
+.sidebar-toggle svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+body.dark-mode .sidebar-toggle {
+  background: #2a2a2a;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .sidebar-toggle:hover {
+  background: #333333;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-signout {
+  width: 100%;
+  background: transparent;
+  color: var(--button-text);
+  padding: 6px 12px;
+  borderRadius: 3px;
+  border: 1px solid var(--button-border);
+  cursor: pointer;
+  fontSize: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  overflow: hidden;
+}
+
+.btn-signout:hover {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+body.dark-mode .sidebar {
+  background: #0f0f0f;
+  border-right-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .sidebar-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .sidebar-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item-text {
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .nav-item-text {
+  opacity: 0;
+  width: 0;
+}
+
+.nav-item-icon {
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Additional Status Badges */
+.status-draft {
+  background: rgba(55, 53, 47, 0.08);
+  color: rgba(55, 53, 47, 0.65);
+}
+
+.status-sent {
+  background: rgba(46, 170, 220, 0.1);
+  color: #2eaadc;
+}
+
+.status-paid {
+  background: rgba(46, 170, 220, 0.1);
+  color: #2eaadc;
+}
+
+.status-overdue {
+  background: rgba(235, 87, 87, 0.1);
+  color: #eb5757;
+}
+
+body.dark-mode .status-draft,
+body.dark-mode .status-sent,
+body.dark-mode .status-paid,
+body.dark-mode .status-overdue {
+  opacity: 1;
+}
+
+/* Dark mode for login/register logo */
+body.dark-mode .login-container img,
+body.dark-mode .register-container img {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Dark mode for nested stat boxes in Reports */
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="color: rgba(55, 53, 47, 0.65)"] {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Dark mode for stat card icons */
+body.dark-mode .card div[style*="color: rgba(55, 53, 47, 0.4)"] {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Dark mode for empty state icons */
+body.dark-mode .empty-state-icon {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Dark mode for inline icons in task details */
+body.dark-mode span[style*="display: flex"] svg {
+  opacity: 0.8;
+}
+
+/* Ensure all headers are visible in dark mode */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ensure all paragraphs and text are visible */
+body.dark-mode p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Ensure strong/bold text is visible */
+body.dark-mode strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Ensure table text is visible */
+body.dark-mode table td strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark mode for form labels */
+body.dark-mode label {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Dark mode for select options */
+body.dark-mode select option {
+  background: #191919;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark mode for textarea */
+body.dark-mode textarea {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark mode for task description text */
+body.dark-mode .card p[style*="color: rgba(55, 53, 47, 0.65)"] {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Dark mode for task title text */
+body.dark-mode span[style*="color: #37352f"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dark mode for date/time text */
+body.dark-mode span[style*="color: rgba(55, 53, 47, 0.5)"] {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Dark mode for overdue text */
+body.dark-mode span[style*="color: #eb5757"] {
+  color: #eb5757 !important;
+}
+
+/* Dark mode for Reports page nested stat boxes */
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="color: #37352f"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="fontSize: '20px'"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="fontSize: '24px'"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dark mode for large stat numbers in Reports */
+body.dark-mode .card p[style*="fontSize: '48px'"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dark mode for all card headings */
+body.dark-mode .card h2,
+body.dark-mode .card h3 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dark mode for time tracking table */
+body.dark-mode table td[style*="fontWeight: '600'"] {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark mode for invoice amounts */
+body.dark-mode table td[style*="fontWeight: '600'"] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* React Big Calendar Styling */
+.rbc-calendar {
+  background: var(--bg-primary);
+  border-radius: 3px;
+  border: 1px solid var(--border-secondary);
+  padding: 16px;
+}
+
+.rbc-header {
+  padding: 10px 3px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.rbc-today {
+  background-color: rgba(46, 170, 220, 0.05);
+}
+
+.rbc-off-range-bg {
+  background: var(--bg-tertiary);
+}
+
+.rbc-date-cell {
+  padding: 4px;
+  text-align: right;
+}
+
+.rbc-date-cell > a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.rbc-date-cell.rbc-now > a {
+  color: #2eaadc;
+  font-weight: 600;
+}
+
+.rbc-event {
+  padding: 2px 5px;
+  background-color: #2eaadc;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  border: none;
+}
+
+.rbc-event:hover {
+  opacity: 0.8;
+}
+
+.rbc-event-label {
+  font-size: 11px;
+}
+
+.rbc-event-content {
+  font-size: 12px;
+}
+
+.rbc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rbc-toolbar button {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rbc-toolbar button:hover {
+  background: var(--hover-bg);
+}
+
+.rbc-toolbar button:active,
+.rbc-toolbar button.rbc-active {
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  border-color: var(--primary-bg);
+}
+
+.rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rbc-month-view {
+  border: 1px solid var(--border-secondary);
+  border-radius: 3px;
+  background: var(--bg-primary);
+}
+
+.rbc-month-row {
+  border-top: 1px solid var(--border-secondary);
+}
+
+.rbc-day-bg {
+  border-left: 1px solid var(--border-secondary);
+}
+
+.rbc-day-bg:first-child {
+  border-left: none;
+}
+
+.rbc-header + .rbc-header {
+  border-left: 1px solid var(--border-secondary);
+}
+
+.rbc-time-view {
+  border: 1px solid var(--border-secondary);
+  border-radius: 3px;
+}
+
+.rbc-time-header {
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.rbc-time-content {
+  border-top: 1px solid var(--border-secondary);
+}
+
+.rbc-time-slot {
+  border-top: 1px solid var(--border-secondary);
+}
+
+.rbc-current-time-indicator {
+  background-color: #2eaadc;
+  height: 2px;
+}
+
+.rbc-agenda-view {
+  border: 1px solid var(--border-secondary);
+  border-radius: 3px;
+}
+
+.rbc-agenda-view table {
+  border: none;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.rbc-agenda-event-cell {
+  color: var(--text-primary);
+}
+
+.rbc-show-more {
+  background-color: transparent;
+  color: #2eaadc;
+  font-size: 11px;
+  padding: 2px 4px;
+  cursor: pointer;
+  border: none;
+  text-decoration: underline;
+}
+
+.rbc-show-more:hover {
+  color: #1a8ab8;
+}
+
+.rbc-overlay {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+.rbc-overlay-header {
+  border-bottom: 1px solid var(--border-secondary);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+body.dark-mode .rbc-today {
+  background-color: rgba(46, 170, 220, 0.1);
+}
+
+body.dark-mode .rbc-overlay {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .rbc-current-time-indicator {
+  background-color: #2eaadc;
+}
+
+
+/* Login Background Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-5%) translateY(-5%);
+  }
+  50% {
+    transform: translateX(-10%) translateY(5%);
+  }
+  75% {
+    transform: translateX(-5%) translateY(-2%);
+  }
+}
