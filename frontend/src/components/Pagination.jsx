@@ -17,61 +17,29 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="pagination-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '8px' }}>
-      <div style={{ fontSize: '14px', color: '#666' }}>
-        Showing {startItem}-{endItem} of {totalItems} items
+    <div className="pagination-container">
+      <div className="pagination-info">
+        {startItem}–{endItem} of {totalItems}
       </div>
       
-      <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-        <button
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            background: currentPage === 1 ? '#e9ecef' : '#fff',
-            color: currentPage === 1 ? '#adb5bd' : '#495057',
-            borderRadius: '4px',
-            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          ««
-        </button>
-        
+      <div className="pagination-buttons">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            background: currentPage === 1 ? '#e9ecef' : '#fff',
-            color: currentPage === 1 ? '#adb5bd' : '#495057',
-            borderRadius: '4px',
-            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            fontSize: '14px'
-          }}
+          className="pagination-btn"
         >
-          «
+          ←
         </button>
 
         {startPage > 1 && (
           <>
             <button
               onClick={() => onPageChange(1)}
-              style={{
-                padding: '8px 12px',
-                border: 'none',
-                background: '#fff',
-                color: '#495057',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
+              className="pagination-btn"
             >
               1
             </button>
-            {startPage > 2 && <span style={{ padding: '0 5px' }}>...</span>}
+            {startPage > 2 && <span className="pagination-ellipsis">···</span>}
           </>
         )}
 
@@ -79,16 +47,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            style={{
-              padding: '8px 12px',
-              border: 'none',
-              background: page === currentPage ? '#007bff' : '#fff',
-              color: page === currentPage ? '#fff' : '#495057',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: page === currentPage ? 'bold' : 'normal'
-            }}
+            className={`pagination-btn ${page === currentPage ? 'active' : ''}`}
           >
             {page}
           </button>
@@ -96,18 +55,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
 
         {endPage < totalPages && (
           <>
-            {endPage < totalPages - 1 && <span style={{ padding: '0 5px' }}>...</span>}
+            {endPage < totalPages - 1 && <span className="pagination-ellipsis">···</span>}
             <button
               onClick={() => onPageChange(totalPages)}
-              style={{
-                padding: '8px 12px',
-                border: 'none',
-                background: '#fff',
-                color: '#495057',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
+              className="pagination-btn"
             >
               {totalPages}
             </button>
@@ -117,33 +68,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            background: currentPage === totalPages ? '#e9ecef' : '#fff',
-            color: currentPage === totalPages ? '#adb5bd' : '#495057',
-            borderRadius: '4px',
-            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-            fontSize: '14px'
-          }}
+          className="pagination-btn"
         >
-          »
-        </button>
-        
-        <button
-          onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            background: currentPage === totalPages ? '#e9ecef' : '#fff',
-            color: currentPage === totalPages ? '#adb5bd' : '#495057',
-            borderRadius: '4px',
-            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          »»
+          →
         </button>
       </div>
     </div>

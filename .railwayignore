@@ -1,0 +1,17 @@
+node_modules
+.git
+.env
+.env.local
+.env.production
+*.log
+dist
+build
+*.sqlite
+*.db
+.DS_Store
+coverage
+.vscode
+.idea
+uploads
+backups
+deploy-scripts

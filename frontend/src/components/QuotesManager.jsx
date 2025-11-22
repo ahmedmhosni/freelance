@@ -1,22 +1,29 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { MdAdd, MdEdit, MdDelete, MdCheck, MdClose } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdCheck, MdClose, MdVisibility } from 'react-icons/md';
+import Pagination from './Pagination';
+import QuoteViewModal from './QuoteViewModal';
 
 const QuotesManager = () => {
   const [quotes, setQuotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingQuote, setEditingQuote] = useState(null);
   const [formData, setFormData] = useState({ text: '', author: '', is_active: 1 });
+  const [viewingQuote, setViewingQuote] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
 
   useEffect(() => {
     fetchQuotes();
-  }, []);
+  }, [currentPage]);
 
   const fetchQuotes = async () => {
     try {
-      const response = await axios.get('/api/quotes');
+      const response = await axios.get(`/api/quotes?page=${currentPage}&limit=${itemsPerPage}`);
       setQuotes(response.data.data || []);
+      setPagination(response.data.pagination || { total: 0, totalPages: 0 });
     } catch (error) {
       console.error('Error fetching quotes:', error);
       toast.error('Failed to load quotes');
@@ -32,6 +39,7 @@ const QuotesManager = () => {
       } else {
         await axios.post('/api/quotes', formData);
         toast.success('Quote created successfully!');
+        setCurrentPage(1); // Reset to first page for new quotes
       }
       setShowForm(false);
       setEditingQuote(null);
@@ -58,7 +66,13 @@ const QuotesManager = () => {
       try {
         await axios.delete(`/api/quotes/${id}`);
         toast.success('Quote deleted successfully!');
-        fetchQuotes();
+        
+        // If we're on a page that will be empty after deletion, go to previous page
+        if (quotes.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        } else {
+          fetchQuotes();
+        }
       } catch (error) {
         console.error('Error deleting quote:', error);
         toast.error('Failed to delete quote');
@@ -78,6 +92,30 @@ const QuotesManager = () => {
       console.error('Error updating quote:', error);
       toast.error('Failed to update quote');
     }
+  };
+
+  const handleView = (quote) => {
+    setViewingQuote(quote);
+  };
+
+  const handleViewEdit = () => {
+    handleEdit(viewingQuote);
+    setViewingQuote(null);
+  };
+
+  const handleViewDelete = async () => {
+    setViewingQuote(null);
+    await handleDelete(viewingQuote.id);
+  };
+
+  const handleViewToggleActive = async () => {
+    await toggleActive(viewingQuote);
+    setViewingQuote({ ...viewingQuote, is_active: viewingQuote.is_active ? 0 : 1 });
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -203,6 +241,14 @@ const QuotesManager = () => {
                 </td>
                 <td style={{ padding: '12px', textAlign: 'right' }}>
                   <button
+                    onClick={() => handleView(quote)}
+                    className="btn-view"
+                    style={{ marginRight: '8px' }}
+                    title="View details"
+                  >
+                    <MdVisibility size={14} />
+                  </button>
+                  <button
                     onClick={() => handleEdit(quote)}
                     className="btn-edit"
                     style={{ marginRight: '8px' }}
@@ -230,7 +276,27 @@ const QuotesManager = () => {
             No quotes yet. Add your first motivational quote!
           </div>
         )}
+
+        {pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+            totalItems={pagination.total}
+            itemsPerPage={itemsPerPage}
+          />
+        )}
       </div>
+
+      {viewingQuote && (
+        <QuoteViewModal
+          quote={viewingQuote}
+          onClose={() => setViewingQuote(null)}
+          onEdit={handleViewEdit}
+          onDelete={handleViewDelete}
+          onToggleActive={handleViewToggleActive}
+        />
+      )}
     </div>
   );
 };

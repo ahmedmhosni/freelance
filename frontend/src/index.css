@@ -153,26 +153,95 @@ body.dark-mode .react-calendar__month-view__days__day--weekend {
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Minimal Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: rgba(55, 53, 47, 0.5);
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pagination-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  color: rgba(55, 53, 47, 0.65);
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(55, 53, 47, 0.08);
+  color: rgba(55, 53, 47, 0.9);
+}
+
+.pagination-btn:disabled {
+  color: rgba(55, 53, 47, 0.3);
+  cursor: not-allowed;
+}
+
+.pagination-btn.active {
+  background: rgba(55, 53, 47, 0.08);
+  color: rgba(55, 53, 47, 0.9);
+  font-weight: 500;
+}
+
+.pagination-ellipsis {
+  padding: 0 4px;
+  color: rgba(55, 53, 47, 0.3);
+  font-size: 13px;
+  user-select: none;
+}
+
 /* Dark mode for Pagination */
 body.dark-mode .pagination-container {
-  background: #202020;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.09);
 }
 
-body.dark-mode .pagination-container button {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.8);
-  border-color: rgba(255, 255, 255, 0.15);
+body.dark-mode .pagination-info {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-body.dark-mode .pagination-container button:hover:not(:disabled) {
+body.dark-mode .pagination-btn {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+body.dark-mode .pagination-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
 }
 
-body.dark-mode .pagination-container button:disabled {
-  background: transparent;
+body.dark-mode .pagination-btn:disabled {
   color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .pagination-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .pagination-ellipsis {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* Dark mode for Charts */
@@ -499,6 +568,19 @@ body.dark-mode .register-container a {
   background: rgba(55, 53, 47, 0.08);
 }
 
+.btn-view {
+  background: transparent;
+  color: #2eaadc;
+  border: 1px solid rgba(46, 170, 220, 0.3);
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.btn-view:hover {
+  background: rgba(46, 170, 220, 0.1);
+}
+
 .btn-delete {
   background: transparent;
   color: #eb5757;
@@ -521,6 +603,15 @@ body.dark-mode .btn-edit {
 
 body.dark-mode .btn-edit:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .btn-view {
+  color: #2eaadc;
+  border-color: rgba(46, 170, 220, 0.3);
+}
+
+body.dark-mode .btn-view:hover {
+  background: rgba(46, 170, 220, 0.1);
 }
 
 body.dark-mode .btn-delete {

@@ -42,19 +42,42 @@ router.get('/daily', (req, res) => {
   }
 });
 
-// Get all quotes (admin only)
+// Get all quotes (admin only) with pagination
 router.get('/', authenticateToken, requireAdmin, (req, res) => {
   try {
-    db.all(
-      'SELECT * FROM quotes ORDER BY id DESC',
-      [],
-      (err, quotes) => {
-        if (err) {
-          return res.status(500).json({ error: 'Failed to fetch quotes' });
-        }
-        res.json({ data: quotes });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    db.get('SELECT COUNT(*) as total FROM quotes', [], (err, countResult) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to fetch quotes count' });
       }
-    );
+
+      const total = countResult.total;
+      const totalPages = Math.ceil(total / limit);
+
+      // Get paginated quotes
+      db.all(
+        'SELECT * FROM quotes ORDER BY id DESC LIMIT ? OFFSET ?',
+        [limit, offset],
+        (err, quotes) => {
+          if (err) {
+            return res.status(500).json({ error: 'Failed to fetch quotes' });
+          }
+          res.json({ 
+            data: quotes,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages
+            }
+          });
+        }
+      );
+    });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }

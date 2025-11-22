@@ -1,6 +1,7 @@
 node_modules/
 .env
 .env.local
+.env.production
 *.log
 dist/
 build/
@@ -10,3 +11,7 @@ build/
 coverage/
 .vscode/
 .idea/
+
+# Deployment
+uploads/
+backups/

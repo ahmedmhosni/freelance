@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/projects', projectRoutes);
@@ -67,6 +67,19 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/time-tracking', timeTrackingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quotes', quotesRoutes);
+
+// Serve static files from frontend build in production
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  
+  app.use(express.static(frontendPath));
+  
+  // Serve index.html for all non-API routes (SPA support)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
 
 // Health check
 app.get('/health', (req, res) => {
