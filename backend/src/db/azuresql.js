@@ -76,11 +76,13 @@ async function closePool() {
   }
 }
 
-module.exports = {
-  sql,
-  getPool,
-  query,
-  getOne,
-  getAll,
-  closePool
-};
+// Export pool as default for easier usage
+module.exports = getPool();
+
+// Also export named exports
+module.exports.sql = sql;
+module.exports.getPool = getPool;
+module.exports.query = query;
+module.exports.getOne = getOne;
+module.exports.getAll = getAll;
+module.exports.closePool = closePool;
