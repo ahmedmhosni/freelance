@@ -4,6 +4,9 @@ import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
 
+// Use environment variable for Socket.io URL
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -11,7 +14,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io(SOCKET_URL, {
         transports: ['websocket', 'polling']
       });
 
