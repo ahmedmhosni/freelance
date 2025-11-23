@@ -1,7 +1,7 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
 const sql = require('mssql');
-const db = require('../db/azuresql');
+const db = require('../db');
 const { generateInvoicePDF } = require('../utils/pdfGenerator');
 const path = require('path');
 

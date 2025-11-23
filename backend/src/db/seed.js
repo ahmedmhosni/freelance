@@ -1,7 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const sql = require('mssql');
-const db = require('./azuresql');
+const db = require('./index');
 
 const seedDatabase = async () => {
   try {

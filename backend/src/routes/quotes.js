@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
-const db = require('../db/azuresql');
+const db = require('../db');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 // Get daily quote (public endpoint)
