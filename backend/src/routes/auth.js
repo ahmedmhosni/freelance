@@ -2,8 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const sql = require('mssql');
-const db = require('../db/azuresql');
+const { sql, getPool } = require('../db/azuresql');
 
 const router = express.Router();
 
@@ -21,7 +20,7 @@ router.post('/register', [
   const { name, email, password, role = 'freelancer' } = req.body;
 
   try {
-    const pool = await db;
+    const pool = await getPool();
     
     // Check if user exists
     const checkRequest = pool.request();
@@ -66,7 +65,7 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
-    const pool = await db;
+    const pool = await getPool();
     
     // Get user by email
     const request = pool.request();
