@@ -2,7 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { runQuery, getOne } = require('../db/database');
+const sql = require('mssql');
+const db = require('../db/azuresql');
 
 const router = express.Router();
 
@@ -20,18 +21,33 @@ router.post('/register', [
   const { name, email, password, role = 'freelancer' } = req.body;
 
   try {
-    const existingUser = await getOne('SELECT id FROM users WHERE email = ?', [email]);
-    if (existingUser) {
+    const pool = await db;
+    
+    // Check if user exists
+    const checkRequest = pool.request();
+    checkRequest.input('email', sql.NVarChar, email);
+    const checkResult = await checkRequest.query('SELECT id FROM users WHERE email = @email');
+    
+    if (checkResult.recordset.length > 0) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
+    // Hash password and insert user
     const passwordHash = await bcrypt.hash(password, 10);
-    const result = await runQuery(
-      'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [name, email, passwordHash, role]
+    const insertRequest = pool.request();
+    insertRequest.input('name', sql.NVarChar, name);
+    insertRequest.input('email', sql.NVarChar, email);
+    insertRequest.input('passwordHash', sql.NVarChar, passwordHash);
+    insertRequest.input('role', sql.NVarChar, role);
+    
+    const insertResult = await insertRequest.query(
+      'INSERT INTO users (name, email, password_hash, role) OUTPUT INSERTED.id VALUES (@name, @email, @passwordHash, @role)'
     );
 
-    res.status(201).json({ message: 'User registered successfully', userId: result.id });
+    res.status(201).json({ 
+      message: 'User registered successfully', 
+      userId: insertResult.recordset[0].id 
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -50,7 +66,14 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
-    const user = await getOne('SELECT * FROM users WHERE email = ?', [email]);
+    const pool = await db;
+    
+    // Get user by email
+    const request = pool.request();
+    request.input('email', sql.NVarChar, email);
+    const result = await request.query('SELECT * FROM users WHERE email = @email');
+    
+    const user = result.recordset[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

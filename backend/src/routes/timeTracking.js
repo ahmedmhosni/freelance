@@ -1,6 +1,7 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const { runQuery, getAll, getOne } = require('../db/database');
+const sql = require('mssql');
+const db = require('../db/azuresql');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -8,26 +9,30 @@ router.use(authenticateToken);
 // Get all time entries
 router.get('/', async (req, res) => {
   try {
+    const pool = await db;
     const { task_id, project_id, start_date, end_date } = req.query;
-    let query = 'SELECT * FROM time_entries WHERE user_id = ?';
-    let params = [req.user.id];
+    
+    let query = 'SELECT * FROM time_entries WHERE user_id = @userId';
+    const request = pool.request();
+    request.input('userId', sql.Int, req.user.id);
 
     if (task_id) {
-      query += ' AND task_id = ?';
-      params.push(task_id);
+      query += ' AND task_id = @taskId';
+      request.input('taskId', sql.Int, task_id);
     }
     if (project_id) {
-      query += ' AND project_id = ?';
-      params.push(project_id);
+      query += ' AND project_id = @projectId';
+      request.input('projectId', sql.Int, project_id);
     }
     if (start_date && end_date) {
-      query += ' AND date BETWEEN ? AND ?';
-      params.push(start_date, end_date);
+      query += ' AND date BETWEEN @startDate AND @endDate';
+      request.input('startDate', sql.Date, start_date);
+      request.input('endDate', sql.Date, end_date);
     }
 
     query += ' ORDER BY date DESC, start_time DESC';
-    const entries = await getAll(query, params);
-    res.json(entries);
+    const result = await request.query(query);
+    res.json(result.recordset);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -37,11 +42,20 @@ router.get('/', async (req, res) => {
 router.post('/start', async (req, res) => {
   const { task_id, project_id, description } = req.body;
   try {
-    const result = await runQuery(
-      'INSERT INTO time_entries (user_id, task_id, project_id, description, date, start_time, is_running) VALUES (?, ?, ?, ?, date("now"), time("now"), 1)',
-      [req.user.id, task_id, project_id, description]
-    );
-    res.status(201).json({ id: result.id, message: 'Time tracking started' });
+    const pool = await db;
+    const request = pool.request();
+    request.input('userId', sql.Int, req.user.id);
+    request.input('taskId', sql.Int, task_id || null);
+    request.input('projectId', sql.Int, project_id || null);
+    request.input('description', sql.NVarChar, description || null);
+    
+    const result = await request.query(`
+      INSERT INTO time_entries (user_id, task_id, project_id, description, date, start_time, is_running) 
+      OUTPUT INSERTED.id
+      VALUES (@userId, @taskId, @projectId, @description, CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 1)
+    `);
+    
+    res.status(201).json({ id: result.recordset[0].id, message: 'Time tracking started' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -50,19 +64,38 @@ router.post('/start', async (req, res) => {
 // Stop time tracking
 router.post('/stop/:id', async (req, res) => {
   try {
-    const entry = await getOne('SELECT * FROM time_entries WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+    const pool = await db;
+    
+    // Check if entry exists
+    const checkRequest = pool.request();
+    checkRequest.input('id', sql.Int, req.params.id);
+    checkRequest.input('userId', sql.Int, req.user.id);
+    const checkResult = await checkRequest.query('SELECT * FROM time_entries WHERE id = @id AND user_id = @userId');
+    const entry = checkResult.recordset[0];
+    
     if (!entry) return res.status(404).json({ error: 'Time entry not found' });
 
-    await runQuery(
-      'UPDATE time_entries SET end_time = time("now"), is_running = 0 WHERE id = ?',
-      [req.params.id]
-    );
-
-    // Calculate duration
-    const updated = await getOne('SELECT * FROM time_entries WHERE id = ?', [req.params.id]);
-    const duration = calculateDuration(updated.start_time, updated.end_time);
+    // Stop tracking and calculate duration
+    const updateRequest = pool.request();
+    updateRequest.input('id', sql.Int, req.params.id);
     
-    await runQuery('UPDATE time_entries SET duration = ? WHERE id = ?', [duration, req.params.id]);
+    await updateRequest.query(`
+      UPDATE time_entries 
+      SET 
+        end_time = CAST(GETDATE() AS TIME), 
+        is_running = 0,
+        duration = DATEDIFF(MINUTE, 
+          CAST(CONCAT(CAST(date AS VARCHAR), ' ', CAST(start_time AS VARCHAR)) AS DATETIME),
+          GETDATE()
+        ) / 60.0
+      WHERE id = @id
+    `);
+
+    // Get updated entry
+    const getRequest = pool.request();
+    getRequest.input('id', sql.Int, req.params.id);
+    const getResult = await getRequest.query('SELECT duration FROM time_entries WHERE id = @id');
+    const duration = getResult.recordset[0].duration;
 
     res.json({ message: 'Time tracking stopped', duration });
   } catch (error) {
@@ -73,10 +106,24 @@ router.post('/stop/:id', async (req, res) => {
 // Delete time entry
 router.delete('/:id', async (req, res) => {
   try {
-    const entry = await getOne('SELECT * FROM time_entries WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
-    if (!entry) return res.status(404).json({ error: 'Time entry not found' });
+    const pool = await db;
+    
+    // Check if entry exists
+    const checkRequest = pool.request();
+    checkRequest.input('id', sql.Int, req.params.id);
+    checkRequest.input('userId', sql.Int, req.user.id);
+    const checkResult = await checkRequest.query('SELECT * FROM time_entries WHERE id = @id AND user_id = @userId');
+    
+    if (checkResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Time entry not found' });
+    }
 
-    await runQuery('DELETE FROM time_entries WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+    // Delete entry
+    const deleteRequest = pool.request();
+    deleteRequest.input('id', sql.Int, req.params.id);
+    deleteRequest.input('userId', sql.Int, req.user.id);
+    await deleteRequest.query('DELETE FROM time_entries WHERE id = @id AND user_id = @userId');
+    
     res.json({ message: 'Time entry deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -86,27 +133,24 @@ router.delete('/:id', async (req, res) => {
 // Get summary
 router.get('/summary', async (req, res) => {
   try {
+    const pool = await db;
     const { start_date, end_date } = req.query;
-    let query = 'SELECT SUM(duration) as total_hours, COUNT(*) as total_entries FROM time_entries WHERE user_id = ? AND is_running = 0';
-    let params = [req.user.id];
+    
+    let query = 'SELECT ISNULL(SUM(duration), 0) as total_hours, COUNT(*) as total_entries FROM time_entries WHERE user_id = @userId AND is_running = 0';
+    const request = pool.request();
+    request.input('userId', sql.Int, req.user.id);
 
     if (start_date && end_date) {
-      query += ' AND date BETWEEN ? AND ?';
-      params.push(start_date, end_date);
+      query += ' AND date BETWEEN @startDate AND @endDate';
+      request.input('startDate', sql.Date, start_date);
+      request.input('endDate', sql.Date, end_date);
     }
 
-    const summary = await getOne(query, params);
-    res.json(summary);
+    const result = await request.query(query);
+    res.json(result.recordset[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
-// Helper function
-const calculateDuration = (startTime, endTime) => {
-  const start = new Date(`1970-01-01T${startTime}`);
-  const end = new Date(`1970-01-01T${endTime}`);
-  return (end - start) / (1000 * 60 * 60); // hours
-};
 
 module.exports = router;
