@@ -10,7 +10,7 @@
     }
   ],
   "globalHeaders": {
-    "content-security-policy": "default-src 'self' https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net"
+    "content-security-policy": "default-src 'self' https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; font-src 'self' data: https://r2cdn.perplexity.ai; connect-src 'self' https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net ws://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net wss://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net"
   },
   "mimeTypes": {
     ".json": "application/json"
