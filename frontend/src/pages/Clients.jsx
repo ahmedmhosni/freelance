@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -25,7 +25,7 @@ const Clients = () => {
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/clients?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`);
+      const response = await api.get(`/api/clients?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`);
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
       if (response.data.pagination) {
@@ -43,10 +43,10 @@ const Clients = () => {
     e.preventDefault();
     try {
       if (editingClient) {
-        await axios.put(`/api/clients/${editingClient.id}`, formData);
+        await api.put(`/api/clients/${editingClient.id}`, formData);
         toast.success('Client updated successfully!');
       } else {
-        await axios.post('/api/clients', formData);
+        await api.post('/api/clients', formData);
         toast.success('Client created successfully!');
       }
       setShowForm(false);
@@ -71,7 +71,7 @@ const Clients = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/clients/${deleteDialog.clientId}`);
+      await api.delete(`/api/clients/${deleteDialog.clientId}`);
       toast.success('Client deleted successfully!');
       setDeleteDialog({ isOpen: false, clientId: null });
       fetchClients();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../utils/api';
 import DashboardCharts from '../components/DashboardCharts';
 import { MdPeople, MdFolder, MdCheckCircle, MdAttachMoney, MdAccessTime } from 'react-icons/md';
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/dashboard/stats');
+      const response = await api.get('/api/dashboard/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -28,7 +28,7 @@ const Dashboard = () => {
 
   const fetchRecentTasks = async () => {
     try {
-      const response = await axios.get('/api/dashboard/recent-tasks?limit=5');
+      const response = await api.get('/api/dashboard/recent-tasks?limit=5');
       const tasks = response.data.map(task => ({
         ...task,
         projectName: task.project_name || 'No Project'
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   const fetchChartData = async () => {
     try {
-      const response = await axios.get('/api/dashboard/charts');
+      const response = await api.get('/api/dashboard/charts');
       setTaskData(response.data.taskData || []);
       setInvoiceData(response.data.invoiceData || []);
     } catch (error) {

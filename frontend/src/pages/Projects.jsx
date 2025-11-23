@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -24,7 +24,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -37,7 +37,7 @@ const Projects = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/clients');
+      const response = await api.get('/api/clients');
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -49,10 +49,10 @@ const Projects = () => {
     e.preventDefault();
     try {
       if (editingProject) {
-        await axios.put(`/api/projects/${editingProject.id}`, formData);
+        await api.put(`/api/projects/${editingProject.id}`, formData);
         toast.success('Project updated successfully!');
       } else {
-        await axios.post('/api/projects', formData);
+        await api.post('/api/projects', formData);
         toast.success('Project created successfully!');
       }
       setShowForm(false);
@@ -77,7 +77,7 @@ const Projects = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/projects/${deleteDialog.projectId}`);
+      await api.delete(`/api/projects/${deleteDialog.projectId}`);
       toast.success('Project deleted successfully!');
       setDeleteDialog({ isOpen: false, projectId: null });
       fetchProjects();

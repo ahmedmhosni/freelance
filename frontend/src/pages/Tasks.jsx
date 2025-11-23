@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { useSocket } from '../context/SocketContext';
 import Calendar from 'react-calendar';
@@ -31,7 +31,7 @@ const Tasks = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -64,7 +64,7 @@ const Tasks = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/tasks');
+      const response = await api.get('/api/tasks');
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -78,10 +78,10 @@ const Tasks = () => {
     e.preventDefault();
     try {
       if (editingTask) {
-        await axios.put(`/api/tasks/${editingTask.id}`, formData);
+        await api.put(`/api/tasks/${editingTask.id}`, formData);
         toast.success('Task updated successfully!');
       } else {
-        await axios.post('/api/tasks', formData);
+        await api.post('/api/tasks', formData);
         toast.success('Task created successfully!');
       }
       setShowForm(false);
@@ -106,7 +106,7 @@ const Tasks = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/tasks/${deleteDialog.taskId}`);
+      await api.delete(`/api/tasks/${deleteDialog.taskId}`);
       toast.success('Task deleted successfully!');
       setDeleteDialog({ isOpen: false, taskId: null });
       fetchTasks();
@@ -119,7 +119,7 @@ const Tasks = () => {
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       const task = tasks.find(t => t.id === taskId);
-      await axios.put(`/api/tasks/${taskId}`, { ...task, status: newStatus });
+      await api.put(`/api/tasks/${taskId}`, { ...task, status: newStatus });
       fetchTasks();
     } catch (error) {
       console.error('Error updating task:', error);

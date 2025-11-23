@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('financial');
@@ -14,9 +14,9 @@ const Reports = () => {
   const fetchReports = async () => {
     try {
       const [financial, projects, clients] = await Promise.all([
-        axios.get('/api/reports/financial'),
-        axios.get('/api/reports/projects'),
-        axios.get('/api/reports/clients')
+        api.get('/api/reports/financial'),
+        api.get('/api/reports/projects'),
+        api.get('/api/reports/clients')
       ]);
       setFinancialReport(financial.data);
       setProjectReport(projects.data);

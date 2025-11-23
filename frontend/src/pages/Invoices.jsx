@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -26,7 +26,7 @@ const Invoices = () => {
   const fetchInvoices = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/invoices');
+      const response = await api.get('/api/invoices');
       const data = response.data.data || response.data;
       setInvoices(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -39,7 +39,7 @@ const Invoices = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/clients');
+      const response = await api.get('/api/clients');
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -49,7 +49,7 @@ const Invoices = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -61,10 +61,10 @@ const Invoices = () => {
     e.preventDefault();
     try {
       if (editingInvoice) {
-        await axios.put(`/api/invoices/${editingInvoice.id}`, formData);
+        await api.put(`/api/invoices/${editingInvoice.id}`, formData);
         toast.success('Invoice updated successfully!');
       } else {
-        await axios.post('/api/invoices', formData);
+        await api.post('/api/invoices', formData);
         toast.success('Invoice created successfully!');
       }
       setShowForm(false);
@@ -89,7 +89,7 @@ const Invoices = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/invoices/${deleteDialog.invoiceId}`);
+      await api.delete(`/api/invoices/${deleteDialog.invoiceId}`);
       toast.success('Invoice deleted successfully!');
       setDeleteDialog({ isOpen: false, invoiceId: null });
       fetchInvoices();
