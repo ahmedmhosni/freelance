@@ -60,9 +60,9 @@ class EmailService {
   }
 
   /**
-   * Send email verification
+   * Send email verification (with both link and code)
    */
-  async sendVerificationEmail(user, token) {
+  async sendVerificationEmail(user, token, code) {
     const verificationUrl = `${emailConfig.templates.appUrl}/verify-email?token=${token}`;
     
     const html = `
@@ -75,6 +75,9 @@ class EmailService {
           .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
           .content { padding: 30px 0; }
           .button { display: inline-block; padding: 12px 30px; background: #37352f; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+          .code-box { background: #f8f9fa; border: 2px dashed #37352f; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
+          .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #37352f; font-family: 'Courier New', monospace; }
+          .divider { text-align: center; margin: 30px 0; color: #999; }
           .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
         </style>
       </head>
@@ -86,12 +89,26 @@ class EmailService {
           <div class="content">
             <h2>Welcome, ${user.name}!</h2>
             <p>Thank you for registering with ${emailConfig.templates.appName}. Please verify your email address to get started.</p>
-            <p>Click the button below to verify your email:</p>
+            
+            <h3>Option 1: Click the button</h3>
             <a href="${verificationUrl}" class="button">Verify Email Address</a>
-            <p>Or copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #666;">${verificationUrl}</p>
-            <p><strong>This link will expire in ${emailConfig.templates.emailVerificationExpiry}.</strong></p>
-            <p>If you didn't create an account, you can safely ignore this email.</p>
+            
+            <div class="divider">── OR ──</div>
+            
+            <h3>Option 2: Enter this code</h3>
+            <div class="code-box">
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Your verification code:</p>
+              <div class="code">${code}</div>
+              <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">Enter this code on the verification page</p>
+            </div>
+            
+            <p style="font-size: 13px; color: #666; margin-top: 30px;">
+              <strong>Can't click the button?</strong> Copy and paste this link:<br>
+              <span style="word-break: break-all; color: #999;">${verificationUrl}</span>
+            </p>
+            
+            <p><strong>This code and link will expire in ${emailConfig.templates.emailVerificationExpiry}.</strong></p>
+            <p style="font-size: 13px; color: #999;">If you didn't create an account, you can safely ignore this email.</p>
           </div>
           <div class="footer">
             <p>© ${new Date().getFullYear()} ${emailConfig.templates.appName}. All rights reserved.</p>
@@ -105,10 +122,15 @@ class EmailService {
     const text = `
       Welcome to ${emailConfig.templates.appName}!
       
-      Please verify your email address by clicking this link:
+      Please verify your email address using one of these methods:
+      
+      OPTION 1: Click this link
       ${verificationUrl}
       
-      This link will expire in ${emailConfig.templates.emailVerificationExpiry}.
+      OPTION 2: Enter this code on the website
+      ${code}
+      
+      This code and link will expire in ${emailConfig.templates.emailVerificationExpiry}.
       
       If you didn't create an account, you can safely ignore this email.
     `;
