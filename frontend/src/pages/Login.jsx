@@ -295,16 +295,27 @@ const Login = () => {
             disabled={isLoading}
             style={{
               width: '100%',
-              padding: '8px',
+              padding: '10px',
               fontSize: '14px',
-              fontWeight: '500',
+              fontWeight: '600',
               color: '#ffffff',
-              background: isLoading ? 'rgba(55, 53, 47, 0.4)' : '#37352f',
+              background: isLoading ? 'rgba(55, 53, 47, 0.5)' : '#37352f',
               border: 'none',
               borderRadius: '3px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s ease',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              opacity: isLoading ? 0.6 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.target.style.background = '#2f2d29';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.target.style.background = '#37352f';
+              }
             }}
           >
             {isLoading ? 'Signing in...' : 'Continue'}
