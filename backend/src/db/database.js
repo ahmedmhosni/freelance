@@ -12,7 +12,7 @@ const initDatabase = () => {
     if (err) {
       console.error('Error initializing database:', err);
     } else {
-      console.log('Database initialized successfully');
+      console.log('✓ SQLite Database initialized successfully');
     }
   });
 };
@@ -45,6 +45,37 @@ const getAll = (sql, params = []) => {
   });
 };
 
+// Azure SQL-compatible interface
+async function getPool() {
+  return {
+    request: () => ({
+      input: () => this,
+      query: async (queryText) => {
+        // Convert Azure SQL query to SQLite
+        const sqliteQuery = queryText.replace(/@param(\d+)/g, '?');
+        const rows = await getAll(sqliteQuery);
+        return { recordset: rows, rowsAffected: [rows.length] };
+      }
+    })
+  };
+}
+
+async function query(queryText, params = []) {
+  // Convert Azure SQL query to SQLite
+  const sqliteQuery = queryText.replace(/@param(\d+)/g, '?');
+  const rows = await getAll(sqliteQuery, params);
+  return { recordset: rows, rowsAffected: [rows.length] };
+}
+
+async function closePool() {
+  return new Promise((resolve) => {
+    db.close((err) => {
+      if (err) console.error('Error closing database:', err);
+      resolve();
+    });
+  });
+}
+
 initDatabase();
 
-module.exports = { db, runQuery, getOne, getAll };
+module.exports = { db, runQuery, getOne, getAll, getPool, query, closePool };

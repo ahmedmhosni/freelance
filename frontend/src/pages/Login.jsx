@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
-import axios from 'axios';
+import api from '../utils/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,7 +21,7 @@ const Login = () => {
 
   const fetchDailyQuote = async () => {
     try {
-      const response = await axios.get('/api/quotes/daily');
+      const response = await api.get('/api/quotes/daily');
       setQuote(response.data);
     } catch (err) {
       // Fallback quote if API fails

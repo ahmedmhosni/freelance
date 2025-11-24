@@ -3,7 +3,7 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const locales = {
@@ -29,7 +29,7 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/tasks');
+      const response = await api.get('/api/tasks');
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {

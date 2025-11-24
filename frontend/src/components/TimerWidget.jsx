@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { MdAccessTime, MdPlayArrow, MdStop } from 'react-icons/md';
-import axios from 'axios';
+import api from '../utils/api';
 
 const TimerWidget = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -54,7 +54,7 @@ const TimerWidget = () => {
 
   const fetchActiveTimer = async () => {
     try {
-      const response = await axios.get('/api/time-tracking');
+      const response = await api.get('/api/time-tracking');
       const entries = response.data.data || response.data;
       const running = entries.find(e => e.is_running === 1);
       setActiveEntry(running || null);
@@ -65,7 +65,7 @@ const TimerWidget = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/tasks');
+      const response = await api.get('/api/tasks');
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -75,7 +75,7 @@ const TimerWidget = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -89,7 +89,7 @@ const TimerWidget = () => {
       return;
     }
     try {
-      await axios.post('/api/time-tracking/start', formData);
+      await api.post('/api/time-tracking/start', formData);
       setFormData({ description: '', task_id: '', project_id: '' });
       await fetchActiveTimer();
       setShowPopup(false);
@@ -102,7 +102,7 @@ const TimerWidget = () => {
   const stopTimer = async () => {
     if (!activeEntry) return;
     try {
-      await axios.post(`/api/time-tracking/stop/${activeEntry.id}`);
+      await api.post(`/api/time-tracking/stop/${activeEntry.id}`);
       await fetchActiveTimer();
       setElapsedTime(0);
     } catch (error) {

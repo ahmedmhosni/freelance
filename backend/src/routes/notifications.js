@@ -1,6 +1,7 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const { runQuery, getAll } = require('../db/database');
+const sql = require('mssql');
+const db = require('../db');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -8,16 +9,35 @@ router.use(authenticateToken);
 // Get user notifications
 router.get('/', async (req, res) => {
   try {
-    // This is a placeholder - in production, you'd have a notifications table
-    const upcomingTasks = await getAll(
-      'SELECT * FROM tasks WHERE user_id = ? AND status != "done" AND due_date <= date("now", "+7 days") ORDER BY due_date ASC',
-      [req.user.id]
-    );
+    const pool = await db;
+    
+    // Get upcoming tasks
+    const tasksRequest = pool.request();
+    tasksRequest.input('userId', sql.Int, req.user.id);
+    tasksRequest.input('doneStatus', sql.NVarChar, 'done');
+    
+    const tasksResult = await tasksRequest.query(`
+      SELECT * FROM tasks 
+      WHERE user_id = @userId 
+        AND status != @doneStatus 
+        AND due_date <= DATEADD(day, 7, GETDATE())
+      ORDER BY due_date ASC
+    `);
+    const upcomingTasks = tasksResult.recordset;
 
-    const overdueInvoices = await getAll(
-      'SELECT * FROM invoices WHERE user_id = ? AND status = "sent" AND due_date < date("now") ORDER BY due_date ASC',
-      [req.user.id]
-    );
+    // Get overdue invoices
+    const invoicesRequest = pool.request();
+    invoicesRequest.input('userId', sql.Int, req.user.id);
+    invoicesRequest.input('sentStatus', sql.NVarChar, 'sent');
+    
+    const invoicesResult = await invoicesRequest.query(`
+      SELECT * FROM invoices 
+      WHERE user_id = @userId 
+        AND status = @sentStatus 
+        AND due_date < CAST(GETDATE() AS DATE)
+      ORDER BY due_date ASC
+    `);
+    const overdueInvoices = invoicesResult.recordset;
 
     const notifications = [
       ...upcomingTasks.map(task => ({

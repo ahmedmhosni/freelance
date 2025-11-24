@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const TimeTracking = () => {
   const [entries, setEntries] = useState([]);
@@ -24,7 +24,7 @@ const TimeTracking = () => {
 
   const fetchEntries = async () => {
     try {
-      const response = await axios.get('/api/time-tracking');
+      const response = await api.get('/api/time-tracking');
       const data = response.data.data || response.data;
       setEntries(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -35,7 +35,7 @@ const TimeTracking = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/tasks');
+      const response = await api.get('/api/tasks');
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -46,7 +46,7 @@ const TimeTracking = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -57,7 +57,7 @@ const TimeTracking = () => {
 
   const fetchSummary = async () => {
     try {
-      const response = await axios.get('/api/time-tracking/summary');
+      const response = await api.get('/api/time-tracking/summary');
       setSummary(response.data || { total_hours: 0, total_entries: 0 });
     } catch (error) {
       console.error('Error fetching summary:', error);
@@ -76,7 +76,7 @@ const TimeTracking = () => {
       return;
     }
     try {
-      await axios.post('/api/time-tracking/start', formData);
+      await api.post('/api/time-tracking/start', formData);
       setFormData({ task_id: '', project_id: '', description: '' });
       await fetchEntries();
       await fetchSummary();
@@ -88,7 +88,7 @@ const TimeTracking = () => {
 
   const stopTimer = async (id) => {
     try {
-      await axios.post(`/api/time-tracking/stop/${id}`);
+      await api.post(`/api/time-tracking/stop/${id}`);
       await fetchEntries();
       await fetchSummary();
       setActiveEntry(null);
@@ -101,7 +101,7 @@ const TimeTracking = () => {
   const deleteEntry = async (id) => {
     if (!confirm('Delete this time entry?')) return;
     try {
-      await axios.delete(`/api/time-tracking/${id}`);
+      await api.delete(`/api/time-tracking/${id}`);
       await fetchEntries();
       await fetchSummary();
     } catch (error) {

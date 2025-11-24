@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import QuotesManager from '../components/QuotesManager';
+import MaintenanceEditor from '../components/MaintenanceEditor';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +15,7 @@ const AdminPanel = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/admin/users');
+      const response = await api.get('/api/admin/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -23,7 +24,7 @@ const AdminPanel = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/admin/reports');
+      const response = await api.get('/api/admin/reports');
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -32,7 +33,7 @@ const AdminPanel = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await axios.put(`/api/admin/users/${userId}/role`, { role: newRole });
+      await api.put(`/api/admin/users/${userId}/role`, { role: newRole });
       fetchUsers();
     } catch (error) {
       console.error('Error updating role:', error);
@@ -42,7 +43,7 @@ const AdminPanel = () => {
   const handleDeleteUser = async (userId) => {
     if (confirm('Delete this user? This will delete all their data.')) {
       try {
-        await axios.delete(`/api/admin/users/${userId}`);
+        await api.delete(`/api/admin/users/${userId}`);
         fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);
@@ -72,6 +73,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'quotes' ? 'active' : ''}`}
         >
           Daily Quotes
+        </button>
+        <button
+          onClick={() => setActiveTab('maintenance')}
+          className={`view-toggle ${activeTab === 'maintenance' ? 'active' : ''}`}
+        >
+          Maintenance Page
         </button>
       </div>
 
@@ -162,6 +169,8 @@ const AdminPanel = () => {
       )}
 
       {activeTab === 'quotes' && <QuotesManager />}
+      
+      {activeTab === 'maintenance' && <MaintenanceEditor />}
     </div>
   );
 };

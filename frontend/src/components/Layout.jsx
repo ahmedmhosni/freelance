@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useMaintenanceMode } from '../context/MaintenanceContext';
 import NotificationBell from './NotificationBell';
 import TimerWidget from './TimerWidget';
+import MaintenanceBanner from './MaintenanceBanner';
 import { 
   MdDashboard, 
   MdPeople, 
@@ -23,6 +25,7 @@ import {
 const Layout = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { isMaintenanceMode } = useMaintenanceMode();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -42,7 +45,12 @@ const Layout = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* Show maintenance banner for admins */}
+      {isMaintenanceMode && user?.role === 'admin' && <MaintenanceBanner />}
+      
+      <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{
+        marginTop: isMaintenanceMode && user?.role === 'admin' ? '48px' : '0'
+      }}>
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -231,13 +239,14 @@ const Layout = () => {
         flex: 1, 
         overflowY: 'auto',
         position: 'relative',
+        marginTop: isMaintenanceMode && user?.role === 'admin' ? '48px' : '0',
         background: isDark 
           ? 'radial-gradient(circle at 20% 20%, rgba(46, 170, 220, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(46, 170, 220, 0.02) 0%, transparent 50%)'
           : 'radial-gradient(circle at 20% 20%, rgba(46, 170, 220, 0.02) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(46, 170, 220, 0.015) 0%, transparent 50%)'
       }}>
         <div style={{ 
           position: 'fixed', 
-          top: '20px', 
+          top: isMaintenanceMode && user?.role === 'admin' ? '68px' : '20px',
           right: '20px', 
           zIndex: 100,
           display: 'flex',

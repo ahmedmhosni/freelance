@@ -15,3 +15,37 @@ coverage/
 # Deployment
 uploads/
 backups/
+
+# Documentation and test files (keep local only)
+*_SUMMARY.md
+*_STATUS.md
+*_COMPLETE.md
+*_SUCCESS.md
+*_GUIDE.md
+*_SETUP.md
+*_CHECKLIST.md
+*_COMPARISON.md
+*_CHOICE.md
+*_PLAN.md
+*_WORKFLOW.md
+QUICK_*.md
+START_*.md
+WHATS_*.md
+SESSION_*.md
+RECOMMENDED_*.md
+ENABLE_*.md
+INSTALL_*.md
+LOCAL_*.md
+SCHEMA_*.md
+DATABASE_*.md
+
+# Test and setup scripts
+backend/test-*.js
+backend/*-test.js
+backend/seed-data.js
+backend/update-azure-*.js
+backend/update-azure-*.sql
+backend/create-sql-login.sql
+backend/setup-local-db.sql
+setup-*.ps1
+*.ps1

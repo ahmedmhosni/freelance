@@ -18,6 +18,7 @@ const reportRoutes = require('./routes/reports');
 const timeTrackingRoutes = require('./routes/timeTracking');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
+const maintenanceRoutes = require('./routes/maintenance');
 
 const app = express();
 const server = http.createServer(app);
@@ -54,6 +55,11 @@ io.on('connection', (socket) => {
   });
 });
 
+// Health check (must be before other routes)
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
@@ -67,6 +73,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/time-tracking', timeTrackingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quotes', quotesRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
 
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {
@@ -80,11 +87,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
 // Error handler
 app.use((err, req, res, next) => {
