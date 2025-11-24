@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const http = require('http');
 const socketIo = require('socket.io');
+const fs = require('fs');
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
@@ -19,6 +21,16 @@ const timeTrackingRoutes = require('./routes/timeTracking');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
 const maintenanceRoutes = require('./routes/maintenance');
+
+const { apiLimiter } = require('./middleware/rateLimiter');
+const { errorHandler } = require('./middleware/errorHandler');
+const logger = require('./utils/logger');
+
+// Create logs directory if it doesn't exist
+const logsDir = path.join(__dirname, '../logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -52,14 +64,25 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true
 }));
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Request logging
+app.use(morgan('combined', {
+  stream: {
+    write: (message) => logger.info(message.trim())
+  }
+}));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 // Make io accessible to routes
 app.set('io', io);
@@ -111,15 +134,21 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal server error'
+// 404 handler
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+    code: 'NOT_FOUND'
   });
 });
 
+// Global error handler (must be last)
+app.use(errorHandler);
+
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server ready`);
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`WebSocket server ready`);
+  console.log(`✅ Server running on port ${PORT}`);
 });

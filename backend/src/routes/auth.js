@@ -1,68 +1,61 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
 const queries = require('../db/queries');
+const { authLimiter } = require('../middleware/rateLimiter');
+const { asyncHandler, AppError } = require('../middleware/errorHandler');
+const validators = require('../utils/validators');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
 // Register
-router.post('/register', [
-  body('name').trim().notEmpty(),
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 })
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+router.post('/register', 
+  authLimiter,
+  validators.register,
+  asyncHandler(async (req, res) => {
+    const { name, email, password, role = 'freelancer' } = req.body;
 
-  const { name, email, password, role = 'freelancer' } = req.body;
-
-  try {
     // Check if user exists
     const existingUser = await queries.findUserByEmail(email);
     
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
     }
 
     // Hash password and create user
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
     const result = await queries.createUser(name, email, passwordHash, role);
 
+    logger.info(`New user registered: ${email}`);
+
     res.status(201).json({ 
+      success: true,
       message: 'User registered successfully', 
       userId: result.id 
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  })
+);
 
 // Login
-router.post('/login', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').notEmpty()
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+router.post('/login',
+  authLimiter,
+  validators.login,
+  asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
-  const { email, password } = req.body;
-
-  try {
     // Get user by email
     const user = await queries.findUserByEmail(email);
     
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      logger.warn(`Failed login attempt for non-existent user: ${email}`);
+      throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      logger.warn(`Failed login attempt for user: ${email}`);
+      throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     }
 
     const token = jwt.sign(
@@ -71,7 +64,10 @@ router.post('/login', [
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
+    logger.info(`User logged in: ${email}`);
+
     res.json({
+      success: true,
       token,
       user: {
         id: user.id,
@@ -80,10 +76,7 @@ router.post('/login', [
         role: user.role
       }
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+  })
+);
 
 module.exports = router;

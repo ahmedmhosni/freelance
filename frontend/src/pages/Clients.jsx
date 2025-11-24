@@ -4,7 +4,8 @@ import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { MdPeople } from 'react-icons/md';
+import { MdPeople, MdFileDownload } from 'react-icons/md';
+import { exportClientsCSV } from '../utils/exportCSV';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
@@ -81,6 +82,15 @@ const Clients = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    try {
+      exportClientsCSV(clients);
+      toast.success('Clients exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export clients');
+    }
+  };
+
   return (
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -90,7 +100,19 @@ const Clients = () => {
             Manage your client relationships
           </p>
         </div>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>Add Client</button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {clients.length > 0 && (
+            <button 
+              className="btn-edit" 
+              onClick={handleExportCSV}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <MdFileDownload size={18} />
+              Export CSV
+            </button>
+          )}
+          <button className="btn-primary" onClick={() => setShowForm(true)}>Add Client</button>
+        </div>
       </div>
 
       <div style={{ marginBottom: '20px' }}>

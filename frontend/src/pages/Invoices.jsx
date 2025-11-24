@@ -3,7 +3,9 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { MdReceipt, MdAttachMoney } from 'react-icons/md';
+import { MdReceipt, MdAttachMoney, MdFileDownload } from 'react-icons/md';
+import { exportInvoicesCSV } from '../utils/exportCSV';
+import { generateInvoiceNumber, validateInvoiceNumber, invoiceNumberExists } from '../utils/invoiceGenerator';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -16,6 +18,7 @@ const Invoices = () => {
   const [formData, setFormData] = useState({
     client_id: '', project_id: '', invoice_number: '', amount: '', status: 'draft', due_date: '', notes: ''
   });
+  const [invoiceNumberError, setInvoiceNumberError] = useState('');
 
   useEffect(() => {
     fetchInvoices();
@@ -59,6 +62,19 @@ const Invoices = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate invoice number
+    if (!validateInvoiceNumber(formData.invoice_number)) {
+      setInvoiceNumberError('Invalid invoice number format');
+      return;
+    }
+    
+    // Check for duplicates
+    if (invoiceNumberExists(formData.invoice_number, invoices, editingInvoice?.id)) {
+      setInvoiceNumberError('Invoice number already exists');
+      return;
+    }
+    
     try {
       if (editingInvoice) {
         await api.put(`/api/invoices/${editingInvoice.id}`, formData);
@@ -69,11 +85,35 @@ const Invoices = () => {
       }
       setShowForm(false);
       setEditingInvoice(null);
+      setInvoiceNumberError('');
       setFormData({ client_id: '', project_id: '', invoice_number: '', amount: '', status: 'draft', due_date: '', notes: '' });
       fetchInvoices();
     } catch (error) {
       console.error('Error saving invoice:', error);
-      toast.error('Failed to save invoice');
+      toast.error(error.response?.data?.error || 'Failed to save invoice');
+    }
+  };
+
+  const handleCreateNew = () => {
+    const newInvoiceNumber = generateInvoiceNumber(invoices);
+    setFormData({ 
+      client_id: '', 
+      project_id: '', 
+      invoice_number: newInvoiceNumber, 
+      amount: '', 
+      status: 'draft', 
+      due_date: '', 
+      notes: '' 
+    });
+    setShowForm(true);
+  };
+
+  const handleExportCSV = () => {
+    try {
+      exportInvoicesCSV(invoices);
+      toast.success('Invoices exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export invoices');
     }
   };
 
@@ -125,7 +165,19 @@ const Invoices = () => {
             Manage billing and payments
           </p>
         </div>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>Create Invoice</button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {invoices.length > 0 && (
+            <button 
+              className="btn-edit" 
+              onClick={handleExportCSV}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <MdFileDownload size={18} />
+              Export CSV
+            </button>
+          )}
+          <button className="btn-primary" onClick={handleCreateNew}>Create Invoice</button>
+        </div>
       </div>
 
       {loading ? (
@@ -187,7 +239,31 @@ const Invoices = () => {
         <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
           <h3>{editingInvoice ? 'Edit Invoice' : 'New Invoice'}</h3>
           <form onSubmit={handleSubmit}>
-            <input placeholder="Invoice Number (e.g., INV-002) *" value={formData.invoice_number} onChange={(e) => setFormData({...formData, invoice_number: e.target.value})} required style={{ marginBottom: '10px' }} />
+            <div style={{ marginBottom: '10px' }}>
+              <input 
+                placeholder="Invoice Number (e.g., INV-0001) *" 
+                value={formData.invoice_number} 
+                onChange={(e) => {
+                  setFormData({...formData, invoice_number: e.target.value});
+                  setInvoiceNumberError('');
+                }} 
+                required 
+                style={{ 
+                  borderColor: invoiceNumberError ? '#eb5757' : undefined,
+                  marginBottom: invoiceNumberError ? '4px' : '0'
+                }} 
+              />
+              {invoiceNumberError && (
+                <p style={{ color: '#eb5757', fontSize: '12px', margin: '4px 0 0 0' }}>
+                  {invoiceNumberError}
+                </p>
+              )}
+              {!editingInvoice && (
+                <p style={{ fontSize: '11px', color: 'rgba(55, 53, 47, 0.5)', margin: '4px 0 0 0' }}>
+                  Auto-generated. You can modify if needed.
+                </p>
+              )}
+            </div>
             <select value={formData.client_id} onChange={(e) => setFormData({...formData, client_id: e.target.value})} required style={{ marginBottom: '10px' }}>
               <option value="">Select Client *</option>
               {clients.map(client => (
