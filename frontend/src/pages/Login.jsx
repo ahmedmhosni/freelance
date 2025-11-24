@@ -298,8 +298,10 @@ const Login = () => {
               padding: '10px',
               fontSize: '14px',
               fontWeight: '600',
-              color: '#ffffff',
-              background: isLoading ? 'rgba(55, 53, 47, 0.5)' : '#37352f',
+              color: isDark ? '#191919' : '#ffffff',
+              background: isLoading 
+                ? (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)')
+                : (isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'),
               border: 'none',
               borderRadius: '3px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
@@ -309,12 +311,12 @@ const Login = () => {
             }}
             onMouseEnter={(e) => {
               if (!isLoading) {
-                e.target.style.background = '#2f2d29';
+                e.target.style.background = isDark ? '#ffffff' : '#2f2e2a';
               }
             }}
             onMouseLeave={(e) => {
               if (!isLoading) {
-                e.target.style.background = '#37352f';
+                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
               }
             }}
           >
