@@ -254,7 +254,7 @@ const MaintenanceEditor = () => {
             }}
           >
             Preview Page
-          </button>
+          </a>
         </div>
       </form>
     </div>

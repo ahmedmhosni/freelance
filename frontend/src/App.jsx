@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { MaintenanceProvider } from './context/MaintenanceContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ComingSoon from './pages/ComingSoon';
@@ -19,7 +20,10 @@ import Layout from './components/Layout';
 const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
   
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>Loading...</div>;
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>Loading...</div>;
+  }
+  
   if (!user) return <Navigate to="/login" />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" />;
   
@@ -32,12 +36,13 @@ function App() {
       <ThemeProvider>
         <SocketProvider>
           <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
-            <Toaster
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <MaintenanceProvider>
+              <Toaster
               position="top-right"
               toastOptions={{
                 duration: 3000,
@@ -77,6 +82,7 @@ function App() {
                 <Route path="admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
               </Route>
             </Routes>
+            </MaintenanceProvider>
           </BrowserRouter>
         </SocketProvider>
       </ThemeProvider>

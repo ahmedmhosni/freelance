@@ -33,7 +33,7 @@ const ComingSoon = () => {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Roboto\', \'Oxygen\', \'Ubuntu\', \'Cantarell\', sans-serif',
       position: 'relative',
       overflow: 'hidden',
       background: isDark ? '#0a0a0a' : '#ffffff'
@@ -159,39 +159,39 @@ const ComingSoon = () => {
 
         {/* Main Title */}
         <h1 style={{
-          fontSize: '42px',
-          fontWeight: '700',
+          fontSize: '28px',
+          fontWeight: '600',
           color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#37352f',
-          marginBottom: '20px',
-          lineHeight: '1.2',
-          letterSpacing: '-0.02em'
+          marginBottom: '16px',
+          lineHeight: '1.3',
+          letterSpacing: '-0.01em'
         }}>
           {content.title}
         </h1>
 
         {/* Subtitle */}
         <h2 style={{
-          fontSize: '24px',
-          fontWeight: '600',
+          fontSize: '18px',
+          fontWeight: '500',
           background: isDark
-            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'
+            ? 'linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(168, 85, 247, 1))'
             : 'linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(168, 85, 247, 1))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
-          marginBottom: '30px'
+          marginBottom: '24px'
         }}>
           {content.subtitle}
         </h2>
 
         {/* Message */}
         <p style={{
-          fontSize: '16px',
-          color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+          fontSize: '14px',
+          color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.7)',
           lineHeight: '1.6',
-          marginBottom: '40px',
-          maxWidth: '500px',
-          margin: '0 auto 40px'
+          marginBottom: '32px',
+          maxWidth: '480px',
+          margin: '0 auto 32px'
         }}>
           {content.message}
         </p>
@@ -200,15 +200,15 @@ const ComingSoon = () => {
         {content.launch_date && (
           <div style={{
             display: 'inline-block',
-            padding: '12px 24px',
+            padding: '10px 20px',
             background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.05)',
             border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.1)',
-            borderRadius: '8px',
-            marginBottom: '40px'
+            borderRadius: '6px',
+            marginBottom: '32px'
           }}>
             <div style={{
-              fontSize: '12px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+              fontSize: '11px',
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.5)',
               marginBottom: '4px',
               textTransform: 'uppercase',
               letterSpacing: '0.05em'
@@ -216,9 +216,9 @@ const ComingSoon = () => {
               Expected Launch
             </div>
             <div style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+              fontSize: '14px',
+              fontWeight: '500',
+              color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#37352f'
             }}>
               {new Date(content.launch_date).toLocaleDateString('en-US', { 
                 month: 'long', 
@@ -229,24 +229,33 @@ const ComingSoon = () => {
           </div>
         )}
 
-        {/* Coffee Cup Animation */}
+        {/* Coffee Bean Icon */}
         <div style={{
-          fontSize: '60px',
-          marginTop: '40px',
-          animation: 'steam 2s ease-in-out infinite'
+          marginTop: '32px',
+          marginBottom: '32px',
+          animation: 'pulse 3s ease-in-out infinite'
         }}>
-          ☕
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C9.5 2 7.5 3.5 7 5.5C6.5 7.5 7 9.5 8 11C9 12.5 10.5 13.5 12 14C13.5 13.5 15 12.5 16 11C17 9.5 17.5 7.5 17 5.5C16.5 3.5 14.5 2 12 2Z" 
+                  fill={isDark ? 'rgba(168, 85, 247, 0.8)' : 'rgba(99, 102, 241, 0.8)'}/>
+            <path d="M12 14C10.5 14.5 9 15.5 8 17C7 18.5 6.5 20.5 7 22.5C7.5 24.5 9.5 26 12 26C14.5 26 16.5 24.5 17 22.5C17.5 20.5 17 18.5 16 17C15 15.5 13.5 14.5 12 14Z" 
+                  fill={isDark ? 'rgba(99, 102, 241, 0.8)' : 'rgba(168, 85, 247, 0.8)'}/>
+            <ellipse cx="12" cy="10" rx="2" ry="3" 
+                     fill={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.4)'}/>
+            <ellipse cx="12" cy="18" rx="2" ry="3" 
+                     fill={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.4)'}/>
+          </svg>
         </div>
 
         {/* Footer */}
         <div style={{
-          marginTop: '60px',
-          paddingTop: '30px',
+          marginTop: '48px',
+          paddingTop: '24px',
           borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
         }}>
           <p style={{
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
+            fontSize: '12px',
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.5)'
           }}>
             © 2024 Roastify. All rights reserved.
           </p>

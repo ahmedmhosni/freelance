@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const queries = require('../db/queries');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const sql = require('mssql');
 
 // Get daily quote (public endpoint)
 router.get('/daily', async (req, res) => {
@@ -29,6 +30,7 @@ router.get('/daily', async (req, res) => {
 // Get all quotes (admin only) with pagination
 router.get('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    const db = require('../db/index');
     const pool = await db;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -70,25 +72,22 @@ router.get('/', authenticateToken, requireAdmin, async (req, res) => {
 // Create quote (admin only)
 router.post('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const pool = await db;
     const { text, author, is_active = 1 } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Quote text is required' });
     }
 
-    const request = pool.request();
-    request.input('text', sql.NVarChar, text);
-    request.input('author', sql.NVarChar, author || '');
-    request.input('isActive', sql.Bit, is_active);
+    const result = await queries.createQuote(text, author || '', is_active ? 1 : 0);
     
-    const result = await request.query(`
-      INSERT INTO quotes (text, author, is_active) 
-      OUTPUT INSERTED.*
-      VALUES (@text, @author, @isActive)
-    `);
+    // Get the created quote
+    const db = require('../db/index');
+    const pool = await db;
+    const request = pool.request();
+    request.input('id', sql.Int, result.id || result.recordset[0].id);
+    const quoteResult = await request.query('SELECT * FROM quotes WHERE id = @id');
 
-    res.status(201).json(result.recordset[0]);
+    res.status(201).json(quoteResult.recordset[0]);
   } catch (error) {
     console.error('Error creating quote:', error);
     res.status(500).json({ error: 'Server error' });
@@ -98,7 +97,6 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
 // Update quote (admin only)
 router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const pool = await db;
     const { id } = req.params;
     const { text, author, is_active } = req.body;
 
@@ -106,28 +104,16 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Quote text is required' });
     }
 
-    const request = pool.request();
-    request.input('id', sql.Int, id);
-    request.input('text', sql.NVarChar, text);
-    request.input('author', sql.NVarChar, author || '');
-    request.input('isActive', sql.Bit, is_active !== undefined ? is_active : 1);
-    
-    await request.query(`
-      UPDATE quotes 
-      SET text = @text, author = @author, is_active = @isActive 
-      WHERE id = @id
-    `);
+    await queries.updateQuote(id, text, author || '', is_active !== undefined ? (is_active ? 1 : 0) : 1);
 
     // Get updated quote
-    const getRequest = pool.request();
-    getRequest.input('id', sql.Int, id);
-    const result = await getRequest.query('SELECT * FROM quotes WHERE id = @id');
+    const quote = await queries.getQuoteById(id);
     
-    if (result.recordset.length === 0) {
+    if (!quote) {
       return res.status(404).json({ error: 'Quote not found' });
     }
 
-    res.json(result.recordset[0]);
+    res.json(quote);
   } catch (error) {
     console.error('Error updating quote:', error);
     res.status(500).json({ error: 'Server error' });
@@ -137,15 +123,11 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
 // Delete quote (admin only)
 router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const pool = await db;
     const { id } = req.params;
 
-    const request = pool.request();
-    request.input('id', sql.Int, id);
-    
-    const result = await request.query('DELETE FROM quotes WHERE id = @id');
+    const result = await queries.deleteQuote(id);
 
-    if (result.rowsAffected[0] === 0) {
+    if (result.changes === 0 && result.rowsAffected && result.rowsAffected[0] === 0) {
       return res.status(404).json({ error: 'Quote not found' });
     }
 
