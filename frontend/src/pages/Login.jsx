@@ -11,13 +11,24 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [quote, setQuote] = useState({ text: 'Loading...', author: '' });
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
   const { login } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchDailyQuote();
+    checkMaintenanceStatus();
   }, []);
+
+  const checkMaintenanceStatus = async () => {
+    try {
+      const response = await api.get('/api/maintenance/status');
+      setIsMaintenanceMode(response.data.is_active);
+    } catch (err) {
+      console.error('Error checking maintenance status:', err);
+    }
+  };
 
   const fetchDailyQuote = async () => {
     try {
@@ -37,7 +48,17 @@ const Login = () => {
     setIsLoading(true);
     setError('');
     try {
-      await login(email, password);
+      const userData = await login(email, password);
+      
+      // If maintenance mode is active and user is not admin, show error and redirect
+      if (isMaintenanceMode && userData.role !== 'admin') {
+        setError('System is currently under maintenance. Only administrators can access at this time.');
+        setTimeout(() => {
+          navigate('/coming-soon');
+        }, 2000);
+        return;
+      }
+      
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
