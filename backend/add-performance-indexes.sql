@@ -57,16 +57,7 @@ END
 ELSE
     PRINT '⏭ idx_users_password_reset_token already exists';
 
--- Password reset code lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_users_password_reset_code' AND object_id = OBJECT_ID('users'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_users_password_reset_code 
-    ON users(password_reset_code) 
-    WHERE password_reset_code IS NOT NULL;
-    PRINT '✓ Created idx_users_password_reset_code';
-END
-ELSE
-    PRINT '⏭ idx_users_password_reset_code already exists';
+-- Note: password_reset_code column doesn't exist in schema, skipping index
 
 -- ============================================
 -- CLIENTS TABLE INDEXES
@@ -353,14 +344,14 @@ PRINT '✅ Performance Indexes Installation Complete!';
 PRINT '============================================';
 PRINT '';
 PRINT 'Indexes created for:';
-PRINT '  ✓ Users (5 indexes)';
+PRINT '  ✓ Users (4 indexes)';
 PRINT '  ✓ Clients (3 indexes)';
 PRINT '  ✓ Projects (4 indexes)';
 PRINT '  ✓ Tasks (6 indexes)';
 PRINT '  ✓ Invoices (7 indexes)';
 PRINT '  ✓ Time Tracking (4 indexes)';
 PRINT '';
-PRINT 'Total: 29 performance indexes';
+PRINT 'Total: 28 performance indexes';
 PRINT '';
 PRINT 'Expected Performance Improvements:';
 PRINT '  • Login queries: 50-70% faster';
