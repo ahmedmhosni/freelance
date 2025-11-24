@@ -48,11 +48,17 @@ const Login = () => {
     setIsLoading(true);
     setError('');
     try {
-      const userData = await login(email, password);
+      await login(email, password);
+      
+      // Get user data from localStorage after login
+      const userData = JSON.parse(localStorage.getItem('user'));
       
       // If maintenance mode is active and user is not admin, show error and redirect
-      if (isMaintenanceMode && userData.role !== 'admin') {
+      if (isMaintenanceMode && userData && userData.role !== 'admin') {
         setError('System is currently under maintenance. Only administrators can access at this time.');
+        // Logout the user
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setTimeout(() => {
           navigate('/coming-soon');
         }, 2000);
