@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Status from './pages/Status';
 import ComingSoon from './pages/ComingSoon';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
@@ -77,6 +78,7 @@ function App() {
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/status" element={<Status />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
                 <Route index element={<Navigate to="/dashboard" />} />

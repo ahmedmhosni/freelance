@@ -232,6 +232,36 @@ const Layout = () => {
               <span className="nav-item-text">Sign out</span>
             )}
           </button>
+
+          {/* Status Link */}
+          {!isCollapsed && (
+            <div style={{
+              marginTop: '12px',
+              paddingTop: '12px',
+              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
+              textAlign: 'center'
+            }}>
+              <a
+                href="/status"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: '11px',
+                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                  textDecoration: 'none',
+                  transition: 'color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                }}
+              >
+                System Status
+              </a>
+            </div>
+          )}
         </div>
       </nav>
       
