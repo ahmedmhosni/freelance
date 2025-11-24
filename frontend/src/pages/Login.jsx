@@ -291,6 +291,30 @@ const Login = () => {
             />
           </div>
 
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            marginBottom: '16px' 
+          }}>
+            <Link
+              to="/forgot-password"
+              style={{
+                fontSize: '13px',
+                color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
+                textDecoration: 'none',
+                transition: 'color 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)';
+              }}
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={isLoading}

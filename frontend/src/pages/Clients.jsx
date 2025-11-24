@@ -93,25 +93,49 @@ const Clients = () => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="page-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '24px',
+        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+        gap: window.innerWidth <= 768 ? '16px' : '0'
+      }}>
         <div>
           <h1 style={{ marginBottom: '4px' }}>Clients</h1>
           <p className="page-subtitle">
             Manage your client relationships
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="page-actions" style={{ 
+          display: 'flex', 
+          gap: '8px',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          width: window.innerWidth <= 768 ? '100%' : 'auto'
+        }}>
           {clients.length > 0 && (
             <button 
               className="btn-edit" 
               onClick={handleExportCSV}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                width: window.innerWidth <= 768 ? '100%' : 'auto'
+              }}
             >
               <MdFileDownload size={18} />
               Export CSV
             </button>
           )}
-          <button className="btn-primary" onClick={() => setShowForm(true)}>Add Client</button>
+          <button 
+            className="btn-primary" 
+            onClick={() => setShowForm(true)}
+            style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
+          >
+            Add Client
+          </button>
         </div>
       </div>
 
@@ -158,44 +182,49 @@ const Clients = () => {
                 <p>{searchTerm ? 'No clients found matching your search.' : 'No clients yet. Add your first client to get started!'}</p>
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #ddd' }}>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Name</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Email</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Company</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Phone</th>
-                    <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.map(client => (
-                    <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '12px' }}>
-                        <strong>{client.name}</strong>
-                      </td>
-                      <td style={{ padding: '12px' }}>{client.email || '-'}</td>
-                      <td style={{ padding: '12px' }}>{client.company || '-'}</td>
-                      <td style={{ padding: '12px' }}>{client.phone || '-'}</td>
-                      <td style={{ padding: '12px', textAlign: 'right' }}>
-                        <button 
-                          onClick={() => handleEdit(client)} 
-                          className="btn-edit"
-                          style={{ marginRight: '8px' }}
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => confirmDelete(client.id)} 
-                          className="btn-delete"
-                        >
-                          Delete
-                        </button>
-                      </td>
+              <div className="table-container" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '600px' : 'auto' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #ddd' }}>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>Name</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>Email</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>Company</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>Phone</th>
+                      <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {clients.map(client => (
+                      <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
+                        <td style={{ padding: '12px' }}>
+                          <strong>{client.name}</strong>
+                        </td>
+                        <td style={{ padding: '12px' }}>{client.email || '-'}</td>
+                        <td style={{ padding: '12px' }}>{client.company || '-'}</td>
+                        <td style={{ padding: '12px' }}>{client.phone || '-'}</td>
+                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                          <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                            <button 
+                              onClick={() => handleEdit(client)} 
+                              className="btn-edit"
+                              style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => confirmDelete(client.id)} 
+                              className="btn-delete"
+                              style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 

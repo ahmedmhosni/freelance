@@ -93,14 +93,27 @@ const Projects = () => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="page-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '24px',
+        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+        gap: window.innerWidth <= 768 ? '16px' : '0'
+      }}>
         <div>
           <h1 style={{ marginBottom: '4px' }}>Projects</h1>
           <p className="page-subtitle">
             Track and manage your projects
           </p>
         </div>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>Add Project</button>
+        <button 
+          className="btn-primary" 
+          onClick={() => setShowForm(true)}
+          style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
+        >
+          Add Project
+        </button>
       </div>
 
       {showForm && (
@@ -167,7 +180,13 @@ const Projects = () => {
           <p>No projects yet. Create your first project to get started!</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: window.innerWidth <= 768 
+            ? '1fr' 
+            : 'repeat(auto-fill, minmax(300px, 1fr))', 
+          gap: '20px' 
+        }}>
           {projects.map(project => (
             <div key={project.id} className="card" style={{ position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>

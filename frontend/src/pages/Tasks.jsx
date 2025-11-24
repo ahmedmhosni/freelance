@@ -163,39 +163,87 @@ const Tasks = () => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="page-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '24px',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
         <div>
           <h1 style={{ marginBottom: '4px' }}>Tasks</h1>
           <p className="page-subtitle">
             Organize and track your work
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px',
+          flexWrap: 'wrap',
+          width: '100%'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px',
+            flex: window.innerWidth <= 768 ? '1 1 100%' : '0 0 auto'
+          }}>
+            <button 
+              onClick={() => setView('kanban')} 
+              className={`view-toggle ${view === 'kanban' ? 'active' : ''}`}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                flex: window.innerWidth <= 768 ? '1' : '0 0 auto',
+                padding: window.innerWidth <= 768 ? '10px 12px' : '6px 12px'
+              }}
+            >
+              <MdViewKanban size={16} />
+              {window.innerWidth > 480 && <span>Kanban</span>}
+            </button>
+            <button 
+              onClick={() => setView('list')} 
+              className={`view-toggle ${view === 'list' ? 'active' : ''}`}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                flex: window.innerWidth <= 768 ? '1' : '0 0 auto',
+                padding: window.innerWidth <= 768 ? '10px 12px' : '6px 12px'
+              }}
+            >
+              <MdViewList size={16} />
+              {window.innerWidth > 480 && <span>List</span>}
+            </button>
+            <button 
+              onClick={() => setView('calendar')} 
+              className={`view-toggle ${view === 'calendar' ? 'active' : ''}`}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                flex: window.innerWidth <= 768 ? '1' : '0 0 auto',
+                padding: window.innerWidth <= 768 ? '10px 12px' : '6px 12px'
+              }}
+            >
+              <MdCalendarToday size={16} />
+              {window.innerWidth > 480 && <span>Calendar</span>}
+            </button>
+          </div>
           <button 
-            onClick={() => setView('kanban')} 
-            className={`view-toggle ${view === 'kanban' ? 'active' : ''}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            onClick={() => setShowForm(true)} 
+            className="btn-primary"
+            style={{ 
+              flex: window.innerWidth <= 768 ? '1 1 100%' : '0 0 auto',
+              width: window.innerWidth <= 768 ? '100%' : 'auto'
+            }}
           >
-            <MdViewKanban size={16} />
-            <span>Kanban</span>
+            Add Task
           </button>
-          <button 
-            onClick={() => setView('list')} 
-            className={`view-toggle ${view === 'list' ? 'active' : ''}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <MdViewList size={16} />
-            <span>List</span>
-          </button>
-          <button 
-            onClick={() => setView('calendar')} 
-            className={`view-toggle ${view === 'calendar' ? 'active' : ''}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <MdCalendarToday size={16} />
-            <span>Calendar</span>
-          </button>
-          <button onClick={() => setShowForm(true)} className="btn-primary">Add Task</button>
         </div>
       </div>
 
@@ -237,7 +285,16 @@ const Tasks = () => {
       )}
 
       {view === 'kanban' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: window.innerWidth <= 768 
+            ? '1fr' 
+            : window.innerWidth <= 1024 
+              ? 'repeat(2, 1fr)' 
+              : 'repeat(4, 1fr)', 
+          gap: '15px',
+          overflowX: window.innerWidth <= 768 ? 'auto' : 'visible'
+        }}>
           {Object.entries(columns).map(([status, { title, color }]) => (
             <div 
               key={status} 
@@ -354,60 +411,65 @@ const Tasks = () => {
 
       {view === 'list' && (
         <div className="card">
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #ddd' }}>
-                <th style={{ textAlign: 'left', padding: '12px' }}>Task</th>
-                <th style={{ textAlign: 'left', padding: '12px' }}>Priority</th>
-                <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
-                <th style={{ textAlign: 'left', padding: '12px' }}>Due Date</th>
-                <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map(task => (
-                <tr 
-                  key={task.id} 
-                  style={{ 
-                    borderBottom: '1px solid #eee',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setViewingTask(task)}
-                >
-                  <td style={{ padding: '12px' }}>
-                    <strong>{task.title}</strong>
-                    <p style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)', margin: '4px 0 0 0' }}>{task.description}</p>
-                  </td>
-                  <td style={{ padding: '12px' }}>
-                    <span className={`status-badge priority-${task.priority}`}>{task.priority}</span>
-                  </td>
-                  <td style={{ padding: '12px' }}>{columns[task.status]?.title}</td>
-                  <td style={{ padding: '12px' }}>{task.due_date ? new Date(task.due_date).toLocaleDateString() : '-'}</td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        handleEdit(task); 
-                      }} 
-                      className="btn-edit" 
-                      style={{ marginRight: '8px' }}
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        confirmDelete(task.id); 
-                      }} 
-                      className="btn-delete"
-                    >
-                      Delete
-                    </button>
-                  </td>
+          <div className="table-container" style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '700px' : 'auto' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Task</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Priority</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Due Date</th>
+                  <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tasks.map(task => (
+                  <tr 
+                    key={task.id} 
+                    style={{ 
+                      borderBottom: '1px solid #eee',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setViewingTask(task)}
+                  >
+                    <td style={{ padding: '12px' }}>
+                      <strong>{task.title}</strong>
+                      <p style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)', margin: '4px 0 0 0' }}>{task.description}</p>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <span className={`status-badge priority-${task.priority}`}>{task.priority}</span>
+                    </td>
+                    <td style={{ padding: '12px' }}>{columns[task.status]?.title}</td>
+                    <td style={{ padding: '12px' }}>{task.due_date ? new Date(task.due_date).toLocaleDateString() : '-'}</td>
+                    <td style={{ padding: '12px', textAlign: 'right' }}>
+                      <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleEdit(task); 
+                          }} 
+                          className="btn-edit" 
+                          style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            confirmDelete(task.id); 
+                          }} 
+                          className="btn-delete"
+                          style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
