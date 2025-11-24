@@ -5,6 +5,7 @@ import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { MaintenanceProvider } from './context/MaintenanceContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import FullPageLoader from './components/FullPageLoader';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
@@ -26,7 +27,7 @@ const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>Loading...</div>;
+    return <FullPageLoader text="Loading your workspace..." />;
   }
   
   if (!user) return <Navigate to="/login" />;

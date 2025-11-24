@@ -2,19 +2,28 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import DashboardCharts from '../components/DashboardCharts';
+import LogoLoader from '../components/LogoLoader';
 import { MdPeople, MdFolder, MdCheckCircle, MdAttachMoney, MdAccessTime } from 'react-icons/md';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ clients: 0, projects: 0, tasks: 0, invoices: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
   const [taskData, setTaskData] = useState([]);
   const [invoiceData, setInvoiceData] = useState([]);
 
   useEffect(() => {
-    fetchStats();
-    fetchRecentTasks();
-    fetchChartData();
+    const loadDashboard = async () => {
+      setLoading(true);
+      await Promise.all([
+        fetchStats(),
+        fetchRecentTasks(),
+        fetchChartData()
+      ]);
+      setLoading(false);
+    };
+    loadDashboard();
   }, []);
 
   const fetchStats = async () => {
@@ -51,6 +60,19 @@ const Dashboard = () => {
       setInvoiceData([]);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container" style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '60vh' 
+      }}>
+        <LogoLoader size={100} text="Loading your dashboard..." />
+      </div>
+    );
+  }
 
   return (
     <div className="container">
