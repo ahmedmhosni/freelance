@@ -1,69 +1,45 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdLightMode, MdDarkMode, MdArrowBack, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { validatePassword } from '../utils/passwordValidator';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
-  const tokenFromUrl = searchParams.get('token');
-  
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [useCode, setUseCode] = useState(!tokenFromUrl);
-  const [passwordStrength, setPasswordStrength] = useState(null);
-  
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const token = searchParams.get('token');
 
   useEffect(() => {
-    if (password) {
-      setPasswordStrength(validatePassword(password));
-    } else {
-      setPasswordStrength(null);
+    if (!token) {
+      toast.error('Invalid reset link');
+      navigate('/forgot-password');
     }
-  }, [password]);
+  }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
 
-    if (passwordStrength && !passwordStrength.isValid) {
-      toast.error('Password does not meet requirements');
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
-
+    
     try {
-      if (useCode) {
-        // Reset by code
-        await api.post('/api/auth/reset-password-code', {
-          email,
-          code,
-          password
-        });
-      } else {
-        // Reset by token
-        await api.post('/api/auth/reset-password', {
-          token: tokenFromUrl,
-          password
-        });
-      }
-
-      toast.success('Password reset successful! You can now log in.');
-      setTimeout(() => navigate('/login'), 2000);
+      await api.post('/api/auth/reset-password', { token, password });
+      toast.success('Password reset successful! You can now login.');
+      navigate('/login');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to reset password');
     } finally {
@@ -71,22 +47,8 @@ const ResetPassword = () => {
     }
   };
 
-  const getStrengthColor = () => {
-    if (!passwordStrength) return 'transparent';
-    if (passwordStrength.score >= 4) return '#28a745';
-    if (passwordStrength.score >= 3) return '#ffc107';
-    return '#dc3545';
-  };
-
-  const getStrengthText = () => {
-    if (!passwordStrength) return '';
-    if (passwordStrength.score >= 4) return 'Strong';
-    if (passwordStrength.score >= 3) return 'Medium';
-    return 'Weak';
-  };
-
   return (
-    <div style={{
+    <div className="reset-password-container" style={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -97,7 +59,7 @@ const ResetPassword = () => {
       background: isDark ? '#0a0a0a' : '#ffffff',
       padding: window.innerWidth <= 768 ? '20px' : '0'
     }}>
-      {/* Background Effects */}
+      {/* Stripe-like Animated Gradient Mesh */}
       <div style={{
         position: 'absolute',
         top: '-50%',
@@ -105,11 +67,59 @@ const ResetPassword = () => {
         width: '200%',
         height: '200%',
         background: isDark
-          ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)'
-          : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)',
+          ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+          : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
         animation: 'wave 20s ease-in-out infinite',
         pointerEvents: 'none',
         opacity: isDark ? 0.6 : 1
+      }} />
+      
+      {/* Large Floating Orb - Blue/Indigo */}
+      <div style={{
+        position: 'absolute',
+        top: '-10%',
+        left: '-5%',
+        width: '500px',
+        height: '500px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(59, 130, 246, 0.15) 40%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)',
+        filter: 'blur(80px)',
+        animation: 'float 20s ease-in-out infinite',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Large Floating Orb - Purple/Pink */}
+      <div style={{
+        position: 'absolute',
+        bottom: '-10%',
+        right: '-5%',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.12) 40%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.2) 40%, transparent 70%)',
+        filter: 'blur(90px)',
+        animation: 'float 25s ease-in-out infinite reverse',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Accent Orb - Cyan */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        right: '15%',
+        width: '350px',
+        height: '350px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, transparent 70%)',
+        filter: 'blur(70px)',
+        animation: 'float 18s ease-in-out infinite',
+        pointerEvents: 'none'
       }} />
 
       {/* Theme Toggle */}
@@ -133,6 +143,14 @@ const ResetPassword = () => {
           backdropFilter: 'blur(10px)',
           zIndex: 10
         }}
+        onMouseEnter={(e) => {
+          e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 1)';
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)';
+          e.target.style.transform = 'scale(1)';
+        }}
         title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       >
         {isDark ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
@@ -140,30 +158,12 @@ const ResetPassword = () => {
 
       <div style={{ 
         width: '100%', 
-        maxWidth: '400px', 
+        maxWidth: '360px', 
         padding: window.innerWidth <= 768 ? '16px' : '20px',
         position: 'relative',
         zIndex: 1
       }}>
-        {/* Back to Login */}
-        <Link
-          to="/login"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-            textDecoration: 'none',
-            marginBottom: '24px',
-            transition: 'color 0.15s ease'
-          }}
-        >
-          <MdArrowBack size={16} />
-          Back to login
-        </Link>
-
-        <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '48px', textAlign: 'center' }}>
           <img 
             src="/Asset 7.svg" 
             alt="Roastify Logo" 
@@ -179,139 +179,17 @@ const ResetPassword = () => {
             color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
             marginBottom: '8px'
           }}>
-            Set new password
+            Create New Password
           </h1>
           <p style={{ 
             fontSize: '14px', 
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
           }}>
-            {useCode ? 'Enter your email and 6-digit code' : 'Enter your new password'}
+            Enter your new password below
           </p>
         </div>
 
-        {/* Toggle between code and link */}
-        {!tokenFromUrl && (
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '20px',
-            padding: '4px',
-            background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.05)',
-            borderRadius: '6px'
-          }}>
-            <button
-              type="button"
-              onClick={() => setUseCode(true)}
-              style={{
-                flex: 1,
-                padding: '8px',
-                fontSize: '13px',
-                fontWeight: '500',
-                color: useCode 
-                  ? (isDark ? '#191919' : '#ffffff')
-                  : (isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'),
-                background: useCode 
-                  ? (isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f')
-                  : 'transparent',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              Use Code
-            </button>
-            <button
-              type="button"
-              onClick={() => setUseCode(false)}
-              style={{
-                flex: 1,
-                padding: '8px',
-                fontSize: '13px',
-                fontWeight: '500',
-                color: !useCode 
-                  ? (isDark ? '#191919' : '#ffffff')
-                  : (isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'),
-                background: !useCode 
-                  ? (isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f')
-                  : 'transparent',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              Use Link
-            </button>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
-          {useCode && (
-            <>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-                  marginBottom: '6px'
-                }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="name@work-email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '14px',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                    borderRadius: '3px',
-                    outline: 'none',
-                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-                  marginBottom: '6px'
-                }}>
-                  6-Digit Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="123456"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  required
-                  maxLength={6}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '18px',
-                    letterSpacing: '4px',
-                    textAlign: 'center',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                    borderRadius: '3px',
-                    outline: 'none',
-                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                  }}
-                />
-              </div>
-            </>
-          )}
-
           <div style={{ marginBottom: '16px' }}>
             <label style={{
               display: 'block',
@@ -322,73 +200,24 @@ const ResetPassword = () => {
             }}>
               New Password
             </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter new password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '8px 40px 8px 10px',
-                  fontSize: '14px',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                  borderRadius: '3px',
-                  outline: 'none',
-                  background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
-              </button>
-            </div>
-            {passwordStrength && (
-              <div style={{ marginTop: '8px' }}>
-                <div style={{
-                  height: '4px',
-                  background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.1)',
-                  borderRadius: '2px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${(passwordStrength.score / 5) * 100}%`,
-                    background: getStrengthColor(),
-                    transition: 'all 0.3s ease'
-                  }} />
-                </div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: '4px',
-                  fontSize: '11px'
-                }}>
-                  <span style={{ color: getStrengthColor(), fontWeight: '500' }}>
-                    {getStrengthText()}
-                  </span>
-                  <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)' }}>
-                    {passwordStrength.score}/5
-                  </span>
-                </div>
-              </div>
-            )}
+            <input
+              type="password"
+              placeholder="At least 8 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                fontSize: '14px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                borderRadius: '3px',
+                outline: 'none',
+                transition: 'all 0.15s ease',
+                background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+              }}
+            />
           </div>
 
           <div style={{ marginBottom: '20px' }}>
@@ -401,43 +230,24 @@ const ResetPassword = () => {
             }}>
               Confirm Password
             </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '8px 40px 8px 10px',
-                  fontSize: '14px',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                  borderRadius: '3px',
-                  outline: 'none',
-                  background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                {showConfirmPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
-              </button>
-            </div>
+            <input
+              type="password"
+              placeholder="Re-enter password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                fontSize: '14px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                borderRadius: '3px',
+                outline: 'none',
+                transition: 'all 0.15s ease',
+                background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+              }}
+            />
           </div>
 
           <button
@@ -456,22 +266,46 @@ const ResetPassword = () => {
               borderRadius: '3px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s ease',
+              marginBottom: '16px',
               opacity: isLoading ? 0.6 : 1
             }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.target.style.background = isDark ? '#ffffff' : '#2f2e2a';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
+              }
+            }}
           >
-            {isLoading ? 'Resetting...' : 'Reset password'}
+            {isLoading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
 
-        <div style={{
-          marginTop: '24px',
-          padding: '12px',
-          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
-          borderRadius: '6px',
-          fontSize: '12px',
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
+        <div style={{ 
+          textAlign: 'center',
+          paddingTop: '20px',
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
         }}>
-          Password must be at least 8 characters long
+          <Link
+            to="/login"
+            style={{
+              fontSize: '13px',
+              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)';
+            }}
+          >
+            ← Back to Login
+          </Link>
         </div>
       </div>
     </div>

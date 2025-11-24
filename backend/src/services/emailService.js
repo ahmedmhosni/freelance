@@ -70,21 +70,25 @@ class EmailService {
       <html>
       <head>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
+          .header { text-align: center; padding: 30px 0 20px 0; }
+          .logo { height: 40px; margin-bottom: 10px; }
           .content { padding: 30px 0; }
-          .button { display: inline-block; padding: 12px 30px; background: #37352f; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+          .button { display: inline-block; padding: 10px 30px; background: #37352f; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 20px 0; font-weight: 600; font-size: 14px; transition: background 0.15s ease; }
+          .button:hover { background: #2f2e2a; }
           .code-box { background: #f8f9fa; border: 2px dashed #37352f; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
           .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #37352f; font-family: 'Courier New', monospace; }
-          .divider { text-align: center; margin: 30px 0; color: #999; }
-          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+          .divider { text-align: center; margin: 30px 0; color: #999; font-size: 14px; }
+          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
+          .footer a { color: #37352f; text-decoration: none; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>${emailConfig.templates.appName}</h1>
+            <h1 style="font-size: 28px; font-weight: 700; color: #37352f; margin: 0; letter-spacing: -0.5px;">${emailConfig.templates.appName}</h1>
+            <p style="font-size: 13px; color: #666; margin: 5px 0 0 0;">Freelance Management Platform</p>
           </div>
           <div class="content">
             <h2>Welcome, ${user.name}!</h2>
@@ -154,22 +158,26 @@ class EmailService {
       <html>
       <head>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
+          .header { text-align: center; padding: 30px 0 20px 0; }
+          .logo { height: 40px; margin-bottom: 10px; }
           .content { padding: 30px 0; }
-          .button { display: inline-block; padding: 12px 30px; background: #37352f; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+          .button { display: inline-block; padding: 10px 30px; background: #37352f; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 20px 0; font-weight: 600; font-size: 14px; transition: background 0.15s ease; }
+          .button:hover { background: #2f2e2a; }
           .code-box { background: #f8f9fa; border: 2px dashed #37352f; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
           .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #37352f; font-family: 'Courier New', monospace; }
-          .divider { text-align: center; margin: 30px 0; color: #999; }
-          .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+          .divider { text-align: center; margin: 30px 0; color: #999; font-size: 14px; }
+          .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px; }
+          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
+          .footer a { color: #37352f; text-decoration: none; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>${emailConfig.templates.appName}</h1>
+            <h1 style="font-size: 28px; font-weight: 700; color: #37352f; margin: 0; letter-spacing: -0.5px;">${emailConfig.templates.appName}</h1>
+            <p style="font-size: 13px; color: #666; margin: 5px 0 0 0;">Freelance Management Platform</p>
           </div>
           <div class="content">
             <h2>Password Reset Request</h2>
@@ -244,19 +252,23 @@ class EmailService {
       <html>
       <head>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
+          .header { text-align: center; padding: 30px 0 20px 0; }
+          .logo { height: 40px; margin-bottom: 10px; }
           .content { padding: 30px 0; }
-          .button { display: inline-block; padding: 12px 30px; background: #37352f; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .features { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
-          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+          .button { display: inline-block; padding: 10px 30px; background: #37352f; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 20px 0; font-weight: 600; font-size: 14px; transition: background 0.15s ease; }
+          .button:hover { background: #2f2e2a; }
+          .features { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
+          .footer a { color: #37352f; text-decoration: none; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 Welcome to ${emailConfig.templates.appName}!</h1>
+            <h1 style="font-size: 28px; font-weight: 700; color: #37352f; margin: 0; letter-spacing: -0.5px;">🎉 Welcome to ${emailConfig.templates.appName}!</h1>
+            <p style="font-size: 13px; color: #666; margin: 5px 0 0 0;">Freelance Management Platform</p>
           </div>
           <div class="content">
             <h2>Hi ${user.name},</h2>
@@ -319,18 +331,21 @@ class EmailService {
       <html>
       <head>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
+          .header { text-align: center; padding: 30px 0 20px 0; }
+          .logo { height: 40px; margin-bottom: 10px; }
           .content { padding: 30px 0; }
-          .invoice-details { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
-          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+          .invoice-details { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
+          .footer a { color: #37352f; text-decoration: none; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>${emailConfig.templates.appName}</h1>
+            <h1 style="font-size: 28px; font-weight: 700; color: #37352f; margin: 0; letter-spacing: -0.5px;">${emailConfig.templates.appName}</h1>
+            <p style="font-size: 13px; color: #666; margin: 5px 0 0 0;">Freelance Management Platform</p>
           </div>
           <div class="content">
             <h2>Invoice ${type === 'sent' ? 'Sent' : 'Paid'}</h2>
@@ -370,19 +385,23 @@ class EmailService {
       <html>
       <head>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #37352f; }
+          .header { text-align: center; padding: 30px 0 20px 0; }
+          .logo { height: 40px; margin-bottom: 10px; }
           .content { padding: 30px 0; }
-          .task-details { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-          .button { display: inline-block; padding: 12px 30px; background: #37352f; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; }
+          .task-details { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px; }
+          .button { display: inline-block; padding: 10px 30px; background: #37352f; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 20px 0; font-weight: 600; font-size: 14px; transition: background 0.15s ease; }
+          .button:hover { background: #2f2e2a; }
+          .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
+          .footer a { color: #37352f; text-decoration: none; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>${emailConfig.templates.appName}</h1>
+            <h1 style="font-size: 28px; font-weight: 700; color: #37352f; margin: 0; letter-spacing: -0.5px;">${emailConfig.templates.appName}</h1>
+            <p style="font-size: 13px; color: #666; margin: 5px 0 0 0;">Freelance Management Platform</p>
           </div>
           <div class="content">
             <h2>⏰ Task Reminder</h2>

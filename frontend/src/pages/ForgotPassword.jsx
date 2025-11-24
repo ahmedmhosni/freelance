@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdLightMode, MdDarkMode, MdArrowBack } from 'react-icons/md';
+import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
@@ -14,7 +14,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+    
     try {
       await api.post('/api/auth/forgot-password', { email });
       setEmailSent(true);
@@ -27,7 +27,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div style={{
+    <div className="forgot-password-container" style={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -38,7 +38,7 @@ const ForgotPassword = () => {
       background: isDark ? '#0a0a0a' : '#ffffff',
       padding: window.innerWidth <= 768 ? '20px' : '0'
     }}>
-      {/* Background Effects */}
+      {/* Stripe-like Animated Gradient Mesh */}
       <div style={{
         position: 'absolute',
         top: '-50%',
@@ -46,11 +46,59 @@ const ForgotPassword = () => {
         width: '200%',
         height: '200%',
         background: isDark
-          ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)'
-          : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)',
+          ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+          : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
         animation: 'wave 20s ease-in-out infinite',
         pointerEvents: 'none',
         opacity: isDark ? 0.6 : 1
+      }} />
+      
+      {/* Large Floating Orb - Blue/Indigo */}
+      <div style={{
+        position: 'absolute',
+        top: '-10%',
+        left: '-5%',
+        width: '500px',
+        height: '500px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(59, 130, 246, 0.15) 40%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)',
+        filter: 'blur(80px)',
+        animation: 'float 20s ease-in-out infinite',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Large Floating Orb - Purple/Pink */}
+      <div style={{
+        position: 'absolute',
+        bottom: '-10%',
+        right: '-5%',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.12) 40%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.2) 40%, transparent 70%)',
+        filter: 'blur(90px)',
+        animation: 'float 25s ease-in-out infinite reverse',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Accent Orb - Cyan */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        right: '15%',
+        width: '350px',
+        height: '350px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, transparent 70%)',
+        filter: 'blur(70px)',
+        animation: 'float 18s ease-in-out infinite',
+        pointerEvents: 'none'
       }} />
 
       {/* Theme Toggle */}
@@ -74,6 +122,14 @@ const ForgotPassword = () => {
           backdropFilter: 'blur(10px)',
           zIndex: 10
         }}
+        onMouseEnter={(e) => {
+          e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 1)';
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)';
+          e.target.style.transform = 'scale(1)';
+        }}
         title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       >
         {isDark ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
@@ -86,31 +142,7 @@ const ForgotPassword = () => {
         position: 'relative',
         zIndex: 1
       }}>
-        {/* Back to Login */}
-        <Link
-          to="/login"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-            textDecoration: 'none',
-            marginBottom: '24px',
-            transition: 'color 0.15s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)';
-          }}
-        >
-          <MdArrowBack size={16} />
-          Back to login
-        </Link>
-
-        <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '48px', textAlign: 'center' }}>
           <img 
             src="/Asset 7.svg" 
             alt="Roastify Logo" 
@@ -126,7 +158,7 @@ const ForgotPassword = () => {
             color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
             marginBottom: '8px'
           }}>
-            Reset your password
+            Reset Your Password
           </h1>
           <p style={{ 
             fontSize: '14px', 
@@ -142,59 +174,34 @@ const ForgotPassword = () => {
         {emailSent ? (
           <div style={{
             padding: '20px',
-            background: isDark ? 'rgba(46, 170, 220, 0.1)' : 'rgba(46, 170, 220, 0.05)',
-            border: isDark ? '1px solid rgba(46, 170, 220, 0.3)' : '1px solid rgba(46, 170, 220, 0.2)',
+            background: isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(40, 167, 69, 0.1)',
+            border: isDark ? '1px solid rgba(40, 167, 69, 0.3)' : '1px solid rgba(40, 167, 69, 0.3)',
             borderRadius: '8px',
+            marginBottom: '20px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📧</div>
-            <h3 style={{
-              fontSize: '15px',
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✉️</div>
+            <h3 style={{ 
+              fontSize: '16px', 
               fontWeight: '600',
               color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
               marginBottom: '8px'
             }}>
-              Email sent!
+              Email Sent!
             </h3>
-            <p style={{
-              fontSize: '13px',
+            <p style={{ 
+              fontSize: '14px', 
               color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-              marginBottom: '16px',
-              lineHeight: '1.5'
+              marginBottom: '16px'
             }}>
               We've sent password reset instructions to <strong>{email}</strong>
             </p>
-            <p style={{
-              fontSize: '12px',
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.55)',
-              marginBottom: '20px'
+            <p style={{ 
+              fontSize: '13px', 
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.5)'
             }}>
-              You can use either the link or the 6-digit code to reset your password.
+              Check your inbox and spam folder. The link expires in 1 hour.
             </p>
-            <button
-              onClick={() => {
-                setEmailSent(false);
-                setEmail('');
-              }}
-              style={{
-                padding: '8px 16px',
-                fontSize: '13px',
-                color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)',
-                background: 'transparent',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(55, 53, 47, 0.2)',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'transparent';
-              }}
-            >
-              Send another email
-            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -206,7 +213,7 @@ const ForgotPassword = () => {
                 color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
                 marginBottom: '6px'
               }}>
-                Email
+                Email Address
               </label>
               <input
                 type="email"
@@ -244,28 +251,47 @@ const ForgotPassword = () => {
                 borderRadius: '3px',
                 cursor: isLoading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.15s ease',
+                marginBottom: '16px',
                 opacity: isLoading ? 0.6 : 1
               }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.target.style.background = isDark ? '#ffffff' : '#2f2e2a';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) {
+                  e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
+                }
+              }}
             >
-              {isLoading ? 'Sending...' : 'Send reset instructions'}
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
             </button>
           </form>
         )}
 
-        <div style={{
-          marginTop: '24px',
-          padding: '16px',
-          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
-          borderRadius: '6px',
-          fontSize: '12px',
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
-          lineHeight: '1.5'
+        <div style={{ 
+          textAlign: 'center',
+          paddingTop: '20px',
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
         }}>
-          <strong>Note:</strong> You'll receive an email with two options:
-          <ul style={{ marginTop: '8px', marginLeft: '20px' }}>
-            <li>Click the reset link to set a new password</li>
-            <li>Or use the 6-digit code on the reset page</li>
-          </ul>
+          <Link
+            to="/login"
+            style={{
+              fontSize: '13px',
+              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)';
+            }}
+          >
+            ← Back to Login
+          </Link>
         </div>
       </div>
     </div>
