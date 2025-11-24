@@ -21,6 +21,7 @@ import Invoices from './pages/Invoices';
 import Reports from './pages/Reports';
 import TimeTracking from './pages/TimeTracking';
 import AdminPanel from './pages/AdminPanel';
+import LoaderTest from './pages/LoaderTest';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -91,6 +92,7 @@ function App() {
                 <Route path="reports" element={<Reports />} />
                 <Route path="time-tracking" element={<TimeTracking />} />
                 <Route path="admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+                <Route path="loader-test" element={<PrivateRoute adminOnly><LoaderTest /></PrivateRoute>} />
               </Route>
             </Routes>
             </MaintenanceProvider>
