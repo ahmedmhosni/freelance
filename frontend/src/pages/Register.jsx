@@ -31,8 +31,8 @@ const Register = () => {
     setIsLoading(true);
     try {
       await api.post('/api/auth/register', formData);
-      setSuccess('Account created successfully');
-      setTimeout(() => navigate('/login'), 1500);
+      setSuccess('Account created! Check your email for verification code.');
+      setTimeout(() => navigate('/verify-email'), 2000);
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.response?.data?.details?.[0]?.msg || 'Registration failed';
       setError(errorMsg);
