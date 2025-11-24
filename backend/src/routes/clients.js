@@ -6,6 +6,58 @@ const db = require('../db');
 const router = express.Router();
 router.use(authenticateToken);
 
+/**
+ * @swagger
+ * /api/clients:
+ *   get:
+ *     summary: Get all clients
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by name, email, or company
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: List of clients
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Client'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
+ *       401:
+ *         description: Unauthorized
+ */
 // Get all clients for user with search and pagination
 router.get('/', async (req, res) => {
   try {

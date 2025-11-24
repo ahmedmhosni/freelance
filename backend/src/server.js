@@ -1,4 +1,21 @@
 require('dotenv').config();
+
+// Application Insights - Must be first!
+if (process.env.NODE_ENV === 'production' && process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
+  const appInsights = require('applicationinsights');
+  appInsights.setup(process.env.APPLICATIONINSIGHTS_CONNECTION_STRING)
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true, true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true, true)
+    .setUseDiskRetryCaching(true)
+    .setSendLiveMetrics(true)
+    .start();
+  console.log('✅ Application Insights initialized');
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -21,6 +38,7 @@ const timeTrackingRoutes = require('./routes/timeTracking');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
 const maintenanceRoutes = require('./routes/maintenance');
+const statusRoutes = require('./routes/status');
 
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -119,6 +137,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customSiteTitle: 'Roastify API Documentation'
 }));
 
+// CSRF token endpoint
+const { getCsrfToken } = require('./middleware/csrfProtection');
+app.get('/api/csrf-token', getCsrfToken);
+
 // Health check (must be before other routes)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -138,6 +160,7 @@ app.use('/api/time-tracking', timeTrackingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quotes', quotesRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api/status', statusRoutes);
 
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {

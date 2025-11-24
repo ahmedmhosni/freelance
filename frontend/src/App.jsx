@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { MaintenanceProvider } from './context/MaintenanceContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
@@ -35,9 +36,10 @@ const PrivateRoute = ({ children, adminOnly = false }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <SocketProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ThemeProvider>
+          <SocketProvider>
           <BrowserRouter
             future={{
               v7_startTransition: true,
@@ -93,6 +95,7 @@ function App() {
         </SocketProvider>
       </ThemeProvider>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
