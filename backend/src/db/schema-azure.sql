@@ -142,3 +142,24 @@ CREATE INDEX idx_files_user_id ON files(user_id);
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_time_entries_user_id ON time_entries(user_id);
 CREATE INDEX idx_time_entries_project_id ON time_entries(project_id);
+
+-- Maintenance page content table
+CREATE TABLE maintenance_content (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    title NVARCHAR(500) NOT NULL DEFAULT 'Brilliant ideas take time to be roasted',
+    subtitle NVARCHAR(500) NOT NULL DEFAULT 'Roastify is coming soon',
+    message NVARCHAR(MAX) NOT NULL DEFAULT 'We''re crafting something extraordinary. Great things take time, and we''re roasting the perfect experience for you.',
+    launch_date DATE NULL,
+    is_active BIT DEFAULT 0,
+    updated_by INT FOREIGN KEY REFERENCES users(id),
+    updated_at DATETIME2 DEFAULT GETDATE()
+);
+
+-- Insert default maintenance content
+INSERT INTO maintenance_content (title, subtitle, message, is_active)
+VALUES (
+    'Brilliant ideas take time to be roasted',
+    'Roastify is coming soon',
+    'We''re crafting something extraordinary. Great things take time, and we''re roasting the perfect experience for you.',
+    0
+);

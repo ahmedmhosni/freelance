@@ -18,6 +18,7 @@ const reportRoutes = require('./routes/reports');
 const timeTrackingRoutes = require('./routes/timeTracking');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
+const maintenanceRoutes = require('./routes/maintenance');
 
 const app = express();
 const server = http.createServer(app);
@@ -72,6 +73,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/time-tracking', timeTrackingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quotes', quotesRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
 
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {

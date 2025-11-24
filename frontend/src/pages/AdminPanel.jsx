@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import QuotesManager from '../components/QuotesManager';
+import MaintenanceEditor from '../components/MaintenanceEditor';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -72,6 +73,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'quotes' ? 'active' : ''}`}
         >
           Daily Quotes
+        </button>
+        <button
+          onClick={() => setActiveTab('maintenance')}
+          className={`view-toggle ${activeTab === 'maintenance' ? 'active' : ''}`}
+        >
+          Maintenance Page
         </button>
       </div>
 
@@ -162,6 +169,8 @@ const AdminPanel = () => {
       )}
 
       {activeTab === 'quotes' && <QuotesManager />}
+      
+      {activeTab === 'maintenance' && <MaintenanceEditor />}
     </div>
   );
 };
