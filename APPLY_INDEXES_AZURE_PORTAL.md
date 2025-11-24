@@ -18,7 +18,7 @@ Your local machine can't connect to Azure SQL because:
 - Dashboard loading: 40-60% faster 📊
 - Filtering/sorting: 50-70% faster 🎯
 
-**29 Indexes Total** covering:
+**23 Indexes Total** covering:
 - User authentication & lookups
 - Client search & filtering
 - Project queries
@@ -165,7 +165,7 @@ WHERE name LIKE 'idx_%'
 ORDER BY OBJECT_NAME(object_id), name;
 ```
 
-You should see **29 indexes** listed!
+You should see **23 indexes** listed!
 
 ### **Option 2: Check Your App**
 - Visit your app
@@ -218,7 +218,7 @@ DROP INDEX idx_users_email ON users;
 ## ✅ Success Checklist
 
 After running the script, you should have:
-- [x] 29 indexes created
+- [x] 23 indexes created
 - [x] No errors (or only "already exists" errors)
 - [x] Faster query performance
 - [x] Lower database CPU usage
@@ -231,7 +231,7 @@ After running the script, you should have:
 **Congratulations!** Your database is now optimized for production!
 
 ### **What You Accomplished**
-- ✅ Applied 29 performance indexes
+- ✅ Applied 23 performance indexes
 - ✅ 40-80% faster queries
 - ✅ Better scalability
 - ✅ Production-ready database

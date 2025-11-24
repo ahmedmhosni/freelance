@@ -1,6 +1,6 @@
 -- ============================================
 -- Performance Indexes for Roastify Database
--- Run this script to optimize query performance
+-- CORRECTED VERSION - Matches actual schema
 -- ============================================
 
 USE roastifydbazure;
@@ -57,22 +57,10 @@ END
 ELSE
     PRINT '⏭ idx_users_password_reset_token already exists';
 
--- Note: password_reset_code column doesn't exist in schema, skipping index
-
 -- ============================================
 -- CLIENTS TABLE INDEXES
 -- ============================================
 PRINT 'Creating indexes on clients table...';
-
--- User's clients lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_clients_user_id' AND object_id = OBJECT_ID('clients'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_clients_user_id 
-    ON clients(user_id);
-    PRINT '✓ Created idx_clients_user_id';
-END
-ELSE
-    PRINT '⏭ idx_clients_user_id already exists';
 
 -- Email lookup
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_clients_email' AND object_id = OBJECT_ID('clients'))
@@ -100,27 +88,6 @@ ELSE
 -- ============================================
 PRINT 'Creating indexes on projects table...';
 
--- User's projects lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_projects_user_id' AND object_id = OBJECT_ID('projects'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_projects_user_id 
-    ON projects(user_id);
-    PRINT '✓ Created idx_projects_user_id';
-END
-ELSE
-    PRINT '⏭ idx_projects_user_id already exists';
-
--- Client's projects lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_projects_client_id' AND object_id = OBJECT_ID('projects'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_projects_client_id 
-    ON projects(client_id) 
-    WHERE client_id IS NOT NULL;
-    PRINT '✓ Created idx_projects_client_id';
-END
-ELSE
-    PRINT '⏭ idx_projects_client_id already exists';
-
 -- Status filtering
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_projects_status' AND object_id = OBJECT_ID('projects'))
 BEGIN
@@ -146,27 +113,6 @@ ELSE
 -- TASKS TABLE INDEXES
 -- ============================================
 PRINT 'Creating indexes on tasks table...';
-
--- User's tasks lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_tasks_user_id' AND object_id = OBJECT_ID('tasks'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_tasks_user_id 
-    ON tasks(user_id);
-    PRINT '✓ Created idx_tasks_user_id';
-END
-ELSE
-    PRINT '⏭ idx_tasks_user_id already exists';
-
--- Project's tasks lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_tasks_project_id' AND object_id = OBJECT_ID('tasks'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_tasks_project_id 
-    ON tasks(project_id) 
-    WHERE project_id IS NOT NULL;
-    PRINT '✓ Created idx_tasks_project_id';
-END
-ELSE
-    PRINT '⏭ idx_tasks_project_id already exists';
 
 -- Status filtering (Kanban board)
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_tasks_status' AND object_id = OBJECT_ID('tasks'))
@@ -215,38 +161,6 @@ ELSE
 -- ============================================
 PRINT 'Creating indexes on invoices table...';
 
--- User's invoices lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_invoices_user_id' AND object_id = OBJECT_ID('invoices'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_invoices_user_id 
-    ON invoices(user_id);
-    PRINT '✓ Created idx_invoices_user_id';
-END
-ELSE
-    PRINT '⏭ idx_invoices_user_id already exists';
-
--- Client's invoices lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_invoices_client_id' AND object_id = OBJECT_ID('invoices'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_invoices_client_id 
-    ON invoices(client_id) 
-    WHERE client_id IS NOT NULL;
-    PRINT '✓ Created idx_invoices_client_id';
-END
-ELSE
-    PRINT '⏭ idx_invoices_client_id already exists';
-
--- Project's invoices lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_invoices_project_id' AND object_id = OBJECT_ID('invoices'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_invoices_project_id 
-    ON invoices(project_id) 
-    WHERE project_id IS NOT NULL;
-    PRINT '✓ Created idx_invoices_project_id';
-END
-ELSE
-    PRINT '⏭ idx_invoices_project_id already exists';
-
 -- Status filtering (paid, pending, overdue)
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_invoices_status' AND object_id = OBJECT_ID('invoices'))
 BEGIN
@@ -289,51 +203,94 @@ ELSE
     PRINT '⏭ idx_invoices_revenue already exists';
 
 -- ============================================
--- TIME TRACKING TABLE INDEXES
+-- TIME ENTRIES TABLE INDEXES
 -- ============================================
-PRINT 'Creating indexes on time_tracking table...';
-
--- User's time entries lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_tracking_user_id' AND object_id = OBJECT_ID('time_tracking'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_time_tracking_user_id 
-    ON time_tracking(user_id);
-    PRINT '✓ Created idx_time_tracking_user_id';
-END
-ELSE
-    PRINT '⏭ idx_time_tracking_user_id already exists';
-
--- Project's time entries lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_tracking_project_id' AND object_id = OBJECT_ID('time_tracking'))
-BEGIN
-    CREATE NONCLUSTERED INDEX idx_time_tracking_project_id 
-    ON time_tracking(project_id) 
-    WHERE project_id IS NOT NULL;
-    PRINT '✓ Created idx_time_tracking_project_id';
-END
-ELSE
-    PRINT '⏭ idx_time_tracking_project_id already exists';
+PRINT 'Creating indexes on time_entries table...';
 
 -- Task's time entries lookup
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_tracking_task_id' AND object_id = OBJECT_ID('time_tracking'))
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_entries_task_id' AND object_id = OBJECT_ID('time_entries'))
 BEGIN
-    CREATE NONCLUSTERED INDEX idx_time_tracking_task_id 
-    ON time_tracking(task_id) 
+    CREATE NONCLUSTERED INDEX idx_time_entries_task_id 
+    ON time_entries(task_id) 
     WHERE task_id IS NOT NULL;
-    PRINT '✓ Created idx_time_tracking_task_id';
+    PRINT '✓ Created idx_time_entries_task_id';
 END
 ELSE
-    PRINT '⏭ idx_time_tracking_task_id already exists';
+    PRINT '⏭ idx_time_entries_task_id already exists';
 
 -- Date range queries
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_tracking_dates' AND object_id = OBJECT_ID('time_tracking'))
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_entries_date' AND object_id = OBJECT_ID('time_entries'))
 BEGIN
-    CREATE NONCLUSTERED INDEX idx_time_tracking_dates 
-    ON time_tracking(user_id, start_time, end_time);
-    PRINT '✓ Created idx_time_tracking_dates';
+    CREATE NONCLUSTERED INDEX idx_time_entries_date 
+    ON time_entries(user_id, date);
+    PRINT '✓ Created idx_time_entries_date';
 END
 ELSE
-    PRINT '⏭ idx_time_tracking_dates already exists';
+    PRINT '⏭ idx_time_entries_date already exists';
+
+-- Running timer lookup
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_time_entries_running' AND object_id = OBJECT_ID('time_entries'))
+BEGIN
+    CREATE NONCLUSTERED INDEX idx_time_entries_running 
+    ON time_entries(user_id, is_running) 
+    WHERE is_running = 1;
+    PRINT '✓ Created idx_time_entries_running';
+END
+ELSE
+    PRINT '⏭ idx_time_entries_running already exists';
+
+-- ============================================
+-- FILE METADATA TABLE INDEXES
+-- ============================================
+PRINT 'Creating indexes on file_metadata table...';
+
+-- Project files lookup
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_file_metadata_project' AND object_id = OBJECT_ID('file_metadata'))
+BEGIN
+    CREATE NONCLUSTERED INDEX idx_file_metadata_project 
+    ON file_metadata(project_id) 
+    WHERE project_id IS NOT NULL;
+    PRINT '✓ Created idx_file_metadata_project';
+END
+ELSE
+    PRINT '⏭ idx_file_metadata_project already exists';
+
+-- Cloud provider filtering
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_file_metadata_provider' AND object_id = OBJECT_ID('file_metadata'))
+BEGIN
+    CREATE NONCLUSTERED INDEX idx_file_metadata_provider 
+    ON file_metadata(user_id, cloud_provider);
+    PRINT '✓ Created idx_file_metadata_provider';
+END
+ELSE
+    PRINT '⏭ idx_file_metadata_provider already exists';
+
+-- ============================================
+-- ACTIVITY LOGS TABLE INDEXES
+-- ============================================
+PRINT 'Creating indexes on activity_logs table...';
+
+-- User activity lookup
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_activity_logs_user' AND object_id = OBJECT_ID('activity_logs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX idx_activity_logs_user 
+    ON activity_logs(user_id, created_at DESC) 
+    WHERE user_id IS NOT NULL;
+    PRINT '✓ Created idx_activity_logs_user';
+END
+ELSE
+    PRINT '⏭ idx_activity_logs_user already exists';
+
+-- Entity lookup
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_activity_logs_entity' AND object_id = OBJECT_ID('activity_logs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX idx_activity_logs_entity 
+    ON activity_logs(entity_type, entity_id) 
+    WHERE entity_type IS NOT NULL AND entity_id IS NOT NULL;
+    PRINT '✓ Created idx_activity_logs_entity';
+END
+ELSE
+    PRINT '⏭ idx_activity_logs_entity already exists';
 
 -- ============================================
 -- SUMMARY
@@ -345,13 +302,15 @@ PRINT '============================================';
 PRINT '';
 PRINT 'Indexes created for:';
 PRINT '  ✓ Users (4 indexes)';
-PRINT '  ✓ Clients (3 indexes)';
-PRINT '  ✓ Projects (4 indexes)';
-PRINT '  ✓ Tasks (6 indexes)';
-PRINT '  ✓ Invoices (7 indexes)';
-PRINT '  ✓ Time Tracking (4 indexes)';
+PRINT '  ✓ Clients (2 indexes)';
+PRINT '  ✓ Projects (2 indexes)';
+PRINT '  ✓ Tasks (4 indexes)';
+PRINT '  ✓ Invoices (4 indexes)';
+PRINT '  ✓ Time Entries (3 indexes)';
+PRINT '  ✓ File Metadata (2 indexes)';
+PRINT '  ✓ Activity Logs (2 indexes)';
 PRINT '';
-PRINT 'Total: 28 performance indexes';
+PRINT 'Total: 23 performance indexes';
 PRINT '';
 PRINT 'Expected Performance Improvements:';
 PRINT '  • Login queries: 50-70% faster';
