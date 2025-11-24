@@ -84,7 +84,8 @@ const Login = () => {
       overflow: 'hidden',
       background: isDark 
         ? '#0a0a0a'
-        : '#ffffff'
+        : '#ffffff',
+      padding: window.innerWidth <= 768 ? '20px' : '0'
     }}>
       {/* Stripe-like Animated Gradient Mesh */}
       <div style={{
@@ -185,7 +186,7 @@ const Login = () => {
       <div style={{ 
         width: '100%', 
         maxWidth: '360px', 
-        padding: '20px',
+        padding: window.innerWidth <= 768 ? '16px' : '20px',
         position: 'relative',
         zIndex: 1
       }}>

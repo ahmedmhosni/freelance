@@ -52,7 +52,8 @@ const Register = () => {
       overflow: 'hidden',
       background: isDark 
         ? '#0a0a0a'
-        : '#ffffff'
+        : '#ffffff',
+      padding: window.innerWidth <= 768 ? '20px' : '0'
     }}>
       {/* Stripe-like Animated Gradient Mesh */}
       <div style={{

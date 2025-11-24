@@ -158,32 +158,65 @@ const Invoices = () => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="page-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '24px',
+        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+        gap: window.innerWidth <= 768 ? '16px' : '0'
+      }}>
         <div>
           <h1 style={{ marginBottom: '4px' }}>Invoices</h1>
           <p className="page-subtitle">
             Manage billing and payments
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="page-actions" style={{ 
+          display: 'flex', 
+          gap: '8px',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          width: window.innerWidth <= 768 ? '100%' : 'auto'
+        }}>
           {invoices.length > 0 && (
             <button 
               className="btn-edit" 
               onClick={handleExportCSV}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                width: window.innerWidth <= 768 ? '100%' : 'auto'
+              }}
             >
               <MdFileDownload size={18} />
               Export CSV
             </button>
           )}
-          <button className="btn-primary" onClick={handleCreateNew}>Create Invoice</button>
+          <button 
+            className="btn-primary" 
+            onClick={handleCreateNew}
+            style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
+          >
+            Create Invoice
+          </button>
         </div>
       </div>
 
       {loading ? (
         <LoadingSkeleton type="stat" count={3} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
+        <div className="stats-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: window.innerWidth <= 768 
+            ? '1fr' 
+            : window.innerWidth <= 1024 
+              ? 'repeat(2, 1fr)' 
+              : 'repeat(3, 1fr)', 
+          gap: '12px', 
+          marginBottom: '32px' 
+        }}>
           <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
             <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
               <MdAttachMoney />
@@ -307,53 +340,58 @@ const Invoices = () => {
               <p>No invoices yet. Create your first invoice to get started!</p>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #ddd' }}>
-                  <th style={{ textAlign: 'left', padding: '12px' }}>Invoice #</th>
-                  <th style={{ textAlign: 'left', padding: '12px' }}>Amount</th>
-                  <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
-                  <th style={{ textAlign: 'left', padding: '12px' }}>Due Date</th>
-                  <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map(invoice => (
-                  <tr key={invoice.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '12px' }}><strong>{invoice.invoice_number}</strong></td>
-                    <td style={{ padding: '12px' }}>${parseFloat(invoice.amount).toFixed(2)}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span className={`status-badge status-${invoice.status}`}>
-                        {invoice.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px' }}>{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}</td>
-                    <td style={{ padding: '12px', textAlign: 'right' }}>
-                      <button 
-                        onClick={() => handleDownloadPDF(invoice.id)}
-                        className="btn-edit"
-                        style={{ marginRight: '8px' }}
-                      >
-                        PDF
-                      </button>
-                      <button 
-                        onClick={() => handleEdit(invoice)}
-                        className="btn-edit"
-                        style={{ marginRight: '8px' }}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => confirmDelete(invoice.id)}
-                        className="btn-delete"
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <div className="table-container" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '600px' : 'auto' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #ddd' }}>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>Invoice #</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>Amount</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>Due Date</th>
+                    <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {invoices.map(invoice => (
+                    <tr key={invoice.id} style={{ borderBottom: '1px solid #eee' }}>
+                      <td style={{ padding: '12px' }}><strong>{invoice.invoice_number}</strong></td>
+                      <td style={{ padding: '12px' }}>${parseFloat(invoice.amount).toFixed(2)}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span className={`status-badge status-${invoice.status}`}>
+                          {invoice.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px' }}>{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}</td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                          <button 
+                            onClick={() => handleDownloadPDF(invoice.id)}
+                            className="btn-edit"
+                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                          >
+                            PDF
+                          </button>
+                          <button 
+                            onClick={() => handleEdit(invoice)}
+                            className="btn-edit"
+                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => confirmDelete(invoice.id)}
+                            className="btn-delete"
+                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
