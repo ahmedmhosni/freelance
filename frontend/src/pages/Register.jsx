@@ -1,28 +1,41 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdLightMode, MdDarkMode } from 'react-icons/md';
+import { MdLightMode, MdDarkMode, MdCheck, MdClose } from 'react-icons/md';
 import api from '../utils/api';
+import { validatePassword, getPasswordRequirements } from '../utils/passwordValidator';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  const passwordReqs = getPasswordRequirements(formData.password);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
     setSuccess('');
+
+    // Validate password on frontend
+    const validation = validatePassword(formData.password);
+    if (!validation.isValid) {
+      setError(validation.errors[0]);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       await api.post('/api/auth/register', formData);
       setSuccess('Account created successfully');
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed');
+      const errorMsg = err.response?.data?.error || err.response?.data?.details?.[0]?.msg || 'Registration failed';
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -272,11 +285,12 @@ const Register = () => {
             </label>
             <input
               type="password"
-              placeholder="Create a password"
+              placeholder="Create a strong password"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
               required
-              minLength={6}
               style={{
                 width: '100%',
                 padding: '8px 10px',
@@ -289,13 +303,41 @@ const Register = () => {
                 color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
               }}
             />
-            <div style={{ 
-              fontSize: '12px', 
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)', 
-              marginTop: '4px' 
-            }}>
-              At least 6 characters
-            </div>
+            
+            {/* Password Requirements */}
+            {(passwordFocused || formData.password) && (
+              <div style={{
+                marginTop: '8px',
+                padding: '8px',
+                background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
+                borderRadius: '3px',
+                fontSize: '11px'
+              }}>
+                <div style={{ marginBottom: '4px', fontWeight: '500', color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)' }}>
+                  Password must contain:
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', color: passwordReqs.minLength ? '#2eaadc' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)') }}>
+                  {passwordReqs.minLength ? <MdCheck size={14} /> : <MdClose size={14} />}
+                  At least 8 characters
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', color: passwordReqs.hasUppercase ? '#2eaadc' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)') }}>
+                  {passwordReqs.hasUppercase ? <MdCheck size={14} /> : <MdClose size={14} />}
+                  One uppercase letter
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', color: passwordReqs.hasLowercase ? '#2eaadc' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)') }}>
+                  {passwordReqs.hasLowercase ? <MdCheck size={14} /> : <MdClose size={14} />}
+                  One lowercase letter
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', color: passwordReqs.hasNumber ? '#2eaadc' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)') }}>
+                  {passwordReqs.hasNumber ? <MdCheck size={14} /> : <MdClose size={14} />}
+                  One number
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: passwordReqs.hasSpecialChar ? '#2eaadc' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)') }}>
+                  {passwordReqs.hasSpecialChar ? <MdCheck size={14} /> : <MdClose size={14} />}
+                  One special character (!@#$%^&*)
+                </div>
+              </div>
+            )}
           </div>
 
           <button
