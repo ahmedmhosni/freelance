@@ -74,7 +74,7 @@ router.get('/:id', async (req, res) => {
 
 // Create client
 router.post('/', async (req, res) => {
-  const { name, email, phone, company, notes, tags } = req.body;
+  const { name, email, phone, company, notes } = req.body;
   try {
     const pool = await db;
     const request = pool.request();
@@ -84,10 +84,9 @@ router.post('/', async (req, res) => {
     request.input('phone', sql.NVarChar, phone || null);
     request.input('company', sql.NVarChar, company || null);
     request.input('notes', sql.NVarChar, notes || null);
-    request.input('tags', sql.NVarChar, tags || null);
     
     const result = await request.query(
-      'INSERT INTO clients (user_id, name, email, phone, company, notes, tags) OUTPUT INSERTED.id VALUES (@userId, @name, @email, @phone, @company, @notes, @tags)'
+      'INSERT INTO clients (user_id, name, email, phone, company, notes) OUTPUT INSERTED.id VALUES (@userId, @name, @email, @phone, @company, @notes)'
     );
     
     res.status(201).json({ id: result.recordset[0].id, message: 'Client created' });
@@ -98,7 +97,7 @@ router.post('/', async (req, res) => {
 
 // Update client
 router.put('/:id', async (req, res) => {
-  const { name, email, phone, company, notes, tags } = req.body;
+  const { name, email, phone, company, notes } = req.body;
   try {
     const pool = await db;
     const request = pool.request();
@@ -107,12 +106,11 @@ router.put('/:id', async (req, res) => {
     request.input('phone', sql.NVarChar, phone || null);
     request.input('company', sql.NVarChar, company || null);
     request.input('notes', sql.NVarChar, notes || null);
-    request.input('tags', sql.NVarChar, tags || null);
     request.input('id', sql.Int, req.params.id);
     request.input('userId', sql.Int, req.user.id);
     
     await request.query(
-      'UPDATE clients SET name = @name, email = @email, phone = @phone, company = @company, notes = @notes, tags = @tags, updated_at = GETDATE() WHERE id = @id AND user_id = @userId'
+      'UPDATE clients SET name = @name, email = @email, phone = @phone, company = @company, notes = @notes WHERE id = @id AND user_id = @userId'
     );
     
     res.json({ message: 'Client updated' });

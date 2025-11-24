@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.azure' });
+require('dotenv').config(); // Use main .env file
 const { getPool, closePool } = require('./azuresql');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');

@@ -25,12 +25,12 @@ router.get('/', async (req, res) => {
       request.input('projectId', sql.Int, project_id);
     }
     if (start_date && end_date) {
-      query += ' AND date BETWEEN @startDate AND @endDate';
+      query += ' AND CAST(start_time AS DATE) BETWEEN @startDate AND @endDate';
       request.input('startDate', sql.Date, start_date);
       request.input('endDate', sql.Date, end_date);
     }
 
-    query += ' ORDER BY date DESC, start_time DESC';
+    query += ' ORDER BY start_time DESC';
     const result = await request.query(query);
     res.json(result.recordset);
   } catch (error) {
@@ -50,9 +50,9 @@ router.post('/start', async (req, res) => {
     request.input('description', sql.NVarChar, description || null);
     
     const result = await request.query(`
-      INSERT INTO time_entries (user_id, task_id, project_id, description, date, start_time, is_running) 
+      INSERT INTO time_entries (user_id, task_id, project_id, description, start_time) 
       OUTPUT INSERTED.id
-      VALUES (@userId, @taskId, @projectId, @description, CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 1)
+      VALUES (@userId, @taskId, @projectId, @description, GETDATE())
     `);
     
     res.status(201).json({ id: result.recordset[0].id, message: 'Time tracking started' });
@@ -82,12 +82,8 @@ router.post('/stop/:id', async (req, res) => {
     await updateRequest.query(`
       UPDATE time_entries 
       SET 
-        end_time = CAST(GETDATE() AS TIME), 
-        is_running = 0,
-        duration = DATEDIFF(MINUTE, 
-          CAST(CONCAT(CAST(date AS VARCHAR), ' ', CAST(start_time AS VARCHAR)) AS DATETIME),
-          GETDATE()
-        ) / 60.0
+        end_time = GETDATE(),
+        duration = DATEDIFF(MINUTE, start_time, GETDATE())
       WHERE id = @id
     `);
 
@@ -136,12 +132,12 @@ router.get('/summary', async (req, res) => {
     const pool = await db;
     const { start_date, end_date } = req.query;
     
-    let query = 'SELECT ISNULL(SUM(duration), 0) as total_hours, COUNT(*) as total_entries FROM time_entries WHERE user_id = @userId AND is_running = 0';
+    let query = 'SELECT ISNULL(SUM(duration), 0) as total_hours, COUNT(*) as total_entries FROM time_entries WHERE user_id = @userId AND end_time IS NOT NULL';
     const request = pool.request();
     request.input('userId', sql.Int, req.user.id);
 
     if (start_date && end_date) {
-      query += ' AND date BETWEEN @startDate AND @endDate';
+      query += ' AND CAST(start_time AS DATE) BETWEEN @startDate AND @endDate';
       request.input('startDate', sql.Date, start_date);
       request.input('endDate', sql.Date, end_date);
     }

@@ -1,33 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const sql = require('mssql');
-const db = require('../db');
+const queries = require('../db/queries');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 // Get daily quote (public endpoint)
 router.get('/daily', async (req, res) => {
   try {
-    const pool = await db;
-    
-    // Get day of year to rotate quotes daily
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 0);
-    const diff = now - start;
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
-
-    const request = pool.request();
-    request.input('offset', sql.Int, dayOfYear % 365);
-    
-    const result = await request.query(`
-      SELECT * FROM quotes 
-      WHERE is_active = 1 
-      ORDER BY id 
-      OFFSET @offset ROWS 
-      FETCH NEXT 1 ROWS ONLY
-    `);
-    
-    const quote = result.recordset[0];
+    const quote = await queries.getDailyQuote();
     
     if (!quote) {
       // Fallback quote

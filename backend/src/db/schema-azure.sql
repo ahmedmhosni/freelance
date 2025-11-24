@@ -21,7 +21,7 @@ CREATE TABLE clients (
     company NVARCHAR(255),
     address NVARCHAR(MAX),
     notes NVARCHAR(MAX),
-    created_by INT FOREIGN KEY REFERENCES users(id),
+    user_id INT FOREIGN KEY REFERENCES users(id),
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE projects (
     budget DECIMAL(10, 2),
     start_date DATE,
     end_date DATE,
-    created_by INT FOREIGN KEY REFERENCES users(id),
+    user_id INT FOREIGN KEY REFERENCES users(id),
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE tasks (
     status NVARCHAR(50) DEFAULT 'todo',
     priority NVARCHAR(50) DEFAULT 'medium',
     due_date DATE,
-    created_by INT FOREIGN KEY REFERENCES users(id),
+    user_id INT FOREIGN KEY REFERENCES users(id),
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE invoices (
     issue_date DATE NOT NULL,
     due_date DATE NOT NULL,
     notes NVARCHAR(MAX),
-    created_by INT FOREIGN KEY REFERENCES users(id),
+    user_id INT FOREIGN KEY REFERENCES users(id),
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
@@ -89,7 +89,7 @@ CREATE TABLE files (
     size INT,
     path NVARCHAR(500) NOT NULL,
     project_id INT FOREIGN KEY REFERENCES projects(id) ON DELETE CASCADE,
-    uploaded_by INT FOREIGN KEY REFERENCES users(id),
+    user_id INT FOREIGN KEY REFERENCES users(id),
     created_at DATETIME2 DEFAULT GETDATE()
 );
 
@@ -108,8 +108,8 @@ CREATE TABLE notifications (
 CREATE TABLE time_entries (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE,
-    project_id INT FOREIGN KEY REFERENCES projects(id) ON DELETE CASCADE,
-    task_id INT FOREIGN KEY REFERENCES tasks(id) ON DELETE SET NULL,
+    project_id INT FOREIGN KEY REFERENCES projects(id) ON DELETE NO ACTION,
+    task_id INT FOREIGN KEY REFERENCES tasks(id) ON DELETE NO ACTION,
     description NVARCHAR(MAX),
     start_time DATETIME2 NOT NULL,
     end_time DATETIME2,
@@ -128,14 +128,17 @@ CREATE TABLE quotes (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_clients_created_by ON clients(created_by);
+CREATE INDEX idx_clients_user_id ON clients(user_id);
 CREATE INDEX idx_projects_client_id ON projects(client_id);
-CREATE INDEX idx_projects_created_by ON projects(created_by);
+CREATE INDEX idx_projects_user_id ON projects(user_id);
 CREATE INDEX idx_tasks_project_id ON tasks(project_id);
+CREATE INDEX idx_tasks_user_id ON tasks(user_id);
 CREATE INDEX idx_tasks_assigned_to ON tasks(assigned_to);
 CREATE INDEX idx_invoices_client_id ON invoices(client_id);
 CREATE INDEX idx_invoices_project_id ON invoices(project_id);
+CREATE INDEX idx_invoices_user_id ON invoices(user_id);
 CREATE INDEX idx_files_project_id ON files(project_id);
+CREATE INDEX idx_files_user_id ON files(user_id);
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_time_entries_user_id ON time_entries(user_id);
 CREATE INDEX idx_time_entries_project_id ON time_entries(project_id);

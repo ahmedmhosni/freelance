@@ -1,17 +1,24 @@
 const sql = require('mssql');
 
-// Azure SQL configuration
+// Load environment variables
+require('dotenv').config();
+
+// SQL Server configuration - supports both local and Azure
+const isAzureSQL = (process.env.DB_SERVER || process.env.AZURE_SQL_SERVER || '').includes('database.windows.net');
+
 const config = {
-  server: process.env.AZURE_SQL_SERVER || 'roastify-db-server.database.windows.net',
-  database: process.env.AZURE_SQL_DATABASE || 'roastifydbazure',
-  user: process.env.AZURE_SQL_USER || 'adminuser',
-  password: process.env.AZURE_SQL_PASSWORD,
+  server: process.env.DB_SERVER || process.env.AZURE_SQL_SERVER || 'roastify-db-server.database.windows.net',
+  database: process.env.DB_DATABASE || process.env.AZURE_SQL_DATABASE || 'roastifydbazure',
+  user: process.env.DB_USER !== undefined ? process.env.DB_USER : process.env.AZURE_SQL_USER,
+  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : process.env.AZURE_SQL_PASSWORD,
+  port: parseInt(process.env.DB_PORT || process.env.AZURE_SQL_PORT || '1433'),
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: isAzureSQL ? true : (process.env.DB_ENCRYPT === 'true'),
+    trustServerCertificate: isAzureSQL ? false : (process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'),
     enableArithAbort: true,
     connectionTimeout: 30000,
-    requestTimeout: 30000
+    requestTimeout: 30000,
+    useUTC: false
   },
   pool: {
     max: 10,
@@ -19,6 +26,36 @@ const config = {
     idleTimeoutMillis: 30000
   }
 };
+
+// Use Windows Authentication only for local SQL Server Express
+if ((!config.user || config.user === '') && (!config.password || config.password === '')) {
+  // Local SQL Server with Windows Authentication
+  config.authentication = {
+    type: 'default'
+  };
+  delete config.user;
+  delete config.password;
+  
+  // Don't use instance name if port is specified
+  if (config.port && config.port !== 1433) {
+    delete config.options.instanceName;
+    console.log(`Using Windows Authentication for SQL Server: ${config.server}:${config.port}`);
+  } else if (config.server.includes('\\')) {
+    // Handle named instances like AHMED\SQLEXPRESS01
+    const parts = config.server.split('\\');
+    config.server = parts[0];
+    config.options.instanceName = parts[1];
+    console.log(`Using Windows Authentication for SQL Server: ${config.server}\\${config.options.instanceName}`);
+  } else {
+    config.options.instanceName = 'SQLEXPRESS';
+    console.log(`Using Windows Authentication for SQL Server: ${config.server}\\${config.options.instanceName}`);
+  }
+} else if (config.server.includes('azure') || config.server.includes('database.windows.net')) {
+  // Azure SQL - use SQL Authentication
+  console.log(`Connecting to Azure SQL: ${config.server}`);
+  console.log(`Encryption enabled: ${config.options.encrypt}`);
+  delete config.options.instanceName;
+}
 
 // Create connection pool
 let pool = null;

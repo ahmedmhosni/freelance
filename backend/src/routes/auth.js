@@ -2,8 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const sql = require('mssql');
-const db = require('../db');
+const queries = require('../db/queries');
 
 const router = express.Router();
 
@@ -21,32 +20,20 @@ router.post('/register', [
   const { name, email, password, role = 'freelancer' } = req.body;
 
   try {
-    const pool = await db;
-    
     // Check if user exists
-    const checkRequest = pool.request();
-    checkRequest.input('email', sql.NVarChar, email);
-    const checkResult = await checkRequest.query('SELECT id FROM users WHERE email = @email');
+    const existingUser = await queries.findUserByEmail(email);
     
-    if (checkResult.recordset.length > 0) {
+    if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Hash password and insert user
+    // Hash password and create user
     const passwordHash = await bcrypt.hash(password, 10);
-    const insertRequest = pool.request();
-    insertRequest.input('name', sql.NVarChar, name);
-    insertRequest.input('email', sql.NVarChar, email);
-    insertRequest.input('passwordHash', sql.NVarChar, passwordHash);
-    insertRequest.input('role', sql.NVarChar, role);
-    
-    const insertResult = await insertRequest.query(
-      'INSERT INTO users (name, email, password_hash, role) OUTPUT INSERTED.id VALUES (@name, @email, @passwordHash, @role)'
-    );
+    const result = await queries.createUser(name, email, passwordHash, role);
 
     res.status(201).json({ 
       message: 'User registered successfully', 
-      userId: insertResult.recordset[0].id 
+      userId: result.id 
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -66,19 +53,14 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
-    const pool = await db;
-    
     // Get user by email
-    const request = pool.request();
-    request.input('email', sql.NVarChar, email);
-    const result = await request.query('SELECT * FROM users WHERE email = @email');
+    const user = await queries.findUserByEmail(email);
     
-    const user = result.recordset[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -99,6 +81,7 @@ router.post('/login', [
       }
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: error.message });
   }
 });
