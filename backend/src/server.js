@@ -25,6 +25,7 @@ const maintenanceRoutes = require('./routes/maintenance');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
+const { swaggerUi, specs } = require('./swagger');
 
 // Create logs directory if it doesn't exist
 const logsDir = path.join(__dirname, '../logs');
@@ -53,6 +54,17 @@ const io = socketIo(server, {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// HTTPS redirect in production
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+}
 
 // Middleware
 app.use(helmet());
@@ -100,6 +112,12 @@ io.on('connection', (socket) => {
     console.log('Client disconnected:', socket.id);
   });
 });
+
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Roastify API Documentation'
+}));
 
 // Health check (must be before other routes)
 app.get('/health', (req, res) => {
