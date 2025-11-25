@@ -10,13 +10,20 @@ const Status = () => {
 
   const fetchStatus = async () => {
     try {
-      const response = await fetch('/api/status');
+      // Use full API URL for production, relative for development
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/status`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       setStatus(data);
       setLastUpdate(new Date());
     } catch (error) {
       console.error('Failed to fetch status:', error);
-      setStatus({ status: 'error', services: {} });
+      setStatus({ status: 'error', services: {}, error: error.message });
     } finally {
       setLoading(false);
     }
