@@ -16,9 +16,10 @@ const config = {
     encrypt: isAzureSQL ? true : (process.env.DB_ENCRYPT === 'true'),
     trustServerCertificate: isAzureSQL ? false : (process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'),
     enableArithAbort: true,
-    connectionTimeout: 30000,
-    requestTimeout: 30000,
-    useUTC: false
+    connectionTimeout: 60000,
+    requestTimeout: 60000,
+    useUTC: false,
+    abortTransactionOnError: true
   },
   pool: {
     max: 10,
