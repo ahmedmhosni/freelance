@@ -25,14 +25,16 @@ ELSE
     PRINT '⏭ username column already exists';
 GO
 
--- Add unique constraint on username
+-- Add unique index on username (allows multiple NULLs)
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'UQ_users_username' AND object_id = OBJECT_ID('users'))
 BEGIN
-    ALTER TABLE users ADD CONSTRAINT UQ_users_username UNIQUE (username);
-    PRINT '✓ Added unique constraint on username';
+    CREATE UNIQUE NONCLUSTERED INDEX UQ_users_username 
+    ON users(username) 
+    WHERE username IS NOT NULL;
+    PRINT '✓ Added unique index on username';
 END
 ELSE
-    PRINT '⏭ Unique constraint on username already exists';
+    PRINT '⏭ Unique index on username already exists';
 GO
 
 -- Add job title
