@@ -49,3 +49,6 @@ backend/create-sql-login.sql
 backend/setup-local-db.sql
 setup-*.ps1
 *.ps1
+
+*storybook.log
+storybook-static

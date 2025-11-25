@@ -1,7 +1,12 @@
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const DashboardCharts = ({ taskData, invoiceData }) => {
-  const COLORS = ['#667eea', '#f093fb', '#4facfe', '#43e97b'];
+  const COLORS = [
+    'var(--chart-color-1)',
+    'var(--chart-color-2)',
+    'var(--chart-color-3)',
+    'var(--chart-color-4)'
+  ];
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginTop: '30px' }}>

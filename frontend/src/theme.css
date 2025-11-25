@@ -34,6 +34,33 @@
   
   --icon-color: rgba(55, 53, 47, 0.4);
   --icon-active: rgba(55, 53, 47, 0.8);
+  
+  /* Semantic Colors - Accent Colors */
+  --accent-blue: #2eaadc;
+  --accent-blue-bg: rgba(46, 170, 220, 0.1);
+  --accent-blue-border: rgba(46, 170, 220, 0.3);
+  
+  --accent-red: #eb5757;
+  --accent-red-bg: rgba(235, 87, 87, 0.1);
+  --accent-red-border: rgba(235, 87, 87, 0.3);
+  
+  --accent-yellow: #ffd426;
+  --accent-yellow-bg: rgba(255, 212, 38, 0.1);
+  --accent-yellow-border: rgba(255, 212, 38, 0.3);
+  
+  --accent-orange: #ffa344;
+  --accent-orange-bg: rgba(255, 163, 68, 0.1);
+  --accent-orange-border: rgba(255, 163, 68, 0.3);
+  
+  --accent-green: #28a745;
+  --accent-green-bg: rgba(40, 167, 69, 0.1);
+  --accent-green-border: rgba(40, 167, 69, 0.3);
+  
+  /* Chart Colors */
+  --chart-color-1: #667eea;
+  --chart-color-2: #f093fb;
+  --chart-color-3: #4facfe;
+  --chart-color-4: #43e97b;
 }
 
 /* Dark Theme Colors */
@@ -71,6 +98,33 @@ body.dark-mode {
   
   --icon-color: rgba(255, 255, 255, 0.3);
   --icon-active: rgba(255, 255, 255, 0.8);
+  
+  /* Semantic Colors - Same in Dark Mode */
+  --accent-blue: #2eaadc;
+  --accent-blue-bg: rgba(46, 170, 220, 0.2);
+  --accent-blue-border: rgba(46, 170, 220, 0.3);
+  
+  --accent-red: #eb5757;
+  --accent-red-bg: rgba(235, 87, 87, 0.2);
+  --accent-red-border: rgba(235, 87, 87, 0.3);
+  
+  --accent-yellow: #ffd426;
+  --accent-yellow-bg: rgba(255, 212, 38, 0.2);
+  --accent-yellow-border: rgba(255, 212, 38, 0.3);
+  
+  --accent-orange: #ffa344;
+  --accent-orange-bg: rgba(255, 163, 68, 0.2);
+  --accent-orange-border: rgba(255, 163, 68, 0.3);
+  
+  --accent-green: #28a745;
+  --accent-green-bg: rgba(40, 167, 69, 0.2);
+  --accent-green-border: rgba(40, 167, 69, 0.3);
+  
+  /* Chart Colors - Same in Dark Mode */
+  --chart-color-1: #667eea;
+  --chart-color-2: #f093fb;
+  --chart-color-3: #4facfe;
+  --chart-color-4: #43e97b;
 }
 
 /* Apply theme variables to common elements */
