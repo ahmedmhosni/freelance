@@ -24,7 +24,6 @@ import AdminPanel from './pages/AdminPanel';
 import LoaderTest from './pages/LoaderTest';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
-import InvoicePayment from './pages/InvoicePayment';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -86,7 +85,6 @@ function App() {
               <Route path="/status" element={<Status />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/profile/:username" element={<PublicProfile />} />
-              <Route path="/invoice/:invoiceId/pay" element={<PrivateRoute><InvoicePayment /></PrivateRoute>} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
                 <Route index element={<Navigate to="/dashboard" />} />
                 <Route path="dashboard" element={<Dashboard />} />
