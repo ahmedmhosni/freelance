@@ -60,14 +60,22 @@ const server = http.createServer(app);
 // Azure uses X-Forwarded-For header
 app.set('trust proxy', true);
 
-// Allowed origins for CORS
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'https://white-sky-0a7e9f003.3.azurestaticapps.net',
-  'https://roastify.online',
-  'https://www.roastify.online'
-];
+// Allowed origins for CORS - use environment variable or defaults
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      process.env.FRONTEND_URL,
+      'https://roastify.online',
+      'https://www.roastify.online'
+    ]
+  : [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://white-sky-0a7e9f003.3.azurestaticapps.net',
+      'https://roastify.online',
+      'https://www.roastify.online'
+    ];
 
 const io = socketIo(server, {
   cors: {
