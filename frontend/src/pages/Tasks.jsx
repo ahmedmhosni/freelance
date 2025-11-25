@@ -96,7 +96,11 @@ const Tasks = () => {
 
   const handleEdit = (task) => {
     setEditingTask(task);
-    setFormData(task);
+    setFormData({
+      ...task,
+      description: task.description || '',
+      project_id: task.project_id || ''
+    });
     setShowForm(true);
   };
 

@@ -24,13 +24,26 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { project_id, client_id, invoice_number, amount, status, due_date, notes } = req.body;
   try {
+    console.log('Creating invoice with data:', { project_id, client_id, invoice_number, amount, status, due_date, notes });
+    
+    // Validate required fields
+    if (!client_id) {
+      return res.status(400).json({ error: 'Client is required' });
+    }
+    if (!invoice_number) {
+      return res.status(400).json({ error: 'Invoice number is required' });
+    }
+    if (!amount || isNaN(parseFloat(amount))) {
+      return res.status(400).json({ error: 'Valid amount is required' });
+    }
+    
     const pool = await db;
     const request = pool.request();
     request.input('userId', sql.Int, req.user.id);
     request.input('projectId', sql.Int, project_id || null);
-    request.input('clientId', sql.Int, client_id);
+    request.input('clientId', sql.Int, parseInt(client_id));
     request.input('invoiceNumber', sql.NVarChar, invoice_number);
-    request.input('amount', sql.Decimal(10, 2), amount);
+    request.input('amount', sql.Decimal(10, 2), parseFloat(amount));
     request.input('status', sql.NVarChar, status || 'draft');
     request.input('dueDate', sql.Date, due_date || null);
     request.input('notes', sql.NVarChar, notes || null);
@@ -41,6 +54,7 @@ router.post('/', async (req, res) => {
     
     res.status(201).json({ id: result.recordset[0].id, message: 'Invoice created' });
   } catch (error) {
+    console.error('Error creating invoice:', error);
     res.status(500).json({ error: error.message });
   }
 });
