@@ -39,12 +39,16 @@ router.get('/preferences', authenticateToken, async (req, res) => {
     const userId = req.user.id;
     
     // Get user preferences from database
-    const query = 'SELECT theme FROM users WHERE id = ?';
-    const user = await db.get(query, [userId]);
+    const pool = await db;
+    const result = await pool.request()
+      .input('userId', userId)
+      .query('SELECT theme FROM users WHERE id = @userId');
     
-    if (!user) {
+    if (!result.recordset || result.recordset.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    const user = result.recordset[0];
     
     res.json({
       theme: user.theme || 'light'
@@ -93,8 +97,11 @@ router.put('/preferences', authenticateToken, async (req, res) => {
     }
     
     // Update user preferences
-    const query = 'UPDATE users SET theme = ? WHERE id = ?';
-    await db.run(query, [theme || 'light', userId]);
+    const pool = await db;
+    await pool.request()
+      .input('theme', theme || 'light')
+      .input('userId', userId)
+      .query('UPDATE users SET theme = @theme WHERE id = @userId');
     
     res.json({
       message: 'Preferences updated successfully',
