@@ -3,6 +3,36 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { MdAdd, MdDelete, MdAccessTime } from 'react-icons/md';
 
+// Consistent styling matching Login page
+const styles = {
+  label: {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: '500',
+    color: 'rgba(55, 53, 47, 0.65)',
+    marginBottom: '6px'
+  },
+  input: {
+    fontSize: '14px',
+    padding: '8px 10px'
+  },
+  button: {
+    fontSize: '14px',
+    fontWeight: '600',
+    padding: '10px'
+  },
+  helpText: {
+    fontSize: '11px',
+    color: 'rgba(55, 53, 47, 0.5)',
+    margin: '4px 0 0 0'
+  },
+  heading: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#37352f'
+  }
+};
+
 const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -274,12 +304,12 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
 
   return (
     <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
-      <h3>{invoice ? 'Edit Invoice' : 'New Invoice'}</h3>
+      <h3 style={styles.heading}>{invoice ? 'Edit Invoice' : 'New Invoice'}</h3>
       <form onSubmit={handleSubmit}>
         {/* Basic Info */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500', color: 'rgba(55, 53, 47, 0.9)' }}>
+            <label style={styles.label}>
               Invoice Number *
             </label>
             <input
