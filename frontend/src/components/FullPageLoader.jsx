@@ -15,11 +15,11 @@ const FullPageLoader = ({ text = '' }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
+      backgroundColor: isDark ? '#191919' : '#ffffff',
       zIndex: 9999,
       transition: 'background-color 0.3s ease'
     }}>
-      <LogoLoader size={80} text={text} />
+      <LogoLoader size={32} text={text} />
     </div>
   );
 };
