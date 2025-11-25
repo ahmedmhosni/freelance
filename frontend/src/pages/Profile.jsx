@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import LogoLoader from '../components/LogoLoader';
 import AvatarPicker from '../components/AvatarPicker';
 import { 
-  MdPerson, MdWork, MdLocationOn, MdLanguage, MdVisibility, MdVisibilityOff,
+  MdPerson, MdWork, MdLocationOn, MdLanguage,
   MdContentCopy, MdCheck, MdPhotoCamera
 } from 'react-icons/md';
 import { 
@@ -163,13 +163,10 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={copyProfileLink}
+                    className="btn-edit"
                     style={{
                       padding: '4px 8px',
                       fontSize: '12px',
-                      backgroundColor: 'transparent',
-                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
-                      borderRadius: '4px',
-                      cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
@@ -193,7 +190,7 @@ const Profile = () => {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 Full Name *
               </label>
               <input
@@ -202,12 +199,12 @@ const Profile = () => {
                 value={profile.name}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 Username (for public profile)
               </label>
               <input
@@ -216,7 +213,7 @@ const Profile = () => {
                 value={profile.username}
                 onChange={handleChange}
                 placeholder="your-username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
               <small style={{ fontSize: '12px', opacity: 0.6 }}>
                 Letters, numbers, underscores, and hyphens only
@@ -224,7 +221,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <MdWork style={{ verticalAlign: 'middle', marginRight: '4px' }} />
                 Job Title
               </label>
@@ -234,12 +231,12 @@ const Profile = () => {
                 value={profile.job_title}
                 onChange={handleChange}
                 placeholder="e.g. Freelance Designer"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <MdLocationOn style={{ verticalAlign: 'middle', marginRight: '4px' }} />
                 Location
               </label>
@@ -249,13 +246,13 @@ const Profile = () => {
                 value={profile.location}
                 onChange={handleChange}
                 placeholder="City, Country"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
           </div>
 
           <div style={{ marginTop: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+            <label className="form-label">
               Bio
             </label>
             <textarea
@@ -265,7 +262,8 @@ const Profile = () => {
               placeholder="Tell us about yourself..."
               rows="4"
               maxLength="500"
-              style={{ width: '100%', padding: '10px 12px', fontSize: '14px', resize: 'vertical' }}
+              className="form-input"
+              style={{ resize: 'vertical' }}
             />
             <small style={{ fontSize: '12px', opacity: 0.6 }}>
               {profile.bio.length}/500 characters
@@ -273,7 +271,7 @@ const Profile = () => {
           </div>
 
           <div style={{ marginTop: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+            <label className="form-label">
               Profile Picture
             </label>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -281,13 +279,6 @@ const Profile = () => {
                 type="button"
                 onClick={() => setShowAvatarPicker(true)}
                 className="btn-primary"
-                style={{ 
-                  fontSize: '13px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '10px 16px'
-                }}
               >
                 <MdPhotoCamera size={16} />
                 Choose Avatar
@@ -323,7 +314,7 @@ const Profile = () => {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 Website
               </label>
               <input
@@ -332,12 +323,12 @@ const Profile = () => {
                 value={profile.website}
                 onChange={handleChange}
                 placeholder="https://yourwebsite.com"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 Portfolio
               </label>
               <input
@@ -346,7 +337,7 @@ const Profile = () => {
                 value={profile.portfolio}
                 onChange={handleChange}
                 placeholder="https://portfolio.com"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
           </div>
@@ -363,7 +354,7 @@ const Profile = () => {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaLinkedin style={{ verticalAlign: 'middle', marginRight: '4px', color: '#0077b5' }} />
                 LinkedIn
               </label>
@@ -373,12 +364,12 @@ const Profile = () => {
                 value={profile.linkedin}
                 onChange={handleChange}
                 placeholder="https://linkedin.com/in/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaBehance style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1769ff' }} />
                 Behance
               </label>
@@ -388,12 +379,12 @@ const Profile = () => {
                 value={profile.behance}
                 onChange={handleChange}
                 placeholder="https://behance.net/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaInstagram style={{ verticalAlign: 'middle', marginRight: '4px', color: '#E4405F' }} />
                 Instagram
               </label>
@@ -403,12 +394,12 @@ const Profile = () => {
                 value={profile.instagram}
                 onChange={handleChange}
                 placeholder="https://instagram.com/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaFacebook style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1877f2' }} />
                 Facebook
               </label>
@@ -418,12 +409,12 @@ const Profile = () => {
                 value={profile.facebook}
                 onChange={handleChange}
                 placeholder="https://facebook.com/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaTwitter style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1DA1F2' }} />
                 Twitter / X
               </label>
@@ -433,12 +424,12 @@ const Profile = () => {
                 value={profile.twitter}
                 onChange={handleChange}
                 placeholder="https://twitter.com/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaGithub style={{ verticalAlign: 'middle', marginRight: '4px' }} />
                 GitHub
               </label>
@@ -448,12 +439,12 @@ const Profile = () => {
                 value={profile.github}
                 onChange={handleChange}
                 placeholder="https://github.com/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+              <label className="form-label">
                 <FaDribbble style={{ verticalAlign: 'middle', marginRight: '4px', color: '#ea4c89' }} />
                 Dribbble
               </label>
@@ -463,7 +454,7 @@ const Profile = () => {
                 value={profile.dribbble}
                 onChange={handleChange}
                 placeholder="https://dribbble.com/username"
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px' }}
+                className="form-input"
               />
             </div>
           </div>
@@ -476,14 +467,15 @@ const Profile = () => {
           </h3>
           
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
+            <label className="form-label">
               Profile Visibility
             </label>
             <select
               name="profile_visibility"
               value={profile.profile_visibility}
               onChange={handleChange}
-              style={{ width: '100%', maxWidth: '300px', padding: '10px 12px', fontSize: '14px' }}
+              className="form-input"
+              style={{ maxWidth: '300px' }}
             >
               <option value="public">
                 Public - Anyone can view your profile
@@ -501,33 +493,14 @@ const Profile = () => {
             type="button"
             onClick={fetchProfile}
             disabled={saving}
-            style={{
-              padding: '12px 24px',
-              fontSize: '14px',
-              fontWeight: '500',
-              backgroundColor: 'transparent',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
-              borderRadius: '8px',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.5 : 1
-            }}
+            className="btn-edit"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            style={{
-              padding: '12px 24px',
-              fontSize: '14px',
-              fontWeight: '500',
-              backgroundColor: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.7 : 1
-            }}
+            className="btn-primary"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
