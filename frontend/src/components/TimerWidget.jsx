@@ -135,13 +135,14 @@ const TimerWidget = () => {
           padding: '8px 12px',
           borderRadius: '3px',
           cursor: 'pointer',
-          fontSize: '14px',
+          fontSize: '16px',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
           fontWeight: '500',
           transition: 'all 0.15s ease',
-          minWidth: activeEntry ? '100px' : 'auto'
+          minWidth: activeEntry ? '100px' : '40px',
+          height: '40px'
         }}
         onMouseEnter={(e) => {
           e.target.style.background = activeEntry
@@ -154,8 +155,8 @@ const TimerWidget = () => {
             : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)');
         }}
       >
-        <MdAccessTime size={18} />
-        {activeEntry && <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatTime(elapsedTime)}</span>}
+        <MdAccessTime size={16} />
+        {activeEntry && <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: '13px' }}>{formatTime(elapsedTime)}</span>}
       </button>
 
       {showPopup && (

@@ -38,7 +38,6 @@ const Layout = () => {
     { path: '/invoices', label: 'Invoices', icon: MdReceipt },
     { path: '/time-tracking', label: 'Time', icon: MdAccessTime },
     { path: '/reports', label: 'Reports', icon: MdBarChart },
-    { path: '/profile', label: 'Profile', icon: MdPerson },
   ];
 
   if (user?.role === 'admin') {
@@ -221,6 +220,41 @@ const Layout = () => {
               <span className="nav-item-text">{isDark ? 'Light' : 'Dark'}</span>
             )}
           </button>
+          
+          <Link
+            to="/profile"
+            title={isCollapsed ? 'Profile' : ''}
+            style={{
+              width: '100%',
+              background: 'transparent',
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
+              padding: '6px 12px',
+              marginBottom: '8px',
+              borderRadius: '3px',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              transition: 'all 0.15s ease',
+              overflow: 'hidden',
+              textDecoration: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.04)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            <span className="nav-item-icon" style={{ fontSize: '18px', display: 'flex', alignItems: 'center' }}>
+              <MdPerson />
+            </span>
+            {!isCollapsed && (
+              <span className="nav-item-text">Profile</span>
+            )}
+          </Link>
           
           <button 
             onClick={logout}

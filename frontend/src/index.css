@@ -534,11 +534,6 @@ body.dark-mode .skeleton {
   }
 }
 
-/* Smooth transitions */
-* {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
 /* Dark mode for Login/Register pages */
 body.dark-mode .login-container,
 body.dark-mode .register-container {
@@ -599,11 +594,6 @@ body.dark-mode .login-container a,
 body.dark-mode .register-container a {
   color: rgba(255, 255, 255, 0.9) !important;
   border-bottom-color: rgba(255, 255, 255, 0.4) !important;
-}
-
-/* Smooth transitions */
-* {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 /* Action Buttons - Minimal Style */

@@ -59,7 +59,12 @@ const NotificationBell = () => {
           cursor: 'pointer',
           position: 'relative',
           fontSize: '16px',
-          transition: 'all 0.15s ease'
+          transition: 'all 0.15s ease',
+          width: '40px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
         onMouseEnter={(e) => {
           e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(55, 53, 47, 0.12)';
