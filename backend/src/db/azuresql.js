@@ -6,10 +6,16 @@ require('dotenv').config();
 // SQL Server configuration - supports both local and Azure
 const isAzureSQL = (process.env.DB_SERVER || process.env.AZURE_SQL_SERVER || '').includes('database.windows.net');
 
+// Get username and remove @server suffix if present (Azure SQL doesn't need it)
+let username = process.env.DB_USER !== undefined ? process.env.DB_USER : process.env.AZURE_SQL_USER;
+if (username && username.includes('@')) {
+  username = username.split('@')[0];
+}
+
 const config = {
   server: process.env.DB_SERVER || process.env.AZURE_SQL_SERVER || 'roastify-db-server.database.windows.net',
   database: process.env.DB_DATABASE || process.env.AZURE_SQL_DATABASE || 'roastifydbazure',
-  user: process.env.DB_USER !== undefined ? process.env.DB_USER : process.env.AZURE_SQL_USER,
+  user: username,
   password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : process.env.AZURE_SQL_PASSWORD,
   port: parseInt(process.env.DB_PORT || process.env.AZURE_SQL_PORT || '1433'),
   options: {
