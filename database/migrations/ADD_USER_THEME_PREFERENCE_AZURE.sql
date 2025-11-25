@@ -1,6 +1,9 @@
 -- Add theme preference column to users table
 -- Azure SQL version
 
+SET QUOTED_IDENTIFIER ON;
+GO
+
 -- Check if column exists, if not add it
 IF NOT EXISTS (
     SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
