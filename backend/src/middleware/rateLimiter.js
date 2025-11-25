@@ -4,20 +4,18 @@ const logger = require('../utils/logger');
 // Check if running in development
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Key generator for user-based rate limiting
-const userKeyGenerator = (req) => {
-  // Use user ID if authenticated, otherwise fall back to IP
-  if (req.user && req.user.id) {
-    return `user_${req.user.id}`;
-  }
-  return `ip_${req.ip}`;
-};
-
-// General API rate limiter (per user)
+// General API rate limiter (per user or IP)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: isDevelopment ? 10000 : 500, // 500 requests per 15 min per user in production
-  keyGenerator: userKeyGenerator,
+  // Use user ID if authenticated, otherwise use IP (handled by express-rate-limit)
+  keyGenerator: (req, res) => {
+    if (req.user && req.user.id) {
+      return `user_${req.user.id}`;
+    }
+    // Return undefined to use default IP-based key generator
+    return undefined;
+  },
   message: 'Too many requests, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -44,7 +42,7 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: isDevelopment ? 1000 : 10, // 10 attempts per 15 min per IP in production
   skipSuccessfulRequests: true, // Don't count successful requests
-  keyGenerator: (req) => `auth_${req.ip}`, // Always use IP for auth
+  // Use default IP-based key generator
   message: 'Too many login attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -65,11 +63,17 @@ const authLimiter = rateLimit({
   }
 });
 
-// Rate limiter for file uploads (per user)
+// Rate limiter for file uploads (per user or IP)
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: isDevelopment ? 1000 : 50, // 50 uploads per hour per user in production
-  keyGenerator: userKeyGenerator,
+  keyGenerator: (req, res) => {
+    if (req.user && req.user.id) {
+      return `user_${req.user.id}`;
+    }
+    // Return undefined to use default IP-based key generator
+    return undefined;
+  },
   message: 'Too many file uploads, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
