@@ -15,6 +15,12 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
+      // Apply dark-mode class to body for CSS
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
     }
     setLoading(false);
 
@@ -32,6 +38,12 @@ export const ThemeProvider = ({ children }) => {
         setTheme(response.data.theme);
         document.documentElement.setAttribute('data-theme', response.data.theme);
         localStorage.setItem('theme', response.data.theme);
+        // Apply dark-mode class to body for CSS
+        if (response.data.theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
       }
     } catch (error) {
       // Silently fail - user might not be logged in or endpoint doesn't exist yet
@@ -44,6 +56,13 @@ export const ThemeProvider = ({ children }) => {
     setTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+    
+    // Apply dark-mode class to body for CSS
+    if (newTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
 
     // Save to server if user is logged in
     const token = localStorage.getItem('token');
