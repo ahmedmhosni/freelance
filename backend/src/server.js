@@ -54,6 +54,10 @@ if (!fs.existsSync(logsDir)) {
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy - Required for Azure App Service to get real client IP
+// Azure uses X-Forwarded-For header
+app.set('trust proxy', true);
+
 // Allowed origins for CORS
 const allowedOrigins = [
   'http://localhost:3000',
