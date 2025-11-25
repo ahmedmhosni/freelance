@@ -14,6 +14,7 @@ import {
   MdReceipt, 
   MdAccessTime, 
   MdBarChart,
+  MdPerson,
   MdAdminPanelSettings,
   MdChevronLeft,
   MdChevronRight,
@@ -37,6 +38,7 @@ const Layout = () => {
     { path: '/invoices', label: 'Invoices', icon: MdReceipt },
     { path: '/time-tracking', label: 'Time', icon: MdAccessTime },
     { path: '/reports', label: 'Reports', icon: MdBarChart },
+    { path: '/profile', label: 'Profile', icon: MdPerson },
   ];
 
   if (user?.role === 'admin') {

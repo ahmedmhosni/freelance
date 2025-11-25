@@ -22,6 +22,8 @@ import Reports from './pages/Reports';
 import TimeTracking from './pages/TimeTracking';
 import AdminPanel from './pages/AdminPanel';
 import LoaderTest from './pages/LoaderTest';
+import Profile from './pages/Profile';
+import PublicProfile from './pages/PublicProfile';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -82,6 +84,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/status" element={<Status />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
+              <Route path="/profile/:username" element={<PublicProfile />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
                 <Route index element={<Navigate to="/dashboard" />} />
                 <Route path="dashboard" element={<Dashboard />} />
@@ -91,6 +94,7 @@ function App() {
                 <Route path="invoices" element={<Invoices />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="time-tracking" element={<TimeTracking />} />
+                <Route path="profile" element={<Profile />} />
                 <Route path="admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
                 <Route path="loader-test" element={<PrivateRoute adminOnly><LoaderTest /></PrivateRoute>} />
               </Route>
