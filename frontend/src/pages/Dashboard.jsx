@@ -192,13 +192,13 @@ const Dashboard = () => {
                         fontSize: '11px',
                         padding: '2px 6px',
                         borderRadius: '2px',
-                        background: task.priority === 'urgent' ? 'rgba(235, 87, 87, 0.1)' : 
-                                   task.priority === 'high' ? 'rgba(255, 163, 68, 0.1)' :
-                                   task.priority === 'medium' ? 'rgba(255, 212, 38, 0.1)' : 'rgba(55, 53, 47, 0.08)',
-                        color: task.priority === 'urgent' ? '#eb5757' : 
-                               task.priority === 'high' ? '#ffa344' :
-                               task.priority === 'medium' ? '#ffd426' : 'rgba(55, 53, 47, 0.65)',
-                        fontWeight: '500'
+                        background: task.priority === 'urgent' ? 'rgba(55, 53, 47, 0.16)' : 
+                                   task.priority === 'high' ? 'rgba(55, 53, 47, 0.12)' :
+                                   task.priority === 'medium' ? 'rgba(55, 53, 47, 0.08)' : 'rgba(55, 53, 47, 0.06)',
+                        color: task.priority === 'urgent' ? 'rgba(55, 53, 47, 0.9)' : 
+                               task.priority === 'high' ? 'rgba(55, 53, 47, 0.8)' :
+                               task.priority === 'medium' ? 'rgba(55, 53, 47, 0.7)' : 'rgba(55, 53, 47, 0.65)',
+                        fontWeight: task.priority === 'urgent' || task.priority === 'high' ? '600' : '500'
                       }}>
                         {task.priority}
                       </span>
@@ -215,7 +215,13 @@ const Dashboard = () => {
                         </span>
                       )}
                       {task.due_date && (
-                        <span style={{ color: isOverdue ? '#eb5757' : 'rgba(55, 53, 47, 0.5)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ 
+                          color: isOverdue ? 'rgba(55, 53, 47, 0.9)' : 'rgba(55, 53, 47, 0.5)', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '4px',
+                          fontWeight: isOverdue ? '600' : '400'
+                        }}>
                           <MdAccessTime size={14} /> {new Date(task.due_date).toLocaleDateString()}
                           {isOverdue && ' • Overdue'}
                         </span>
@@ -227,13 +233,9 @@ const Dashboard = () => {
                       fontSize: '11px', 
                       padding: '3px 8px',
                       borderRadius: '2px',
-                      background: task.status === 'in-progress' ? 'rgba(46, 170, 220, 0.1)' : 
-                                 task.status === 'review' ? 'rgba(255, 212, 38, 0.1)' : 
-                                 task.status === 'done' ? 'rgba(46, 170, 220, 0.1)' : 'rgba(55, 53, 47, 0.08)',
-                      color: task.status === 'in-progress' ? '#2eaadc' : 
-                             task.status === 'review' ? '#ffd426' : 
-                             task.status === 'done' ? '#2eaadc' : 'rgba(55, 53, 47, 0.65)',
-                      fontWeight: '500'
+                      background: task.status === 'done' ? 'rgba(55, 53, 47, 0.16)' : 'rgba(55, 53, 47, 0.08)',
+                      color: task.status === 'done' ? 'rgba(55, 53, 47, 0.9)' : 'rgba(55, 53, 47, 0.65)',
+                      fontWeight: task.status === 'done' ? '600' : '500'
                     }}>
                       {task.status.replace('-', ' ')}
                     </span>

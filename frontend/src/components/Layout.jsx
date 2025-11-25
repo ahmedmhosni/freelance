@@ -252,7 +252,7 @@ const Layout = () => {
               <MdPerson />
             </span>
             {!isCollapsed && (
-              <span className="nav-item-text">Profile</span>
+              <span className="nav-item-text">{user?.name || 'Profile'}</span>
             )}
           </Link>
           

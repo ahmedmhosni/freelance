@@ -260,7 +260,7 @@ const Tasks = () => {
             <select value={formData.project_id} onChange={(e) => setFormData({...formData, project_id: e.target.value})} style={{ marginBottom: '10px' }}>
               <option value="">Select Project (Optional)</option>
               {projects.map(project => (
-                <option key={project.id} value={project.id}>{project.title}</option>
+                <option key={project.id} value={project.id}>{project.name || project.title}</option>
               ))}
             </select>
             <select value={formData.priority} onChange={(e) => setFormData({...formData, priority: e.target.value})} style={{ marginBottom: '10px' }}>

@@ -3,27 +3,22 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
+import InvoiceForm from '../components/InvoiceForm';
 import { MdReceipt, MdAttachMoney, MdFileDownload } from 'react-icons/md';
 import { exportInvoicesCSV } from '../utils/exportCSV';
-import { generateInvoiceNumber, validateInvoiceNumber, invoiceNumberExists } from '../utils/invoiceGenerator';
+import { generateInvoiceNumber } from '../utils/invoiceGenerator';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
   const [clients, setClients] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, invoiceId: null });
-  const [formData, setFormData] = useState({
-    client_id: '', project_id: '', invoice_number: '', amount: '', status: 'draft', due_date: '', notes: ''
-  });
-  const [invoiceNumberError, setInvoiceNumberError] = useState('');
 
   useEffect(() => {
     fetchInvoices();
     fetchClients();
-    fetchProjects();
   }, []);
 
   const fetchInvoices = async () => {
@@ -50,61 +45,11 @@ const Invoices = () => {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/api/projects');
-      const data = response.data.data || response.data;
-      setProjects(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-    }
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate invoice number
-    if (!validateInvoiceNumber(formData.invoice_number)) {
-      setInvoiceNumberError('Invalid invoice number format');
-      return;
-    }
-    
-    // Check for duplicates
-    if (invoiceNumberExists(formData.invoice_number, invoices, editingInvoice?.id)) {
-      setInvoiceNumberError('Invoice number already exists');
-      return;
-    }
-    
-    try {
-      if (editingInvoice) {
-        await api.put(`/api/invoices/${editingInvoice.id}`, formData);
-        toast.success('Invoice updated successfully!');
-      } else {
-        await api.post('/api/invoices', formData);
-        toast.success('Invoice created successfully!');
-      }
-      setShowForm(false);
-      setEditingInvoice(null);
-      setInvoiceNumberError('');
-      setFormData({ client_id: '', project_id: '', invoice_number: '', amount: '', status: 'draft', due_date: '', notes: '' });
-      fetchInvoices();
-    } catch (error) {
-      console.error('Error saving invoice:', error);
-      toast.error(error.response?.data?.error || 'Failed to save invoice');
-    }
-  };
 
   const handleCreateNew = () => {
     const newInvoiceNumber = generateInvoiceNumber(invoices);
-    setFormData({ 
-      client_id: '', 
-      project_id: '', 
-      invoice_number: newInvoiceNumber, 
-      amount: '', 
-      status: 'draft', 
-      due_date: '', 
-      notes: '' 
-    });
+    setEditingInvoice({ invoice_number: newInvoiceNumber });
     setShowForm(true);
   };
 
@@ -119,7 +64,6 @@ const Invoices = () => {
 
   const handleEdit = (invoice) => {
     setEditingInvoice(invoice);
-    setFormData(invoice);
     setShowForm(true);
   };
 
@@ -141,8 +85,21 @@ const Invoices = () => {
 
   const handleDownloadPDF = async (invoiceId) => {
     try {
-      window.open(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, '_blank');
-      toast.success('Opening PDF...');
+      const response = await api.get(`/api/invoices/${invoiceId}/pdf`, {
+        responseType: 'blob'
+      });
+      
+      // Create a blob URL and download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice-${invoiceId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('PDF downloaded!');
     } catch (error) {
       console.error('Error downloading PDF:', error);
       toast.error('Failed to download PDF');
@@ -153,8 +110,8 @@ const Invoices = () => {
     draft: '#6c757d', sent: '#007bff', paid: '#28a745', overdue: '#dc3545', cancelled: '#6c757d'
   };
 
-  const totalRevenue = invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount), 0);
-  const pendingAmount = invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.amount), 0);
+  const totalRevenue = invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
+  const pendingAmount = invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
 
   return (
     <div className="container">
@@ -269,65 +226,14 @@ const Invoices = () => {
       )}
 
       {showForm && (
-        <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
-          <h3>{editingInvoice ? 'Edit Invoice' : 'New Invoice'}</h3>
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '10px' }}>
-              <input 
-                placeholder="Invoice Number (e.g., INV-0001) *" 
-                value={formData.invoice_number} 
-                onChange={(e) => {
-                  setFormData({...formData, invoice_number: e.target.value});
-                  setInvoiceNumberError('');
-                }} 
-                required 
-                style={{ 
-                  borderColor: invoiceNumberError ? '#eb5757' : undefined,
-                  marginBottom: invoiceNumberError ? '4px' : '0'
-                }} 
-              />
-              {invoiceNumberError && (
-                <p style={{ color: '#eb5757', fontSize: '12px', margin: '4px 0 0 0' }}>
-                  {invoiceNumberError}
-                </p>
-              )}
-              {!editingInvoice && (
-                <p style={{ fontSize: '11px', color: 'rgba(55, 53, 47, 0.5)', margin: '4px 0 0 0' }}>
-                  Auto-generated. You can modify if needed.
-                </p>
-              )}
-            </div>
-            <select value={formData.client_id} onChange={(e) => setFormData({...formData, client_id: e.target.value})} required style={{ marginBottom: '10px' }}>
-              <option value="">Select Client *</option>
-              {clients.map(client => (
-                <option key={client.id} value={client.id}>{client.name}</option>
-              ))}
-            </select>
-            <select value={formData.project_id} onChange={(e) => setFormData({...formData, project_id: e.target.value})} style={{ marginBottom: '10px' }}>
-              <option value="">Select Project (Optional)</option>
-              {projects.map(project => (
-                <option key={project.id} value={project.id}>{project.title}</option>
-              ))}
-            </select>
-            <input type="number" step="0.01" placeholder="Amount *" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} required style={{ marginBottom: '10px' }} />
-            <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} style={{ marginBottom: '10px' }}>
-              <option value="draft">Draft</option>
-              <option value="sent">Sent</option>
-              <option value="paid">Paid</option>
-              <option value="overdue">Overdue</option>
-            </select>
-            <input type="date" placeholder="Due Date *" value={formData.due_date} onChange={(e) => setFormData({...formData, due_date: e.target.value})} required style={{ marginBottom: '10px' }} />
-            <textarea placeholder="Notes" value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} style={{ marginBottom: '10px', minHeight: '60px' }} />
-            <div>
-              <button type="submit" className="btn-primary" style={{ marginRight: '10px' }}>
-                {editingInvoice ? 'Update' : 'Create'}
-              </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingInvoice(null); setFormData({ client_id: '', project_id: '', invoice_number: '', amount: '', status: 'draft', due_date: '', notes: '' }); }}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+        <InvoiceForm
+          invoice={editingInvoice?.id ? editingInvoice : null}
+          onClose={() => {
+            setShowForm(false);
+            setEditingInvoice(null);
+          }}
+          onSuccess={fetchInvoices}
+        />
       )}
 
       {loading ? (
@@ -341,27 +247,41 @@ const Invoices = () => {
             </div>
           ) : (
             <div className="table-container" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '600px' : 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '700px' : 'auto', fontFamily: 'inherit' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid #ddd' }}>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Invoice #</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Amount</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>Due Date</th>
-                    <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Invoice #</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Client</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Items</th>
+                    <th style={{ textAlign: 'right', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Amount</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Status</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Due Date</th>
+                    <th style={{ textAlign: 'right', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoices.map(invoice => (
                     <tr key={invoice.id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '12px' }}><strong>{invoice.invoice_number}</strong></td>
-                      <td style={{ padding: '12px' }}>${parseFloat(invoice.amount).toFixed(2)}</td>
-                      <td style={{ padding: '12px' }}>
-                        <span className={`status-badge status-${invoice.status}`}>
+                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px' }}>
+                        <strong style={{ fontFamily: 'inherit' }}>{invoice.invoice_number}</strong>
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
+                        {invoice.client_name || '-'}
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)' }}>
+                        {invoice.item_count || 0} {invoice.item_count === 1 ? 'item' : 'items'}
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', textAlign: 'right', fontWeight: '500' }}>
+                        ${parseFloat(invoice.total || invoice.amount || 0).toFixed(2)}
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'inherit' }}>
+                        <span className={`status-badge status-${invoice.status}`} style={{ fontFamily: 'inherit' }}>
                           {invoice.status}
                         </span>
                       </td>
-                      <td style={{ padding: '12px' }}>{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}</td>
+                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
+                        {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}
+                      </td>
                       <td style={{ padding: '12px', textAlign: 'right' }}>
                         <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                           <button 

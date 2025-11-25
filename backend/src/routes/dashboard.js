@@ -30,20 +30,20 @@ router.get('/stats', async (req, res) => {
         (SELECT COUNT(*) FROM tasks WHERE user_id = @userId AND status != @doneStatus) as active_tasks_count,
         (SELECT COUNT(*) FROM invoices WHERE user_id = @userId) as invoices_count,
         (SELECT COUNT(*) FROM invoices WHERE user_id = @userId AND status IN (@sentStatus, @overdueStatus)) as pending_invoices_count,
-        (SELECT ISNULL(SUM(amount), 0) FROM invoices WHERE user_id = @userId AND status = @paidStatus) as total_revenue
+        (SELECT ISNULL(SUM(total), 0) FROM invoices WHERE user_id = @userId AND status = @paidStatus) as total_revenue
     `);
 
     const stats = result.recordset[0];
 
     res.json({
-      clients: stats.clients_count,
-      projects: stats.projects_count,
-      activeProjects: stats.active_projects_count,
-      tasks: stats.tasks_count,
-      activeTasks: stats.active_tasks_count,
-      invoices: stats.invoices_count,
-      pendingInvoices: stats.pending_invoices_count,
-      totalRevenue: parseFloat(stats.total_revenue)
+      clients: parseInt(stats.clients_count) || 0,
+      projects: parseInt(stats.projects_count) || 0,
+      activeProjects: parseInt(stats.active_projects_count) || 0,
+      tasks: parseInt(stats.tasks_count) || 0,
+      activeTasks: parseInt(stats.active_tasks_count) || 0,
+      invoices: parseInt(stats.invoices_count) || 0,
+      pendingInvoices: parseInt(stats.pending_invoices_count) || 0,
+      totalRevenue: parseFloat(stats.total_revenue) || 0
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -65,7 +65,7 @@ router.get('/recent-tasks', async (req, res) => {
     const result = await request.query(`
       SELECT TOP (@limit)
         t.*,
-        p.title as project_name
+        p.name as project_name
       FROM tasks t
       LEFT JOIN projects p ON t.project_id = p.id
       WHERE t.user_id = @userId AND t.status != @doneStatus

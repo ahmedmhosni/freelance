@@ -147,7 +147,7 @@ const Projects = () => {
             />
             <textarea 
               placeholder="Description" 
-              value={formData.description} 
+              value={formData.description || ''} 
               onChange={(e) => setFormData({...formData, description: e.target.value})} 
               style={{ marginBottom: '10px', minHeight: '80px' }} 
             />
@@ -208,15 +208,15 @@ const Projects = () => {
           {projects.map(project => (
             <div key={project.id} className="card" style={{ position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
-                <h3 style={{ margin: 0, flex: 1, fontSize: '16px' }}>{project.title}</h3>
+                <h3 style={{ margin: 0, flex: 1, fontSize: '16px' }}>{project.name}</h3>
                 <span className={`status-badge status-${project.status}`} style={{ marginLeft: '10px' }}>
                   {project.status}
                 </span>
               </div>
               <p style={{ color: 'rgba(55, 53, 47, 0.65)', marginBottom: '15px', minHeight: '40px', fontSize: '14px' }}>{project.description || 'No description'}</p>
-              {project.deadline && (
+              {project.end_date && (
                 <p style={{ fontSize: '12px', color: 'rgba(55, 53, 47, 0.5)', marginBottom: '15px' }}>
-                  {new Date(project.deadline).toLocaleDateString()}
+                  {new Date(project.end_date).toLocaleDateString()}
                 </p>
               )}
               <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
