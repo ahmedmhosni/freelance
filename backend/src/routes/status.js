@@ -88,7 +88,9 @@ router.get('/', async (req, res) => {
   try {
     const dbStart = Date.now();
     const pool = await db;
-    await pool.request().query('SELECT 1');
+    const request = pool.request();
+    request.timeout = 30000; // 30 second timeout for status check
+    await request.query('SELECT 1');
     status.services.database.status = 'operational';
     status.services.database.responseTime = Date.now() - dbStart;
   } catch (error) {
