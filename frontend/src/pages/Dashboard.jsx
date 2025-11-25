@@ -69,7 +69,7 @@ const Dashboard = () => {
         justifyContent: 'center', 
         minHeight: '60vh' 
       }}>
-        <LogoLoader size={100} text="Loading your dashboard..." />
+        <LogoLoader size={80} text="" />
       </div>
     );
   }

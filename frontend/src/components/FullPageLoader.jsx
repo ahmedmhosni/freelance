@@ -2,7 +2,7 @@ import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 import LogoLoader from './LogoLoader';
 
-const FullPageLoader = ({ text = 'Loading...' }) => {
+const FullPageLoader = ({ text = '' }) => {
   const { isDark } = useTheme();
 
   return (
@@ -15,11 +15,11 @@ const FullPageLoader = ({ text = 'Loading...' }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: isDark ? '#1a1a2e' : '#f8f9fa',
+      backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
       zIndex: 9999,
       transition: 'background-color 0.3s ease'
     }}>
-      <LogoLoader size={100} text={text} />
+      <LogoLoader size={80} text={text} />
     </div>
   );
 };

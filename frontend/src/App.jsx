@@ -28,7 +28,7 @@ const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <FullPageLoader text="Loading your workspace..." />;
+    return <FullPageLoader text="" />;
   }
   
   if (!user) return <Navigate to="/login" />;
