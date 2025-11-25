@@ -48,11 +48,21 @@ const Projects = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Transform formData to match backend expectations
+      const projectData = {
+        name: formData.title,
+        description: formData.description,
+        client_id: formData.client_id || null,
+        status: formData.status,
+        end_date: formData.deadline || null,
+        start_date: formData.start_date || null
+      };
+      
       if (editingProject) {
-        await api.put(`/api/projects/${editingProject.id}`, formData);
+        await api.put(`/api/projects/${editingProject.id}`, projectData);
         toast.success('Project updated successfully!');
       } else {
-        await api.post('/api/projects', formData);
+        await api.post('/api/projects', projectData);
         toast.success('Project created successfully!');
       }
       setShowForm(false);
@@ -67,7 +77,15 @@ const Projects = () => {
 
   const handleEdit = (project) => {
     setEditingProject(project);
-    setFormData(project);
+    // Map backend fields to frontend form fields
+    setFormData({
+      title: project.name,
+      description: project.description,
+      client_id: project.client_id,
+      status: project.status,
+      deadline: project.end_date,
+      start_date: project.start_date
+    });
     setShowForm(true);
   };
 

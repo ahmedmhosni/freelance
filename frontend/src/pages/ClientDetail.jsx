@@ -315,11 +315,6 @@ const ClientDetail = () => {
                         )}
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                           {getStatusBadge(project.status)}
-                          {project.budget && (
-                            <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                              Budget: ${parseFloat(project.budget).toFixed(2)}
-                            </span>
-                          )}
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>

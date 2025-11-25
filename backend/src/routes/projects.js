@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { client_id, name, description, status, end_date, budget, start_date } = req.body;
+  const { client_id, name, description, status, end_date, start_date } = req.body;
   try {
     const pool = await db;
     const request = pool.request();
@@ -40,14 +40,13 @@ router.post('/', async (req, res) => {
     request.input('name', sql.NVarChar, name);
     request.input('description', sql.NVarChar, description || null);
     request.input('status', sql.NVarChar, status || 'active');
-    request.input('budget', sql.Decimal(10, 2), budget || null);
     request.input('startDate', sql.Date, start_date || null);
     request.input('endDate', sql.Date, end_date || null);
     
-    console.log('Creating project with data:', { userId: req.user.id, client_id, name, description, status, budget, start_date, end_date });
+    console.log('Creating project with data:', { userId: req.user.id, client_id, name, description, status, start_date, end_date });
     
     const result = await request.query(
-      'INSERT INTO projects (user_id, client_id, name, description, status, budget, start_date, end_date) OUTPUT INSERTED.id VALUES (@userId, @clientId, @name, @description, @status, @budget, @startDate, @endDate)'
+      'INSERT INTO projects (user_id, client_id, name, description, status, start_date, end_date) OUTPUT INSERTED.id VALUES (@userId, @clientId, @name, @description, @status, @startDate, @endDate)'
     );
     
     res.status(201).json({ id: result.recordset[0].id, message: 'Project created' });
@@ -58,7 +57,7 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { client_id, name, description, status, end_date, budget, start_date } = req.body;
+  const { client_id, name, description, status, end_date, start_date } = req.body;
   try {
     const pool = await db;
     const request = pool.request();
@@ -66,14 +65,13 @@ router.put('/:id', async (req, res) => {
     request.input('name', sql.NVarChar, name);
     request.input('description', sql.NVarChar, description || null);
     request.input('status', sql.NVarChar, status);
-    request.input('budget', sql.Decimal(10, 2), budget || null);
     request.input('startDate', sql.Date, start_date || null);
     request.input('endDate', sql.Date, end_date || null);
     request.input('id', sql.Int, req.params.id);
     request.input('userId', sql.Int, req.user.id);
     
     await request.query(
-      'UPDATE projects SET client_id = @clientId, name = @name, description = @description, status = @status, budget = @budget, start_date = @startDate, end_date = @endDate WHERE id = @id AND user_id = @userId'
+      'UPDATE projects SET client_id = @clientId, name = @name, description = @description, status = @status, start_date = @startDate, end_date = @endDate WHERE id = @id AND user_id = @userId'
     );
     
     res.json({ message: 'Project updated' });
