@@ -7,7 +7,7 @@ import LogoLoader from '../components/LogoLoader';
 import AvatarPicker from '../components/AvatarPicker';
 import { 
   MdPerson, MdWork, MdLocationOn, MdLanguage,
-  MdContentCopy, MdCheck, MdPhotoCamera
+  MdContentCopy, MdCheck
 } from 'react-icons/md';
 import { 
   FaLinkedin, FaBehance, FaInstagram, FaFacebook, FaTwitter, FaGithub, FaDribbble
@@ -183,8 +183,8 @@ const Profile = () => {
 
         {/* Basic Information */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
-            <MdPerson style={{ verticalAlign: 'middle', marginRight: '8px' }} />
+          <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <MdPerson style={{ color: 'var(--primary-color)', fontSize: '18px' }} />
             Basic Information
           </h3>
           
@@ -221,8 +221,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <MdWork style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MdWork style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Job Title
               </label>
               <input
@@ -236,8 +236,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <MdLocationOn style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MdLocationOn style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Location
               </label>
               <input
@@ -280,7 +280,6 @@ const Profile = () => {
                 onClick={() => setShowAvatarPicker(true)}
                 className="btn-primary"
               >
-                <MdPhotoCamera size={16} />
                 Choose Avatar
               </button>
               {profile.profile_picture && (
@@ -307,8 +306,8 @@ const Profile = () => {
 
         {/* Website & Portfolio */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
-            <MdLanguage style={{ verticalAlign: 'middle', marginRight: '8px' }} />
+          <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <MdLanguage style={{ color: 'var(--primary-color)', fontSize: '18px' }} />
             Website & Portfolio
           </h3>
           
@@ -354,8 +353,8 @@ const Profile = () => {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
             <div>
-              <label className="form-label">
-                <FaLinkedin style={{ verticalAlign: 'middle', marginRight: '4px', color: '#0077b5' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaLinkedin style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 LinkedIn
               </label>
               <input
@@ -369,8 +368,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaBehance style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1769ff' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaBehance style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Behance
               </label>
               <input
@@ -384,8 +383,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaInstagram style={{ verticalAlign: 'middle', marginRight: '4px', color: '#E4405F' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaInstagram style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Instagram
               </label>
               <input
@@ -399,8 +398,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaFacebook style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1877f2' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaFacebook style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Facebook
               </label>
               <input
@@ -414,8 +413,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaTwitter style={{ verticalAlign: 'middle', marginRight: '4px', color: '#1DA1F2' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaTwitter style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Twitter / X
               </label>
               <input
@@ -429,8 +428,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaGithub style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaGithub style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 GitHub
               </label>
               <input
@@ -444,8 +443,8 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="form-label">
-                <FaDribbble style={{ verticalAlign: 'middle', marginRight: '4px', color: '#ea4c89' }} />
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FaDribbble style={{ color: 'var(--primary-color)', fontSize: '14px' }} />
                 Dribbble
               </label>
               <input
