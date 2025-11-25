@@ -10,12 +10,12 @@ const LogoLoader = ({ size = 80, text = '' }) => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '16px',
+      gap: '20px',
       padding: '20px'
     }}>
-      {/* Simple Jumping Logo */}
+      {/* Pulsing Logo */}
       <div style={{
-        animation: 'bounce 1.5s ease-in-out infinite'
+        animation: 'pulse 1.5s ease-in-out infinite'
       }}>
         <img 
           src="/Asset 7.svg" 
@@ -26,6 +26,26 @@ const LogoLoader = ({ size = 80, text = '' }) => {
             filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
           }}
         />
+      </div>
+
+      {/* Animated Dots */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '8px', 
+        justifyContent: 'center' 
+      }}>
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isDark ? '#fff' : '#000',
+              animation: `dot 1.4s ease-in-out ${i * 0.2}s infinite`
+            }}
+          />
+        ))}
       </div>
 
       {/* Minimal Loading Text */}
@@ -41,12 +61,23 @@ const LogoLoader = ({ size = 80, text = '' }) => {
       )}
 
       <style>{`
-        @keyframes bounce {
+        @keyframes pulse {
           0%, 100% { 
-            transform: translateY(0);
+            transform: scale(1);
           }
           50% { 
-            transform: translateY(-15px);
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes dot {
+          0%, 80%, 100% { 
+            transform: scale(0);
+            opacity: 0.5;
+          }
+          40% { 
+            transform: scale(1);
+            opacity: 1;
           }
         }
       `}</style>
