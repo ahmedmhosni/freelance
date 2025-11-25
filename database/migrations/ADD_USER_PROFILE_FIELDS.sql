@@ -1,7 +1,7 @@
 -- Add User Profile Fields Migration
--- Run this on your local database first, then on Azure
+-- Local Database: FreelancerDB
 
-USE FreelancerDB; -- Change to your database name
+USE FreelancerDB;
 GO
 
 PRINT 'Adding user profile fields...';
