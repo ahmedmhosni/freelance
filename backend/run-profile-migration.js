@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../backend/.env' });
+require('dotenv').config();
 const sql = require('mssql');
 const fs = require('fs');
 const path = require('path');
@@ -37,7 +37,7 @@ async function runMigration() {
 
   try {
     // Read SQL file
-    const sqlFile = path.join(__dirname, '../../database/migrations/ADD_USER_PROFILE_FIELDS.sql');
+    const sqlFile = path.join(__dirname, '../database/migrations/ADD_USER_PROFILE_FIELDS.sql');
     const sqlScript = fs.readFileSync(sqlFile, 'utf8');
 
     // Connect to database
