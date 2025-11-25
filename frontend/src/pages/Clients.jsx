@@ -197,7 +197,18 @@ const Clients = () => {
                     {clients.map(client => (
                       <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
                         <td style={{ padding: '12px' }}>
-                          <strong>{client.name}</strong>
+                          <strong 
+                            style={{ 
+                              cursor: 'pointer', 
+                              color: 'var(--primary-color)',
+                              textDecoration: 'none'
+                            }}
+                            onClick={() => window.location.href = `/clients/${client.id}`}
+                            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                          >
+                            {client.name}
+                          </strong>
                         </td>
                         <td style={{ padding: '12px' }}>{client.email || '-'}</td>
                         <td style={{ padding: '12px' }}>{client.company || '-'}</td>

@@ -9,12 +9,23 @@ router.use(authenticateToken);
 router.get('/', async (req, res) => {
   try {
     const pool = await db;
+    const { client_id } = req.query;
     const request = pool.request();
     request.input('userId', sql.Int, req.user.id);
     
-    const result = await request.query('SELECT * FROM projects WHERE user_id = @userId ORDER BY created_at DESC');
+    let query = 'SELECT * FROM projects WHERE user_id = @userId';
+    
+    if (client_id) {
+      query += ' AND client_id = @clientId';
+      request.input('clientId', sql.Int, parseInt(client_id));
+    }
+    
+    query += ' ORDER BY created_at DESC';
+    
+    const result = await request.query(query);
     res.json(result.recordset);
   } catch (error) {
+    console.error('Error fetching projects:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -33,12 +44,15 @@ router.post('/', async (req, res) => {
     request.input('startDate', sql.Date, start_date || null);
     request.input('endDate', sql.Date, end_date || null);
     
+    console.log('Creating project with data:', { userId: req.user.id, client_id, name, description, status, budget, start_date, end_date });
+    
     const result = await request.query(
       'INSERT INTO projects (user_id, client_id, name, description, status, budget, start_date, end_date) OUTPUT INSERTED.id VALUES (@userId, @clientId, @name, @description, @status, @budget, @startDate, @endDate)'
     );
     
     res.status(201).json({ id: result.recordset[0].id, message: 'Project created' });
   } catch (error) {
+    console.error('Error creating project:', error);
     res.status(500).json({ error: error.message });
   }
 });
