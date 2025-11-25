@@ -32,7 +32,7 @@ router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
       job_title, bio, profile_picture, location, website,
       linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
       profile_visibility,
-      created_at, updated_at
+      created_at
     FROM users 
     WHERE id = @param1
   `;
@@ -156,8 +156,7 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
       github = @param13,
       dribbble = @param14,
       portfolio = @param15,
-      profile_visibility = COALESCE(@param16, profile_visibility),
-      updated_at = GETDATE()
+      profile_visibility = COALESCE(@param16, profile_visibility)
     WHERE id = @param17
   `;
 
@@ -174,7 +173,7 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
       job_title, bio, profile_picture, location, website,
       linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
       profile_visibility,
-      created_at, updated_at
+      created_at
     FROM users 
     WHERE id = @param1
   `;
