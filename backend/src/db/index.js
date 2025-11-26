@@ -7,7 +7,8 @@ const useAzureSQL = process.env.NODE_ENV === 'production' || process.env.USE_AZU
 
 if (usePostgres) {
   console.log('🐘 Using PostgreSQL Database');
-  module.exports = require('./postgres');
+  module.exports = require('./postgresql');
+  module.exports.queries = require('./queries-pg');
 } else if (useAzureSQL) {
   console.log('🔵 Using Azure SQL Database');
   module.exports = require('./azuresql');

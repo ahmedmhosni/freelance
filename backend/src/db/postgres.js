@@ -68,13 +68,13 @@ function createRequest() {
   let paramIndex = 1;
   const paramMap = {};
 
-  return {
+  const requestObj = {
     input: (name, type, value) => {
       // Store the value with parameter index
       paramMap[name] = paramIndex;
       inputs[paramIndex] = value;
       paramIndex++;
-      return createRequest();
+      return requestObj; // Return same object to maintain state
     },
     query: async (queryText) => {
       try {
@@ -132,6 +132,8 @@ function createRequest() {
       }
     }
   };
+  
+  return requestObj;
 }
 
 // Export pool as a promise (to match Azure SQL interface)
