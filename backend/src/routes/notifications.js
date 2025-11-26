@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { getAll } = require('../db/pg-helper');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -9,35 +8,23 @@ router.use(authenticateToken);
 // Get user notifications
 router.get('/', async (req, res) => {
   try {
-    const pool = await db;
-    
-    // Get upcoming tasks
-    const tasksRequest = pool.request();
-    tasksRequest.input('userId', sql.Int, req.user.id);
-    tasksRequest.input('doneStatus', sql.NVarChar, 'done');
-    
-    const tasksResult = await tasksRequest.query(`
+    // Get upcoming tasks (due within 7 days)
+    const upcomingTasks = await getAll(`
       SELECT * FROM tasks 
-      WHERE user_id = @userId 
-        AND status != @doneStatus 
-        AND due_date <= DATEADD(day, 7, GETDATE())
+      WHERE user_id = $1 
+        AND status != $2 
+        AND due_date <= CURRENT_DATE + INTERVAL '7 days'
       ORDER BY due_date ASC
-    `);
-    const upcomingTasks = tasksResult.recordset;
+    `, [req.user.id, 'done']);
 
     // Get overdue invoices
-    const invoicesRequest = pool.request();
-    invoicesRequest.input('userId', sql.Int, req.user.id);
-    invoicesRequest.input('sentStatus', sql.NVarChar, 'sent');
-    
-    const invoicesResult = await invoicesRequest.query(`
+    const overdueInvoices = await getAll(`
       SELECT * FROM invoices 
-      WHERE user_id = @userId 
-        AND status = @sentStatus 
-        AND due_date < CAST(GETDATE() AS DATE)
+      WHERE user_id = $1 
+        AND status = $2 
+        AND due_date < CURRENT_DATE
       ORDER BY due_date ASC
-    `);
-    const overdueInvoices = invoicesResult.recordset;
+    `, [req.user.id, 'sent']);
 
     const notifications = [
       ...upcomingTasks.map(task => ({

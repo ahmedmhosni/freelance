@@ -1,25 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const queries = require('../db/queries');
+const { getOne } = require('../db/pg-helper');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
-const sql = require('mssql');
 
 // Get daily quote (public endpoint)
 router.get('/daily', async (req, res) => {
   try {
-    const quote = await queries.getDailyQuote();
+    const quote = await getOne(
+      'SELECT * FROM quotes WHERE is_active = true ORDER BY RANDOM() LIMIT 1'
+    );
     
     if (!quote) {
       // Fallback quote
       return res.json({
         text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.',
-        author: 'Winston Churchill'
+        author: 'Winston Churchill',
+        category: 'motivation'
       });
     }
 
     res.json({
       text: quote.text,
-      author: quote.author
+      author: quote.author,
+      category: quote.category
     });
   } catch (error) {
     console.error('Server error in daily quote:', error);

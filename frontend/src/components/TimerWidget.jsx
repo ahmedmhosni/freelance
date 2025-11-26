@@ -160,14 +160,15 @@ const TimerWidget = () => {
       </button>
 
       {showPopup && (
-        <div style={{
+        <div className="timer-popup" style={{
           position: 'fixed',
-          top: '70px',
-          right: '420px',
+          top: '60px',
+          right: '80px',
           background: isDark ? '#202020' : 'white',
           borderRadius: '3px',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
           width: '320px',
+          maxWidth: 'calc(100vw - 40px)',
           zIndex: 1000,
           border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
         }}>

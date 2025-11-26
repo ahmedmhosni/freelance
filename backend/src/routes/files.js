@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { query, getAll } = require('../db/pg-helper');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -9,12 +8,21 @@ router.use(authenticateToken);
 // Get file metadata
 router.get('/', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('userId', sql.Int, req.user.id);
+    // Check if file_metadata table exists, if not use files table
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'file_metadata'
+      )
+    `);
     
-    const result = await request.query('SELECT * FROM file_metadata WHERE user_id = @userId ORDER BY created_at DESC');
-    res.json(result.recordset);
+    const tableName = tableCheck.rows[0].exists ? 'file_metadata' : 'files';
+    const files = await getAll(
+      `SELECT * FROM ${tableName} WHERE user_id = $1 ORDER BY created_at DESC`,
+      [req.user.id]
+    );
+    
+    res.json(files);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -24,23 +32,32 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { project_id, file_name, cloud_provider, file_link, file_size, mime_type } = req.body;
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('userId', sql.Int, req.user.id);
-    request.input('projectId', sql.Int, project_id || null);
-    request.input('fileName', sql.NVarChar, file_name);
-    request.input('cloudProvider', sql.NVarChar, cloud_provider);
-    request.input('fileLink', sql.NVarChar, file_link);
-    request.input('fileSize', sql.Int, file_size || null);
-    request.input('mimeType', sql.NVarChar, mime_type || null);
-    
-    const result = await request.query(`
-      INSERT INTO file_metadata (user_id, project_id, file_name, cloud_provider, file_link, file_size, mime_type) 
-      OUTPUT INSERTED.id
-      VALUES (@userId, @projectId, @fileName, @cloudProvider, @fileLink, @fileSize, @mimeType)
+    // Check which table exists
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'file_metadata'
+      )
     `);
     
-    res.status(201).json({ id: result.recordset[0].id, message: 'File metadata saved' });
+    if (tableCheck.rows[0].exists) {
+      const result = await query(`
+        INSERT INTO file_metadata (user_id, project_id, file_name, cloud_provider, file_link, file_size, mime_type) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id
+      `, [req.user.id, project_id || null, file_name, cloud_provider, file_link, file_size || null, mime_type || null]);
+      
+      res.status(201).json({ id: result.rows[0].id, message: 'File metadata saved' });
+    } else {
+      // Use files table
+      const result = await query(`
+        INSERT INTO files (user_id, project_id, filename, original_name, file_path, file_size, mime_type) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id
+      `, [req.user.id, project_id || null, file_name, file_name, file_link, file_size || null, mime_type || null]);
+      
+      res.status(201).json({ id: result.rows[0].id, message: 'File metadata saved' });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

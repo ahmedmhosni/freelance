@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { MaintenanceProvider } from './context/MaintenanceContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import FullPageLoader from './components/FullPageLoader';
+import './styles/responsive-fixes.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';

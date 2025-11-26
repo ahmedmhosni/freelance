@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { query } = require('../db/postgresql');
+const { query } = require('../db/pg-helper');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 /**
@@ -10,6 +10,11 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  *   name: Profile
  *   description: User profile management
  */
+
+// Root route - redirect to /me
+router.get('/', authenticateToken, asyncHandler(async (req, res) => {
+  res.redirect('/api/profile/me');
+}));
 
 /**
  * @swagger

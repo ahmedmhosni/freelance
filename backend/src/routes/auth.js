@@ -3,7 +3,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sql = require('mssql');
 const db = require('../db');
-const queries = require('../db/queries');
+// Use PostgreSQL queries if enabled, otherwise use default queries
+const queries = process.env.USE_POSTGRES === 'true' 
+  ? require('../db/queries-pg') 
+  : require('../db/queries');
 const { authLimiter } = require('../middleware/rateLimiter');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 const validators = require('../utils/validators');

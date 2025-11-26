@@ -1,6 +1,5 @@
 const express = require('express');
-const sql = require('mssql');
-const db = require('../db');
+const { query } = require('../db/pg-helper');
 const emailService = require('../services/emailService');
 
 const router = express.Router();
@@ -14,47 +13,6 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: System status information
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: operational
- *                 timestamp:
- *                   type: string
- *                   format: date-time
- *                 uptime:
- *                   type: number
- *                   example: 3600
- *                 services:
- *                   type: object
- *                   properties:
- *                     api:
- *                       type: object
- *                       properties:
- *                         status:
- *                           type: string
- *                           example: operational
- *                         responseTime:
- *                           type: number
- *                           example: 5
- *                     database:
- *                       type: object
- *                       properties:
- *                         status:
- *                           type: string
- *                           example: operational
- *                         responseTime:
- *                           type: number
- *                           example: 12
- *                     email:
- *                       type: object
- *                       properties:
- *                         status:
- *                           type: string
- *                           example: operational
  */
 router.get('/', async (req, res) => {
   const startTime = Date.now();
@@ -87,10 +45,7 @@ router.get('/', async (req, res) => {
   // Check database
   try {
     const dbStart = Date.now();
-    const pool = await db;
-    const request = pool.request();
-    request.timeout = 30000; // 30 second timeout for status check
-    await request.query('SELECT 1');
+    await query('SELECT 1');
     status.services.database.status = 'operational';
     status.services.database.responseTime = Date.now() - dbStart;
   } catch (error) {
@@ -156,22 +111,19 @@ router.get('/detailed', async (req, res) => {
     }
   };
 
-  // Check database tables
+  // Check database tables (PostgreSQL)
   try {
-    const pool = await db;
-    const result = await pool.request().query(`
+    const result = await query(`
       SELECT 
-        t.name as table_name,
-        SUM(p.rows) as row_count
-      FROM sys.tables t
-      INNER JOIN sys.partitions p ON t.object_id = p.object_id
-      WHERE p.index_id IN (0,1)
-      GROUP BY t.name
-      ORDER BY t.name
+        schemaname,
+        tablename as table_name,
+        n_live_tup as row_count
+      FROM pg_stat_user_tables
+      ORDER BY tablename
     `);
     
     status.database.status = 'operational';
-    status.database.tables = result.recordset;
+    status.database.tables = result.rows;
   } catch (error) {
     status.database.status = 'error';
     status.database.error = error.message;

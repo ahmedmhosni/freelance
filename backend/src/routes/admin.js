@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { query, getAll, getOne } = require('../db/pg-helper');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -10,11 +9,10 @@ router.use(requireAdmin);
 // Get all users
 router.get('/users', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    
-    const result = await request.query('SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC');
-    res.json(result.recordset);
+    const users = await getAll(
+      'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC'
+    );
+    res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -23,34 +21,29 @@ router.get('/users', async (req, res) => {
 // Get user details with stats
 router.get('/users/:id', async (req, res) => {
   try {
-    const pool = await db;
-    
     // Get user
-    const userRequest = pool.request();
-    userRequest.input('id', sql.Int, req.params.id);
-    const userResult = await userRequest.query('SELECT id, name, email, role, created_at FROM users WHERE id = @id');
-    const user = userResult.recordset[0];
+    const user = await getOne(
+      'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+      [req.params.id]
+    );
     
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Get stats
-    const statsRequest = pool.request();
-    statsRequest.input('userId', sql.Int, req.params.id);
-    
-    const statsResult = await statsRequest.query(`
+    const statsResult = await query(`
       SELECT 
-        (SELECT COUNT(*) FROM clients WHERE user_id = @userId) as clients_count,
-        (SELECT COUNT(*) FROM projects WHERE user_id = @userId) as projects_count,
-        (SELECT COUNT(*) FROM tasks WHERE user_id = @userId) as tasks_count,
-        (SELECT COUNT(*) FROM invoices WHERE user_id = @userId) as invoices_count
-    `);
+        (SELECT COUNT(*) FROM clients WHERE user_id = $1) as clients_count,
+        (SELECT COUNT(*) FROM projects WHERE user_id = $1) as projects_count,
+        (SELECT COUNT(*) FROM tasks WHERE user_id = $1) as tasks_count,
+        (SELECT COUNT(*) FROM invoices WHERE user_id = $1) as invoices_count
+    `, [req.params.id]);
     
-    const statsData = statsResult.recordset[0];
+    const statsData = statsResult.rows[0];
     const stats = {
-      clients: { count: statsData.clients_count },
-      projects: { count: statsData.projects_count },
-      tasks: { count: statsData.tasks_count },
-      invoices: { count: statsData.invoices_count }
+      clients: { count: parseInt(statsData.clients_count) },
+      projects: { count: parseInt(statsData.projects_count) },
+      tasks: { count: parseInt(statsData.tasks_count) },
+      invoices: { count: parseInt(statsData.invoices_count) }
     };
 
     res.json({ user, stats });
@@ -63,12 +56,7 @@ router.get('/users/:id', async (req, res) => {
 router.put('/users/:id/role', async (req, res) => {
   const { role } = req.body;
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('role', sql.NVarChar, role);
-    request.input('id', sql.Int, req.params.id);
-    
-    await request.query('UPDATE users SET role = @role WHERE id = @id');
+    await query('UPDATE users SET role = $1 WHERE id = $2', [role, req.params.id]);
     res.json({ message: 'User role updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -78,11 +66,7 @@ router.put('/users/:id/role', async (req, res) => {
 // Delete user
 router.delete('/users/:id', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('id', sql.Int, req.params.id);
-    
-    await request.query('DELETE FROM users WHERE id = @id');
+    await query('DELETE FROM users WHERE id = $1', [req.params.id]);
     res.json({ message: 'User deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -92,24 +76,20 @@ router.delete('/users/:id', async (req, res) => {
 // System reports
 router.get('/reports', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('paidStatus', sql.NVarChar, 'paid');
-    
-    const result = await request.query(`
+    const result = await query(`
       SELECT 
         (SELECT COUNT(*) FROM users) as users_count,
         (SELECT COUNT(*) FROM projects) as projects_count,
         (SELECT COUNT(*) FROM invoices) as invoices_count,
-        (SELECT ISNULL(SUM(amount), 0) FROM invoices WHERE status = @paidStatus) as total_revenue
-    `);
+        (SELECT COALESCE(SUM(total), 0) FROM invoices WHERE status = $1) as total_revenue
+    `, ['paid']);
     
-    const data = result.recordset[0];
+    const data = result.rows[0];
 
     res.json({
-      users: data.users_count,
-      projects: data.projects_count,
-      invoices: data.invoices_count,
+      users: parseInt(data.users_count),
+      projects: parseInt(data.projects_count),
+      invoices: parseInt(data.invoices_count),
       revenue: parseFloat(data.total_revenue)
     });
   } catch (error) {
@@ -120,15 +100,25 @@ router.get('/reports', async (req, res) => {
 // Activity logs
 router.get('/logs', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    
-    const result = await request.query(`
-      SELECT TOP 100 * FROM activity_logs 
-      ORDER BY created_at DESC
+    // Check if activity_logs table exists
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'activity_logs'
+      )
     `);
     
-    res.json(result.recordset);
+    if (!tableCheck.rows[0].exists) {
+      return res.json([]);
+    }
+
+    const logs = await getAll(`
+      SELECT * FROM activity_logs 
+      ORDER BY created_at DESC
+      LIMIT 100
+    `);
+    
+    res.json(logs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

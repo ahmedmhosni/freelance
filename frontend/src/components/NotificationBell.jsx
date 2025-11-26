@@ -96,9 +96,30 @@ const NotificationBell = () => {
       </button>
 
       {showDropdown && (
-        <div className="notification-dropdown">
-          <div className="notification-header">
-            <h3>Notifications</h3>
+        <div className="notification-dropdown" style={{
+          position: 'fixed',
+          top: '60px',
+          right: '20px',
+          background: isDark ? '#202020' : 'white',
+          borderRadius: '3px',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+          width: '320px',
+          maxWidth: 'calc(100vw - 40px)',
+          zIndex: 1000,
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
+          maxHeight: 'calc(100vh - 80px)',
+          overflowY: 'auto'
+        }}>
+          <div className="notification-header" style={{
+            padding: '12px 16px',
+            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
+          }}>
+            <h3 style={{ 
+              margin: 0, 
+              fontSize: '14px', 
+              fontWeight: '600',
+              color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+            }}>Notifications</h3>
           </div>
           {notifications.length === 0 ? (
             <div style={{ 

@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { getAll } = require('../db/pg-helper');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -9,27 +8,23 @@ router.use(authenticateToken);
 // Financial report
 router.get('/financial', async (req, res) => {
   try {
-    const pool = await db;
     const { startDate, endDate } = req.query;
     
-    let query = 'SELECT * FROM invoices WHERE user_id = @userId';
-    const request = pool.request();
-    request.input('userId', sql.Int, req.user.id);
+    let queryText = 'SELECT * FROM invoices WHERE user_id = $1';
+    const params = [req.user.id];
 
     if (startDate && endDate) {
-      query += ' AND created_at BETWEEN @startDate AND @endDate';
-      request.input('startDate', sql.DateTime, startDate);
-      request.input('endDate', sql.DateTime, endDate);
+      queryText += ' AND created_at BETWEEN $2 AND $3';
+      params.push(startDate, endDate);
     }
 
-    const result = await request.query(query);
-    const invoices = result.recordset;
+    const invoices = await getAll(queryText, params);
 
     const report = {
       totalInvoices: invoices.length,
-      totalRevenue: invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount), 0),
-      pendingAmount: invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.amount), 0),
-      overdueAmount: invoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + parseFloat(inv.amount), 0),
+      totalRevenue: invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
+      pendingAmount: invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
+      overdueAmount: invoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
       byStatus: {
         draft: invoices.filter(inv => inv.status === 'draft').length,
         sent: invoices.filter(inv => inv.status === 'sent').length,
@@ -49,17 +44,8 @@ router.get('/financial', async (req, res) => {
 // Project report
 router.get('/projects', async (req, res) => {
   try {
-    const pool = await db;
-    
-    const projectsRequest = pool.request();
-    projectsRequest.input('userId', sql.Int, req.user.id);
-    const projectsResult = await projectsRequest.query('SELECT * FROM projects WHERE user_id = @userId');
-    const projects = projectsResult.recordset;
-    
-    const tasksRequest = pool.request();
-    tasksRequest.input('userId', sql.Int, req.user.id);
-    const tasksResult = await tasksRequest.query('SELECT * FROM tasks WHERE user_id = @userId');
-    const tasks = tasksResult.recordset;
+    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [req.user.id]);
+    const tasks = await getAll('SELECT * FROM tasks WHERE user_id = $1', [req.user.id]);
 
     const report = {
       totalProjects: projects.length,
@@ -71,10 +57,10 @@ router.get('/projects', async (req, res) => {
       },
       totalTasks: tasks.length,
       tasksByStatus: {
-        todo: tasks.filter(t => t.status === 'todo').length,
+        todo: tasks.filter(t => t.status === 'todo' || t.status === 'pending').length,
         'in-progress': tasks.filter(t => t.status === 'in-progress').length,
         review: tasks.filter(t => t.status === 'review').length,
-        done: tasks.filter(t => t.status === 'done').length
+        done: tasks.filter(t => t.status === 'done' || t.status === 'completed').length
       },
       projects: projects
     };
@@ -88,27 +74,16 @@ router.get('/projects', async (req, res) => {
 // Client report
 router.get('/clients', async (req, res) => {
   try {
-    const pool = await db;
-    
-    const clientsRequest = pool.request();
-    clientsRequest.input('userId', sql.Int, req.user.id);
-    const clientsResult = await clientsRequest.query('SELECT * FROM clients WHERE user_id = @userId');
-    const clients = clientsResult.recordset;
-    
-    const projectsRequest = pool.request();
-    projectsRequest.input('userId', sql.Int, req.user.id);
-    const projectsResult = await projectsRequest.query('SELECT * FROM projects WHERE user_id = @userId');
-    const projects = projectsResult.recordset;
-    
-    const invoicesRequest = pool.request();
-    invoicesRequest.input('userId', sql.Int, req.user.id);
-    const invoicesResult = await invoicesRequest.query('SELECT * FROM invoices WHERE user_id = @userId');
-    const invoices = invoicesResult.recordset;
+    const clients = await getAll('SELECT * FROM clients WHERE user_id = $1', [req.user.id]);
+    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [req.user.id]);
+    const invoices = await getAll('SELECT * FROM invoices WHERE user_id = $1', [req.user.id]);
 
     const clientReport = clients.map(client => {
       const clientProjects = projects.filter(p => p.client_id === client.id);
       const clientInvoices = invoices.filter(inv => inv.client_id === client.id);
-      const totalRevenue = clientInvoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount), 0);
+      const totalRevenue = clientInvoices
+        .filter(inv => inv.status === 'paid')
+        .reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
 
       return {
         ...client,
