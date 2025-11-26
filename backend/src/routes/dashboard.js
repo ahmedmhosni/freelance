@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { query } = require('../db/postgresql');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -9,31 +8,21 @@ router.use(authenticateToken);
 // Get dashboard statistics
 router.get('/stats', async (req, res) => {
   try {
-    const pool = await db;
     const userId = req.user.id;
 
-    // Get counts
-    const request = pool.request();
-    request.input('userId', sql.Int, userId);
-    request.input('activeStatus', sql.NVarChar, 'active');
-    request.input('doneStatus', sql.NVarChar, 'done');
-    request.input('sentStatus', sql.NVarChar, 'sent');
-    request.input('overdueStatus', sql.NVarChar, 'overdue');
-    request.input('paidStatus', sql.NVarChar, 'paid');
-
-    const result = await request.query(`
+    const result = await query(`
       SELECT 
-        (SELECT COUNT(*) FROM clients WHERE user_id = @userId) as clients_count,
-        (SELECT COUNT(*) FROM projects WHERE user_id = @userId) as projects_count,
-        (SELECT COUNT(*) FROM projects WHERE user_id = @userId AND status = @activeStatus) as active_projects_count,
-        (SELECT COUNT(*) FROM tasks WHERE user_id = @userId) as tasks_count,
-        (SELECT COUNT(*) FROM tasks WHERE user_id = @userId AND status != @doneStatus) as active_tasks_count,
-        (SELECT COUNT(*) FROM invoices WHERE user_id = @userId) as invoices_count,
-        (SELECT COUNT(*) FROM invoices WHERE user_id = @userId AND status IN (@sentStatus, @overdueStatus)) as pending_invoices_count,
-        (SELECT ISNULL(SUM(total), 0) FROM invoices WHERE user_id = @userId AND status = @paidStatus) as total_revenue
-    `);
+        (SELECT COUNT(*) FROM clients WHERE user_id = $1) as clients_count,
+        (SELECT COUNT(*) FROM projects WHERE user_id = $1) as projects_count,
+        (SELECT COUNT(*) FROM projects WHERE user_id = $1 AND status = 'active') as active_projects_count,
+        (SELECT COUNT(*) FROM tasks WHERE user_id = $1) as tasks_count,
+        (SELECT COUNT(*) FROM tasks WHERE user_id = $1 AND status != 'done') as active_tasks_count,
+        (SELECT COUNT(*) FROM invoices WHERE user_id = $1) as invoices_count,
+        (SELECT COUNT(*) FROM invoices WHERE user_id = $1 AND status IN ('sent', 'overdue')) as pending_invoices_count,
+        (SELECT COALESCE(SUM(total), 0) FROM invoices WHERE user_id = $1 AND status = 'paid') as total_revenue
+    `, [userId]);
 
-    const stats = result.recordset[0];
+    const stats = result.rows[0];
 
     res.json({
       clients: parseInt(stats.clients_count) || 0,
@@ -53,28 +42,23 @@ router.get('/stats', async (req, res) => {
 // Get recent tasks with project info
 router.get('/recent-tasks', async (req, res) => {
   try {
-    const pool = await db;
     const userId = req.user.id;
     const limit = parseInt(req.query.limit) || 5;
 
-    const request = pool.request();
-    request.input('userId', sql.Int, userId);
-    request.input('doneStatus', sql.NVarChar, 'done');
-    request.input('limit', sql.Int, limit);
-
-    const result = await request.query(`
-      SELECT TOP (@limit)
+    const result = await query(`
+      SELECT 
         t.*,
         p.name as project_name
       FROM tasks t
       LEFT JOIN projects p ON t.project_id = p.id
-      WHERE t.user_id = @userId AND t.status != @doneStatus
+      WHERE t.user_id = $1 AND t.status != 'done'
       ORDER BY 
         CASE WHEN t.due_date IS NULL THEN 1 ELSE 0 END,
         t.due_date ASC
-    `);
+      LIMIT $2
+    `, [userId, limit]);
 
-    res.json(result.recordset);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -83,38 +67,32 @@ router.get('/recent-tasks', async (req, res) => {
 // Get chart data
 router.get('/charts', async (req, res) => {
   try {
-    const pool = await db;
     const userId = req.user.id;
 
-    const request = pool.request();
-    request.input('userId', sql.Int, userId);
-
     // Task status distribution
-    const taskResult = await request.query(`
+    const taskResult = await query(`
       SELECT status, COUNT(*) as count
       FROM tasks
-      WHERE user_id = @userId
+      WHERE user_id = $1
       GROUP BY status
-    `);
+    `, [userId]);
 
     // Invoice status distribution
-    const invoiceRequest = pool.request();
-    invoiceRequest.input('userId', sql.Int, userId);
-    const invoiceResult = await invoiceRequest.query(`
+    const invoiceResult = await query(`
       SELECT status, COUNT(*) as count
       FROM invoices
-      WHERE user_id = @userId
+      WHERE user_id = $1
       GROUP BY status
-    `);
+    `, [userId]);
 
     res.json({
-      taskData: taskResult.recordset.map(row => ({
+      taskData: taskResult.rows.map(row => ({
         name: row.status.replace('-', ' '),
-        value: row.count
+        value: parseInt(row.count)
       })),
-      invoiceData: invoiceResult.recordset.map(row => ({
+      invoiceData: invoiceResult.rows.map(row => ({
         name: row.status.charAt(0).toUpperCase() + row.status.slice(1),
-        count: row.count
+        count: parseInt(row.count)
       }))
     });
   } catch (error) {
