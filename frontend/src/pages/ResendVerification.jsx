@@ -1,132 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdCheckCircle, MdError, MdMail } from 'react-icons/md';
+import { MdMail, MdCheckCircle } from 'react-icons/md';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
-const VerifyEmail = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { isDark } = useTheme();
-  
-  const [method, setMethod] = useState('code'); // 'code' or 'link'
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+const ResendVerification = () => {
   const [email, setEmail] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState(null); // 'success', 'error', null
-  const [message, setMessage] = useState('');
-  
-  const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
 
-  // Auto-verify if token in URL, or pre-fill email from URL
-  useEffect(() => {
-    const token = searchParams.get('token');
-    const emailParam = searchParams.get('email');
-    
-    if (token) {
-      verifyByToken(token);
-    }
-    
-    if (emailParam) {
-      setEmail(decodeURIComponent(emailParam));
-    }
-  }, [searchParams]);
-
-  const verifyByToken = async (token) => {
-    setIsVerifying(true);
-    try {
-      const response = await api.get(`/api/auth/verify-email/${token}`);
-      setVerificationStatus('success');
-      setMessage(response.data.message);
-      toast.success('Email verified successfully!');
-      setTimeout(() => navigate('/login'), 2000);
-    } catch (error) {
-      setVerificationStatus('error');
-      setMessage(error.response?.data?.error || 'Verification failed');
-      toast.error(error.response?.data?.error || 'Verification failed');
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const handleCodeChange = (index, value) => {
-    // Only allow digits
-    if (value && !/^\d$/.test(value)) return;
-
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs[index + 1].current?.focus();
-    }
-
-    // Auto-submit when all 6 digits entered
-    if (newCode.every(digit => digit !== '') && email) {
-      handleVerifyCode(newCode.join(''));
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    // Handle backspace
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs[index - 1].current?.focus();
-    }
-  };
-
-  const handlePaste = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').trim();
-    
-    // Check if pasted data is 6 digits
-    if (/^\d{6}$/.test(pastedData)) {
-      const newCode = pastedData.split('');
-      setCode(newCode);
-      inputRefs[5].current?.focus();
-      
-      // Auto-submit if email is filled
-      if (email) {
-        handleVerifyCode(pastedData);
-      }
-    }
-  };
+    setIsLoading(true);
 
-  const handleVerifyCode = async (codeString = code.join('')) => {
-    if (!email) {
-      toast.error('Please enter your email');
-      return;
-    }
-
-    if (codeString.length !== 6) {
-      toast.error('Please enter all 6 digits');
-      return;
-    }
-
-    setIsVerifying(true);
     try {
-      const response = await api.post('/api/auth/verify-code', {
-        email,
-        code: codeString
-      });
-      setVerificationStatus('success');
-      setMessage(response.data.message);
-      toast.success('Email verified successfully!');
-      setTimeout(() => navigate('/login'), 2000);
+      const response = await api.post('/api/auth/resend-verification', { email });
+      setSuccess(true);
+      toast.success(response.data.message);
+      
+      // Redirect to verification page after 2 seconds
+      setTimeout(() => {
+        navigate(`/verify-email?email=${encodeURIComponent(email)}`);
+      }, 2000);
     } catch (error) {
-      setVerificationStatus('error');
-      setMessage(error.response?.data?.error || 'Invalid code');
-      toast.error(error.response?.data?.error || 'Invalid code');
-      // Clear code on error
-      setCode(['', '', '', '', '', '']);
-      inputRefs[0].current?.focus();
+      const errorMessage = error.response?.data?.error || 'Failed to resend verification email';
+      toast.error(errorMessage);
     } finally {
-      setIsVerifying(false);
+      setIsLoading(false);
     }
   };
 
-  if (verificationStatus === 'success') {
+  if (success) {
     return (
       <div style={{
         display: 'flex',
@@ -140,13 +47,13 @@ const VerifyEmail = () => {
             <MdCheckCircle />
           </div>
           <h2 style={{ color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f', marginBottom: '10px' }}>
-            Email Verified!
+            Email Sent!
           </h2>
           <p style={{ color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)', marginBottom: '20px' }}>
-            {message}
+            Check your inbox for the verification code.
           </p>
           <p style={{ fontSize: '14px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)' }}>
-            Redirecting to login...
+            Redirecting to verification page...
           </p>
         </div>
       </div>
@@ -230,7 +137,7 @@ const VerifyEmail = () => {
 
       <div style={{ 
         width: '100%', 
-        maxWidth: '450px',
+        maxWidth: '360px',
         position: 'relative',
         zIndex: 1
       }}>
@@ -250,19 +157,18 @@ const VerifyEmail = () => {
             color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
             marginBottom: '8px'
           }}>
-            Verify Your Email
+            Resend Verification
           </h1>
           <p style={{ 
             fontSize: '14px', 
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
           }}>
-            Check your email for the verification code
+            Enter your email to receive a new code
           </p>
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          {/* Email Input */}
-          <div style={{ marginBottom: '16px' }}>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
               fontSize: '13px',
@@ -277,6 +183,7 @@ const VerifyEmail = () => {
               placeholder="name@work-email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               style={{
                 width: '100%',
                 padding: '8px 10px',
@@ -291,116 +198,37 @@ const VerifyEmail = () => {
             />
           </div>
 
-          {/* Code Input */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '500',
-              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-              marginBottom: '6px'
-            }}>
-              Verification Code
-            </label>
-            <div style={{ 
-              display: 'flex', 
-              gap: '8px', 
-              justifyContent: 'center',
-              marginBottom: '8px'
-            }}>
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={inputRefs[index]}
-                  type="text"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleCodeChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
-                  style={{
-                    width: '48px',
-                    height: '56px',
-                    fontSize: '22px',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                    borderRadius: '3px',
-                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                    outline: 'none',
-                    transition: 'all 0.2s'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#2eaadc';
-                    e.target.select();
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(55, 53, 47, 0.16)';
-                  }}
-                />
-              ))}
-            </div>
-            <p style={{ 
-              fontSize: '12px', 
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-              textAlign: 'center'
-            }}>
-              Enter the 6-digit code from your email
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {verificationStatus === 'error' && (
-            <div style={{
-              padding: '10px 12px',
-              background: 'rgba(235, 87, 87, 0.1)',
-              border: '1px solid rgba(235, 87, 87, 0.3)',
-              borderRadius: '4px',
-              color: '#eb5757',
-              fontSize: '13px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <MdError />
-              {message}
-            </div>
-          )}
-
-          {/* Verify Button */}
           <button
-            onClick={() => handleVerifyCode()}
-            disabled={isVerifying || code.some(d => !d) || !email}
+            type="submit"
+            disabled={isLoading}
             style={{
               width: '100%',
               padding: '10px',
               fontSize: '14px',
               fontWeight: '600',
               color: isDark ? '#191919' : '#ffffff',
-              background: (isVerifying || code.some(d => !d) || !email)
+              background: isLoading
                 ? (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)')
                 : (isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'),
               border: 'none',
               borderRadius: '3px',
-              cursor: (isVerifying || code.some(d => !d) || !email) ? 'not-allowed' : 'pointer',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s ease',
               marginBottom: '16px',
-              opacity: (isVerifying || code.some(d => !d) || !email) ? 0.6 : 1
+              opacity: isLoading ? 0.6 : 1
             }}
             onMouseEnter={(e) => {
-              if (!isVerifying && !code.some(d => !d) && email) {
+              if (!isLoading) {
                 e.target.style.background = isDark ? '#ffffff' : '#2f2e2a';
               }
             }}
             onMouseLeave={(e) => {
-              if (!isVerifying && !code.some(d => !d) && email) {
+              if (!isLoading) {
                 e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f';
               }
             }}
           >
-            {isVerifying ? 'Verifying...' : 'Continue'}
+            {isLoading ? 'Sending...' : 'Continue'}
           </button>
 
           <div style={{
@@ -408,21 +236,20 @@ const VerifyEmail = () => {
             fontSize: '13px',
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
           }}>
-            Didn't receive the code?{' '}
+            Remember your code?{' '}
             <Link
-              to="/resend-verification"
+              to="/verify-email"
               style={{
                 color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
                 textDecoration: 'none',
                 borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(55, 53, 47, 0.3)'
               }}
             >
-              Resend
+              Verify now
             </Link>
           </div>
-        </div>
+        </form>
 
-        {/* Back to Login */}
         <div style={{
           marginTop: '24px',
           paddingTop: '24px',
@@ -447,4 +274,4 @@ const VerifyEmail = () => {
   );
 };
 
-export default VerifyEmail;
+export default ResendVerification;

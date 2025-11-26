@@ -148,6 +148,12 @@ router.post('/login',
       throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     }
 
+    // Check if email is verified
+    if (!user.email_verified) {
+      logger.warn(`Login attempt with unverified email: ${email}`);
+      throw new AppError('Please verify your email before logging in. Check your inbox for the verification code.', 403, 'EMAIL_NOT_VERIFIED');
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,

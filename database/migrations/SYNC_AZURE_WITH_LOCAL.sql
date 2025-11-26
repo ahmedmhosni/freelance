@@ -161,6 +161,57 @@ BEGIN
     PRINT '  ✓ Updated theme column type';
 END
 
+-- Add email_verified if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'email_verified')
+BEGIN
+    ALTER TABLE users ADD email_verified BIT NULL DEFAULT 0;
+    PRINT '  ✓ Added email_verified column';
+END
+GO
+
+-- Set defaults for email_verified (existing users are verified)
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'email_verified')
+BEGIN
+    UPDATE users SET email_verified = 1 WHERE email_verified IS NULL;
+    PRINT '  ✓ Set default values for email_verified';
+END
+GO
+
+-- Add email_verification_token if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'email_verification_token')
+BEGIN
+    ALTER TABLE users ADD email_verification_token NVARCHAR(255) NULL;
+    PRINT '  ✓ Added email_verification_token column';
+END
+
+-- Add email_verification_code if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'email_verification_code')
+BEGIN
+    ALTER TABLE users ADD email_verification_code NVARCHAR(10) NULL;
+    PRINT '  ✓ Added email_verification_code column';
+END
+
+-- Add email_verification_expires if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'email_verification_expires')
+BEGIN
+    ALTER TABLE users ADD email_verification_expires DATETIME2 NULL;
+    PRINT '  ✓ Added email_verification_expires column';
+END
+
+-- Add password_reset_token if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'password_reset_token')
+BEGIN
+    ALTER TABLE users ADD password_reset_token NVARCHAR(255) NULL;
+    PRINT '  ✓ Added password_reset_token column';
+END
+
+-- Add password_reset_expires if missing
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'password_reset_expires')
+BEGIN
+    ALTER TABLE users ADD password_reset_expires DATETIME2 NULL;
+    PRINT '  ✓ Added password_reset_expires column';
+END
+
 PRINT '';
 
 -- ============================================
@@ -204,6 +255,6 @@ PRINT 'Changes applied:';
 PRINT '- Invoices: Added issue_date, tax, total columns';
 PRINT '- Projects: Renamed/added columns to match local';
 PRINT '- Tasks: Added assigned_to column';
-PRINT '- Users: Ensured all profile fields exist';
+PRINT '- Users: Added email verification & password reset fields';
 PRINT '- Tables: Checked and synced all tables';
 PRINT '========================================';

@@ -67,7 +67,19 @@ const Login = () => {
       
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      const errorCode = err.response?.data?.code;
+      const errorMessage = err.response?.data?.error || 'Login failed';
+      
+      // Handle email not verified error
+      if (errorCode === 'EMAIL_NOT_VERIFIED') {
+        setError(errorMessage);
+        // Redirect to verification page after 2 seconds
+        setTimeout(() => {
+          navigate(`/verify-email?email=${encodeURIComponent(email)}`);
+        }, 2000);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
