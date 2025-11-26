@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const db = require('../db');
+const { query } = require('../db/postgresql');
 
 const router = express.Router();
 
@@ -39,16 +39,13 @@ router.get('/preferences', authenticateToken, async (req, res) => {
     const userId = req.user.id;
     
     // Get user preferences from database
-    const pool = await db;
-    const result = await pool.request()
-      .input('userId', userId)
-      .query('SELECT theme FROM users WHERE id = @userId');
+    const result = await query('SELECT theme FROM users WHERE id = $1', [userId]);
     
-    if (!result.recordset || result.recordset.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    const user = result.recordset[0];
+    const user = result.rows[0];
     
     res.json({
       theme: user.theme || 'light'
@@ -97,11 +94,10 @@ router.put('/preferences', authenticateToken, async (req, res) => {
     }
     
     // Update user preferences
-    const pool = await db;
-    await pool.request()
-      .input('theme', theme || 'light')
-      .input('userId', userId)
-      .query('UPDATE users SET theme = @theme WHERE id = @userId');
+    await query(
+      'UPDATE users SET theme = $1 WHERE id = $2',
+      [theme || 'light', userId]
+    );
     
     res.json({
       message: 'Preferences updated successfully',
