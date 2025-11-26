@@ -1,10 +1,14 @@
-// Database adapter - switches between SQLite (local) and Azure SQL (production)
+// Database adapter - switches between PostgreSQL, SQLite, and Azure SQL
 require('dotenv').config();
 const sql = require('mssql');
 
+const usePostgres = process.env.USE_POSTGRES === 'true';
 const useAzureSQL = process.env.NODE_ENV === 'production' || process.env.USE_AZURE_SQL === 'true';
 
-if (useAzureSQL) {
+if (usePostgres) {
+  console.log('🐘 Using PostgreSQL Database');
+  module.exports = require('./postgres');
+} else if (useAzureSQL) {
   console.log('🔵 Using Azure SQL Database');
   module.exports = require('./azuresql');
 } else {
