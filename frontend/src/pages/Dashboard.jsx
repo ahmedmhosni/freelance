@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import DashboardCharts from '../components/DashboardCharts';
 import LogoLoader from '../components/LogoLoader';
@@ -7,6 +8,7 @@ import { MdPeople, MdFolder, MdCheckCircle, MdAttachMoney, MdAccessTime } from '
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ clients: 0, projects: 0, tasks: 0, invoices: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
@@ -159,13 +161,28 @@ const Dashboard = () => {
 
       <div className="card" style={{ marginTop: '24px', padding: '20px' }}>
         <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#37352f' }}>Upcoming Tasks</h2>
-          <p className="page-subtitle" style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: '16px', 
+            fontWeight: '600', 
+            color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f' 
+          }}>
+            Upcoming Tasks
+          </h2>
+          <p className="page-subtitle" style={{ 
+            margin: '4px 0 0 0', 
+            fontSize: '13px', 
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)' 
+          }}>
             Next 5 tasks by due date
           </p>
         </div>
         {recentTasks.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: 'rgba(55, 53, 47, 0.4)' }}>
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '40px', 
+            color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' 
+          }}>
             <div style={{ fontSize: '48px', marginBottom: '8px' }}><MdCheckCircle /></div>
             <p style={{ fontSize: '14px' }}>No pending tasks</p>
           </div>
@@ -177,65 +194,82 @@ const Dashboard = () => {
               return (
                 <div key={task.id} style={{ 
                   padding: '12px 0', 
-                  borderBottom: '1px solid rgba(55, 53, 47, 0.09)',
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
                   display: 'flex', 
                   justifyContent: 'space-between',
                   alignItems: 'start',
                   transition: 'all 0.15s ease'
                 }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#37352f' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                        lineHeight: '1.4'
+                      }}>
                         {task.title}
                       </span>
-                      <span style={{ 
+                      <span className="status-badge" style={{ 
                         fontSize: '11px',
-                        padding: '2px 6px',
-                        borderRadius: '2px',
-                        background: task.priority === 'urgent' ? 'rgba(55, 53, 47, 0.16)' : 
-                                   task.priority === 'high' ? 'rgba(55, 53, 47, 0.12)' :
-                                   task.priority === 'medium' ? 'rgba(55, 53, 47, 0.08)' : 'rgba(55, 53, 47, 0.06)',
-                        color: task.priority === 'urgent' ? 'rgba(55, 53, 47, 0.9)' : 
-                               task.priority === 'high' ? 'rgba(55, 53, 47, 0.8)' :
-                               task.priority === 'medium' ? 'rgba(55, 53, 47, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-                        fontWeight: task.priority === 'urgent' || task.priority === 'high' ? '600' : '500'
+                        padding: '3px 8px',
+                        borderRadius: '3px',
+                        background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)',
+                        color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+                        fontWeight: '500',
+                        textTransform: 'capitalize'
                       }}>
                         {task.priority}
                       </span>
                     </div>
                     {task.description && (
-                      <p style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)', margin: '4px 0' }}>
+                      <p style={{ 
+                        fontSize: '13px', 
+                        color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)', 
+                        margin: '0 0 8px 0',
+                        lineHeight: '1.5'
+                      }}>
                         {task.description}
                       </p>
                     )}
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'rgba(55, 53, 47, 0.5)', marginTop: '6px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '16px', 
+                      fontSize: '12px', 
+                      color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                      alignItems: 'center'
+                    }}>
                       {task.projectName && (
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <MdFolder size={14} /> {task.projectName}
+                          <MdFolder size={14} /> 
+                          <span>{task.projectName}</span>
                         </span>
                       )}
                       {task.due_date && (
                         <span style={{ 
-                          color: isOverdue ? 'rgba(55, 53, 47, 0.9)' : 'rgba(55, 53, 47, 0.5)', 
+                          color: isOverdue ? '#eb5757' : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'), 
                           display: 'flex', 
                           alignItems: 'center', 
                           gap: '4px',
-                          fontWeight: isOverdue ? '600' : '400'
+                          fontWeight: isOverdue ? '500' : '400'
                         }}>
-                          <MdAccessTime size={14} /> {new Date(task.due_date).toLocaleDateString()}
-                          {isOverdue && ' • Overdue'}
+                          <MdAccessTime size={14} /> 
+                          <span>{new Date(task.due_date).toLocaleDateString()}</span>
+                          {isOverdue && <span style={{ fontWeight: '600' }}>• Overdue</span>}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div style={{ marginLeft: '16px' }}>
-                    <span style={{ 
+                  <div style={{ marginLeft: '16px', flexShrink: 0 }}>
+                    <span className="status-badge" style={{ 
                       fontSize: '11px', 
-                      padding: '3px 8px',
-                      borderRadius: '2px',
-                      background: task.status === 'done' ? 'rgba(55, 53, 47, 0.16)' : 'rgba(55, 53, 47, 0.08)',
-                      color: task.status === 'done' ? 'rgba(55, 53, 47, 0.9)' : 'rgba(55, 53, 47, 0.65)',
-                      fontWeight: task.status === 'done' ? '600' : '500'
+                      padding: '4px 10px',
+                      borderRadius: '3px',
+                      background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+                      fontWeight: '500',
+                      textTransform: 'capitalize',
+                      whiteSpace: 'nowrap'
                     }}>
                       {task.status.replace('-', ' ')}
                     </span>
