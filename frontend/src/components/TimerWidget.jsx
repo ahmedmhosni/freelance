@@ -163,7 +163,7 @@ const TimerWidget = () => {
         <div style={{
           position: 'fixed',
           top: '70px',
-          right: '160px',
+          right: '420px',
           background: isDark ? '#202020' : 'white',
           borderRadius: '3px',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
@@ -255,7 +255,7 @@ const TimerWidget = () => {
               >
                 <option value="">Select Project (Optional)</option>
                 {projects.map(project => (
-                  <option key={project.id} value={project.id}>{project.title}</option>
+                  <option key={project.id} value={project.id}>{project.name}</option>
                 ))}
               </select>
               <select

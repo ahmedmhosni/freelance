@@ -159,8 +159,8 @@ const Dashboard = () => {
 
       <div className="card" style={{ marginTop: '24px', padding: '20px' }}>
         <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Upcoming Tasks</h2>
-          <p className="page-subtitle" style={{ margin: '4px 0 0 0' }}>
+          <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#37352f' }}>Upcoming Tasks</h2>
+          <p className="page-subtitle" style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>
             Next 5 tasks by due date
           </p>
         </div>
