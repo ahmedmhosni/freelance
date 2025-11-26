@@ -228,14 +228,18 @@ CREATE TABLE quotes (
 -- ============================================
 -- MAINTENANCE TABLE
 -- ============================================
-CREATE TABLE maintenance (
+-- MAINTENANCE CONTENT TABLE
+-- ============================================
+CREATE TABLE maintenance_content (
     id SERIAL PRIMARY KEY,
+    title VARCHAR(500) NOT NULL DEFAULT 'Brilliant ideas take time to be roasted',
+    subtitle VARCHAR(500) NOT NULL DEFAULT 'Roastify is coming soon',
+    message TEXT NOT NULL DEFAULT 'We are crafting something extraordinary. Great things take time, and we are roasting the perfect experience for you.',
+    launch_date DATE,
     is_active BOOLEAN DEFAULT FALSE,
-    message TEXT,
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_by INTEGER,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
