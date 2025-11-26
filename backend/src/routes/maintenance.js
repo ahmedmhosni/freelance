@@ -1,23 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
+const { query } = require('../db/postgresql');
 
 // Get maintenance content (public)
 router.get('/', async (req, res) => {
   try {
-    const dbModule = require('../db/index');
-    const pool = await dbModule;
-    const request = pool.request();
-    
-    const result = await request.query(`
-      SELECT TOP 1 title, subtitle, message, launch_date, is_active
+    const result = await query(`
+      SELECT title, subtitle, message, launch_date, is_active
       FROM maintenance_content
       ORDER BY updated_at DESC
+      LIMIT 1
     `);
     
-    if (result.recordset.length > 0) {
-      res.json(result.recordset[0]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
     } else {
       res.json({
         title: 'Brilliant ideas take time to be roasted',
@@ -41,44 +38,25 @@ router.put('/', authenticateToken, async (req, res) => {
     }
 
     const { title, subtitle, message, launch_date, is_active } = req.body;
-    const dbModule = require('../db/index');
-    const pool = await dbModule;
     
-    const checkRequest = pool.request();
-    const checkResult = await checkRequest.query('SELECT id FROM maintenance_content');
+    const checkResult = await query('SELECT id FROM maintenance_content');
     
-    if (checkResult.recordset.length === 0) {
-      const insertRequest = pool.request();
-      insertRequest.input('title', sql.NVarChar, title);
-      insertRequest.input('subtitle', sql.NVarChar, subtitle);
-      insertRequest.input('message', sql.NVarChar, message);
-      insertRequest.input('launchDate', sql.Date, launch_date || null);
-      insertRequest.input('isActive', sql.Bit, is_active ? 1 : 0);
-      insertRequest.input('updatedBy', sql.Int, req.user.id);
-      
-      await insertRequest.query(`
+    if (checkResult.rows.length === 0) {
+      await query(`
         INSERT INTO maintenance_content (title, subtitle, message, launch_date, is_active, updated_by, updated_at)
-        VALUES (@title, @subtitle, @message, @launchDate, @isActive, @updatedBy, GETDATE())
-      `);
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      `, [title, subtitle, message, launch_date || null, is_active ? true : false, req.user.id]);
     } else {
-      const updateRequest = pool.request();
-      updateRequest.input('title', sql.NVarChar, title);
-      updateRequest.input('subtitle', sql.NVarChar, subtitle);
-      updateRequest.input('message', sql.NVarChar, message);
-      updateRequest.input('launchDate', sql.Date, launch_date || null);
-      updateRequest.input('isActive', sql.Bit, is_active ? 1 : 0);
-      updateRequest.input('updatedBy', sql.Int, req.user.id);
-      
-      await updateRequest.query(`
+      await query(`
         UPDATE maintenance_content
-        SET title = @title,
-            subtitle = @subtitle,
-            message = @message,
-            launch_date = @launchDate,
-            is_active = @isActive,
-            updated_by = @updatedBy,
-            updated_at = GETDATE()
-      `);
+        SET title = $1,
+            subtitle = $2,
+            message = $3,
+            launch_date = $4,
+            is_active = $5,
+            updated_by = $6,
+            updated_at = NOW()
+      `, [title, subtitle, message, launch_date || null, is_active ? true : false, req.user.id]);
     }
     
     res.json({ message: 'Maintenance content updated successfully' });
@@ -91,18 +69,15 @@ router.put('/', authenticateToken, async (req, res) => {
 // Check if maintenance mode is active (public)
 router.get('/status', async (req, res) => {
   try {
-    const dbModule = require('../db/index');
-    const pool = await dbModule;
-    const request = pool.request();
-    
-    const result = await request.query(`
-      SELECT TOP 1 is_active
+    const result = await query(`
+      SELECT is_active
       FROM maintenance_content
       ORDER BY updated_at DESC
+      LIMIT 1
     `);
     
     res.json({ 
-      is_active: result.recordset.length > 0 ? result.recordset[0].is_active : false 
+      is_active: result.rows.length > 0 ? result.rows[0].is_active : false 
     });
   } catch (error) {
     console.error('Error checking maintenance status:', error);
