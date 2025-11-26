@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const db = require('../db');
+const { query } = require('../db/postgresql');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 /**
@@ -26,7 +26,7 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  *         description: Unauthorized
  */
 router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
-  const query = `
+  const queryText = `
     SELECT 
       id, name, email, username, role,
       job_title, bio, profile_picture, location, website,
@@ -34,16 +34,16 @@ router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
       profile_visibility,
       created_at
     FROM users 
-    WHERE id = @param1
+    WHERE id = $1
   `;
   
-  const result = await db.query(query, [req.user.id]);
+  const result = await query(queryText, [req.user.id]);
   
-  if (!result.recordset || result.recordset.length === 0) {
+  if (!result.rows || result.rows.length === 0) {
     throw new AppError('User not found', 404);
   }
   
-  res.json(result.recordset[0]);
+  res.json(result.rows[0]);
 }));
 
 /**
@@ -114,11 +114,11 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
     // Check if username is already taken by another user
     const checkQuery = `
       SELECT id FROM users 
-      WHERE username = @param1 AND id != @param2
+      WHERE username = $1 AND id != $2
     `;
-    const existing = await db.query(checkQuery, [username, req.user.id]);
+    const existing = await query(checkQuery, [username, req.user.id]);
     
-    if (existing.recordset && existing.recordset.length > 0) {
+    if (existing.rows && existing.rows.length > 0) {
       throw new AppError('Username already taken', 400);
     }
 
@@ -141,26 +141,26 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
   const updateQuery = `
     UPDATE users 
     SET 
-      name = COALESCE(@param1, name),
-      username = @param2,
-      job_title = @param3,
-      bio = @param4,
-      profile_picture = @param5,
-      location = @param6,
-      website = @param7,
-      linkedin = @param8,
-      behance = @param9,
-      instagram = @param10,
-      facebook = @param11,
-      twitter = @param12,
-      github = @param13,
-      dribbble = @param14,
-      portfolio = @param15,
-      profile_visibility = COALESCE(@param16, profile_visibility)
-    WHERE id = @param17
+      name = COALESCE($1, name),
+      username = $2,
+      job_title = $3,
+      bio = $4,
+      profile_picture = $5,
+      location = $6,
+      website = $7,
+      linkedin = $8,
+      behance = $9,
+      instagram = $10,
+      facebook = $11,
+      twitter = $12,
+      github = $13,
+      dribbble = $14,
+      portfolio = $15,
+      profile_visibility = COALESCE($16, profile_visibility)
+    WHERE id = $17
   `;
 
-  await db.query(updateQuery, [
+  await query(updateQuery, [
     name, username, job_title, bio, profile_picture, location, website,
     linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
     profile_visibility, req.user.id
@@ -175,14 +175,14 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
       profile_visibility,
       created_at
     FROM users 
-    WHERE id = @param1
+    WHERE id = $1
   `;
   
-  const result = await db.query(getQuery, [req.user.id]);
+  const result = await query(getQuery, [req.user.id]);
   
   res.json({
     message: 'Profile updated successfully',
-    profile: result.recordset[0]
+    profile: result.rows[0]
   });
 }));
 
@@ -208,23 +208,23 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
 router.get('/:username', asyncHandler(async (req, res) => {
   const { username } = req.params;
 
-  const query = `
+  const queryText = `
     SELECT 
       id, name, username, role,
       job_title, bio, profile_picture, location, website,
       linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
       created_at
     FROM users 
-    WHERE username = @param1 AND profile_visibility = 'public'
+    WHERE username = $1 AND profile_visibility = 'public'
   `;
   
-  const result = await db.query(query, [username]);
+  const result = await query(queryText, [username]);
   
-  if (!result.recordset || result.recordset.length === 0) {
+  if (!result.rows || result.rows.length === 0) {
     throw new AppError('Profile not found or is private', 404);
   }
   
-  res.json(result.recordset[0]);
+  res.json(result.rows[0]);
 }));
 
 /**
@@ -255,12 +255,12 @@ router.get('/check-username/:username', asyncHandler(async (req, res) => {
     return res.json({ available: false, message: 'Username must be between 3 and 30 characters' });
   }
 
-  const query = `SELECT id FROM users WHERE username = @param1`;
-  const result = await db.query(query, [username]);
+  const queryText = `SELECT id FROM users WHERE username = $1`;
+  const result = await query(queryText, [username]);
   
   res.json({
-    available: !result.recordset || result.recordset.length === 0,
-    message: result.recordset && result.recordset.length > 0 ? 'Username already taken' : 'Username available'
+    available: !result.rows || result.rows.length === 0,
+    message: result.rows && result.rows.length > 0 ? 'Username already taken' : 'Username available'
   });
 }));
 
