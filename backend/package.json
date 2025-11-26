@@ -1,7 +1,7 @@
 {
   "name": "freelancer-backend",
   "version": "1.0.0",
-  "description": "Backend API for freelancer management",
+  "description": "Backend API for freelancer management with PostgreSQL",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
