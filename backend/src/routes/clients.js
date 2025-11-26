@@ -1,7 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const sql = require('mssql');
-const db = require('../db');
+const { query } = require('../db/postgresql');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -61,36 +60,30 @@ router.use(authenticateToken);
 // Get all clients for user with search and pagination
 router.get('/', async (req, res) => {
   try {
-    const pool = await db;
     const { search, page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    let query = 'SELECT * FROM clients WHERE user_id = @userId';
-    let countQuery = 'SELECT COUNT(*) as total FROM clients WHERE user_id = @userId';
-
-    const request = pool.request();
-    const countRequest = pool.request();
-    
-    request.input('userId', sql.Int, req.user.id);
-    countRequest.input('userId', sql.Int, req.user.id);
+    let queryText = 'SELECT * FROM clients WHERE user_id = $1';
+    let countQueryText = 'SELECT COUNT(*) as total FROM clients WHERE user_id = $1';
+    let params = [req.user.id];
+    let countParams = [req.user.id];
 
     if (search) {
       const searchTerm = `%${search}%`;
-      query += ' AND (name LIKE @search OR email LIKE @search OR company LIKE @search)';
-      countQuery += ' AND (name LIKE @search OR email LIKE @search OR company LIKE @search)';
-      request.input('search', sql.NVarChar, searchTerm);
-      countRequest.input('search', sql.NVarChar, searchTerm);
+      queryText += ' AND (name ILIKE $2 OR email ILIKE $2 OR company ILIKE $2)';
+      countQueryText += ' AND (name ILIKE $2 OR email ILIKE $2 OR company ILIKE $2)';
+      params.push(searchTerm);
+      countParams.push(searchTerm);
     }
 
-    query += ' ORDER BY created_at DESC OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY';
-    request.input('offset', sql.Int, parseInt(offset));
-    request.input('limit', sql.Int, parseInt(limit));
+    queryText += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(parseInt(limit), parseInt(offset));
 
-    const result = await request.query(query);
-    const countResult = await countRequest.query(countQuery);
+    const result = await query(queryText, params);
+    const countResult = await query(countQueryText, countParams);
     
-    const clients = result.recordset;
-    const total = countResult.recordset[0].total;
+    const clients = result.rows;
+    const total = parseInt(countResult.rows[0].total);
 
     res.json({
       data: clients,
@@ -109,13 +102,11 @@ router.get('/', async (req, res) => {
 // Get single client
 router.get('/:id', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('id', sql.Int, req.params.id);
-    request.input('userId', sql.Int, req.user.id);
-    
-    const result = await request.query('SELECT * FROM clients WHERE id = @id AND user_id = @userId');
-    const client = result.recordset[0];
+    const result = await query(
+      'SELECT * FROM clients WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.id]
+    );
+    const client = result.rows[0];
     
     if (!client) return res.status(404).json({ error: 'Client not found' });
     res.json(client);
@@ -128,20 +119,14 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const { name, email, phone, company, notes } = req.body;
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('userId', sql.Int, req.user.id);
-    request.input('name', sql.NVarChar, name);
-    request.input('email', sql.NVarChar, email || null);
-    request.input('phone', sql.NVarChar, phone || null);
-    request.input('company', sql.NVarChar, company || null);
-    request.input('notes', sql.NVarChar, notes || null);
-    
-    const result = await request.query(
-      'INSERT INTO clients (user_id, name, email, phone, company, notes) OUTPUT INSERTED.id VALUES (@userId, @name, @email, @phone, @company, @notes)'
+    const result = await query(
+      `INSERT INTO clients (user_id, name, email, phone, company, notes) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING id`,
+      [req.user.id, name, email || null, phone || null, company || null, notes || null]
     );
     
-    res.status(201).json({ id: result.recordset[0].id, message: 'Client created' });
+    res.status(201).json({ id: result.rows[0].id, message: 'Client created' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -151,18 +136,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { name, email, phone, company, notes } = req.body;
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('name', sql.NVarChar, name);
-    request.input('email', sql.NVarChar, email || null);
-    request.input('phone', sql.NVarChar, phone || null);
-    request.input('company', sql.NVarChar, company || null);
-    request.input('notes', sql.NVarChar, notes || null);
-    request.input('id', sql.Int, req.params.id);
-    request.input('userId', sql.Int, req.user.id);
-    
-    await request.query(
-      'UPDATE clients SET name = @name, email = @email, phone = @phone, company = @company, notes = @notes WHERE id = @id AND user_id = @userId'
+    await query(
+      `UPDATE clients 
+       SET name = $1, email = $2, phone = $3, company = $4, notes = $5 
+       WHERE id = $6 AND user_id = $7`,
+      [name, email || null, phone || null, company || null, notes || null, req.params.id, req.user.id]
     );
     
     res.json({ message: 'Client updated' });
@@ -174,12 +152,10 @@ router.put('/:id', async (req, res) => {
 // Delete client
 router.delete('/:id', async (req, res) => {
   try {
-    const pool = await db;
-    const request = pool.request();
-    request.input('id', sql.Int, req.params.id);
-    request.input('userId', sql.Int, req.user.id);
-    
-    await request.query('DELETE FROM clients WHERE id = @id AND user_id = @userId');
+    await query(
+      'DELETE FROM clients WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.id]
+    );
     res.json({ message: 'Client deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
