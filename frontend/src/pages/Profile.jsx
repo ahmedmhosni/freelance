@@ -5,6 +5,7 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import LogoLoader from '../components/LogoLoader';
 import AvatarPicker from '../components/AvatarPicker';
+import logger from '../utils/logger';
 import { 
   MdPerson, MdWork, MdLocationOn, MdLanguage,
   MdContentCopy, MdCheck
@@ -66,7 +67,7 @@ const Profile = () => {
         profile_visibility: response.data.profile_visibility || 'public'
       });
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ const Profile = () => {
       await api.put('/api/profile/me', profile);
       toast.success('Profile updated successfully!');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile:', error);
       toast.error(error.response?.data?.message || 'Failed to update profile');
     } finally {
       setSaving(false);

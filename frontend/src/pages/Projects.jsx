@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { MdFolder } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -28,7 +29,7 @@ const Projects = () => {
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      logger.error('Error fetching projects:', error);
       toast.error('Failed to load projects');
     } finally {
       setLoading(false);
@@ -41,7 +42,7 @@ const Projects = () => {
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      logger.error('Error fetching clients:', error);
     }
   };
 
@@ -70,7 +71,7 @@ const Projects = () => {
       setFormData({ title: '', description: '', client_id: '', status: 'active', deadline: '' });
       fetchProjects();
     } catch (error) {
-      console.error('Error saving project:', error);
+      logger.error('Error saving project:', error);
       toast.error('Failed to save project');
     }
   };
@@ -100,7 +101,7 @@ const Projects = () => {
       setDeleteDialog({ isOpen: false, projectId: null });
       fetchProjects();
     } catch (error) {
-      console.error('Error deleting project:', error);
+      logger.error('Error deleting project:', error);
       toast.error('Failed to delete project');
     }
   };

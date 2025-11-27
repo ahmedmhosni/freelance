@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const TimeTracking = () => {
   const [entries, setEntries] = useState([]);
@@ -31,7 +32,7 @@ const TimeTracking = () => {
       const running = entriesData.find(e => e.is_running === 1);
       setActiveEntry(running || null);
     } catch (error) {
-      console.error('Error fetching entries:', error);
+      logger.error('Error fetching entries:', error);
       setEntries([]);
       setActiveEntry(null);
     }
@@ -43,7 +44,7 @@ const TimeTracking = () => {
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
       setTasks([]);
     }
   };
@@ -54,7 +55,7 @@ const TimeTracking = () => {
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      logger.error('Error fetching projects:', error);
       setProjects([]);
     }
   };
@@ -64,7 +65,7 @@ const TimeTracking = () => {
       const response = await api.get('/api/time-tracking/summary');
       setSummary(response.data || { total_hours: 0, total_entries: 0 });
     } catch (error) {
-      console.error('Error fetching summary:', error);
+      logger.error('Error fetching summary:', error);
       setSummary({ total_hours: 0, total_entries: 0 });
     }
   };
@@ -75,7 +76,7 @@ const TimeTracking = () => {
       const data = response.data.data || response.data;
       setGroupedData(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching grouped data:', error);
+      logger.error('Error fetching grouped data:', error);
       setGroupedData([]);
     }
   };
@@ -103,7 +104,7 @@ const TimeTracking = () => {
       await fetchEntries();
       await fetchSummary();
     } catch (error) {
-      console.error('Error starting timer:', error);
+      logger.error('Error starting timer:', error);
       alert('Failed to start timer');
     }
   };
@@ -115,7 +116,7 @@ const TimeTracking = () => {
       await fetchSummary();
       setActiveEntry(null);
     } catch (error) {
-      console.error('Error stopping timer:', error);
+      logger.error('Error stopping timer:', error);
       alert('Failed to stop timer');
     }
   };
@@ -127,7 +128,7 @@ const TimeTracking = () => {
       await fetchEntries();
       await fetchSummary();
     } catch (error) {
-      console.error('Error deleting entry:', error);
+      logger.error('Error deleting entry:', error);
       alert('Failed to delete entry');
     }
   };

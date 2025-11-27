@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('financial');
@@ -31,7 +32,7 @@ const Reports = () => {
       setTimeTrackingProjects(timeProjects.data || []);
       setTimeTrackingClients(timeClients.data || []);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      logger.error('Error fetching reports:', error);
     }
   };
 

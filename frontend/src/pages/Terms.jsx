@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
+import logger from '../utils/logger';
 
 const Terms = () => {
   const { isDark } = useTheme();
@@ -17,7 +18,7 @@ const Terms = () => {
       const data = await response.json();
       setContent(data);
     } catch (error) {
-      console.error('Error fetching terms:', error);
+      logger.error('Error fetching terms:', error);
     } finally {
       setLoading(false);
     }

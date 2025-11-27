@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from './AuthContext';
+import logger from '../utils/logger';
 
 const MaintenanceContext = createContext();
 
@@ -36,7 +37,7 @@ export const MaintenanceProvider = ({ children }) => {
         navigate('/coming-soon');
       }
     } catch (error) {
-      console.error('Error checking maintenance status:', error);
+      logger.error('Error checking maintenance status:', error);
       setIsMaintenanceMode(false);
     } finally {
       setLoading(false);

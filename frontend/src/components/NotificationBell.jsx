@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
@@ -32,7 +33,7 @@ const NotificationBell = () => {
       const response = await api.get('/api/notifications');
       setNotifications(response.data);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error);
     }
   };
 

@@ -8,6 +8,7 @@ import TaskViewModal from '../components/TaskViewModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import 'react-calendar/dist/Calendar.css';
 import { MdViewKanban, MdViewList, MdCalendarToday } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -35,7 +36,7 @@ const Tasks = () => {
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      logger.error('Error fetching projects:', error);
       setProjects([]);
     }
   };
@@ -68,7 +69,7 @@ const Tasks = () => {
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');
       setTasks([]);
     }
@@ -89,7 +90,7 @@ const Tasks = () => {
       setFormData({ title: '', description: '', priority: 'medium', status: 'todo', due_date: '', project_id: null });
       fetchTasks();
     } catch (error) {
-      console.error('Error saving task:', error);
+      logger.error('Error saving task:', error);
       toast.error('Failed to save task');
     }
   };
@@ -115,7 +116,7 @@ const Tasks = () => {
       setDeleteDialog({ isOpen: false, taskId: null });
       fetchTasks();
     } catch (error) {
-      console.error('Error deleting task:', error);
+      logger.error('Error deleting task:', error);
       toast.error('Failed to delete task');
     }
   };
@@ -126,7 +127,7 @@ const Tasks = () => {
       await api.put(`/api/tasks/${taskId}`, { ...task, status: newStatus });
       fetchTasks();
     } catch (error) {
-      console.error('Error updating task:', error);
+      logger.error('Error updating task:', error);
     }
   };
 

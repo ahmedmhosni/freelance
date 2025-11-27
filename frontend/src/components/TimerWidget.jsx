@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { MdAccessTime, MdPlayArrow, MdStop } from 'react-icons/md';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const TimerWidget = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -58,7 +59,7 @@ const TimerWidget = () => {
       const running = entries.find(e => e.is_running === 1);
       setActiveEntry(running || null);
     } catch (error) {
-      console.error('Error fetching timer:', error);
+      logger.error('Error fetching timer:', error);
     }
   };
 
@@ -68,7 +69,7 @@ const TimerWidget = () => {
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
     }
   };
 
@@ -78,7 +79,7 @@ const TimerWidget = () => {
       const data = response.data.data || response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      logger.error('Error fetching projects:', error);
     }
   };
 
@@ -93,7 +94,7 @@ const TimerWidget = () => {
       await fetchActiveTimer();
       setShowPopup(false);
     } catch (error) {
-      console.error('Error starting timer:', error);
+      logger.error('Error starting timer:', error);
       alert('Failed to start timer');
     }
   };
@@ -105,7 +106,7 @@ const TimerWidget = () => {
       await fetchActiveTimer();
       setElapsedTime(0);
     } catch (error) {
-      console.error('Error stopping timer:', error);
+      logger.error('Error stopping timer:', error);
       alert('Failed to stop timer');
     }
   };

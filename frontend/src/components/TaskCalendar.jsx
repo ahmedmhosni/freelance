@@ -5,6 +5,7 @@ import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import logger from '../utils/logger';
 
 const locales = {
   'en-US': enUS
@@ -33,7 +34,7 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');
     } finally {
       setLoading(false);

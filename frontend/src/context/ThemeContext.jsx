@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const ThemeContext = createContext();
 
@@ -47,7 +48,7 @@ export const ThemeProvider = ({ children }) => {
       }
     } catch (error) {
       // Silently fail - user might not be logged in or endpoint doesn't exist yet
-      console.debug('Could not sync theme with server');
+      logger.debug('Could not sync theme with server');
     }
   };
 
@@ -70,7 +71,7 @@ export const ThemeProvider = ({ children }) => {
       try {
         await api.put('/api/user/preferences', { theme: newTheme });
       } catch (error) {
-        console.debug('Could not save theme to server');
+        logger.debug('Could not save theme to server');
       }
     }
   };

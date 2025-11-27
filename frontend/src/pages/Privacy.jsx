@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { MdArrowBack, MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const Privacy = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -18,7 +19,7 @@ const Privacy = () => {
       const response = await api.get('/api/legal/privacy');
       setContent(response.data.content);
     } catch (error) {
-      console.error('Error fetching privacy policy:', error);
+      logger.error('Error fetching privacy policy:', error);
       setContent('<p>Privacy policy content is currently unavailable.</p>');
     } finally {
       setIsLoading(false);

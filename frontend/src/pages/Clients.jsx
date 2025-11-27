@@ -6,6 +6,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { MdPeople, MdFileDownload } from 'react-icons/md';
 import { exportClientsCSV } from '../utils/exportCSV';
+import logger from '../utils/logger';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
@@ -33,7 +34,7 @@ const Clients = () => {
         setPagination(prev => ({ ...prev, ...response.data.pagination }));
       }
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      logger.error('Error fetching clients:', error);
       toast.error('Failed to load clients');
     } finally {
       setLoading(false);
@@ -55,7 +56,7 @@ const Clients = () => {
       setFormData({ name: '', email: '', phone: '', company: '', notes: '', tags: '' });
       fetchClients();
     } catch (error) {
-      console.error('Error saving client:', error);
+      logger.error('Error saving client:', error);
       toast.error('Failed to save client');
     }
   };
@@ -77,7 +78,7 @@ const Clients = () => {
       setDeleteDialog({ isOpen: false, clientId: null });
       fetchClients();
     } catch (error) {
-      console.error('Error deleting client:', error);
+      logger.error('Error deleting client:', error);
       toast.error('Failed to delete client');
     }
   };

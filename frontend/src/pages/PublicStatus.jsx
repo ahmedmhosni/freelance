@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { MdCheckCircle, MdError, MdWarning, MdRefresh, MdHistory, MdTrendingUp } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const PublicStatus = () => {
   const [status, setStatus] = useState(null);
@@ -25,12 +26,12 @@ const PublicStatus = () => {
           setHistory(historyData.history || {});
         }
       } catch (histError) {
-        console.log('History not available:', histError);
+        logger.debug('History not available:', histError);
       }
       
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Failed to fetch status:', error);
+      logger.error('Failed to fetch status:', error);
       setStatus({ status: 'error', services: {} });
     } finally {
       setLoading(false);

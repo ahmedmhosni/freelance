@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { MdAdd, MdEdit, MdDelete, MdCheck, MdClose, MdVisibility } from 'react-icons/md';
 import Pagination from './Pagination';
 import QuoteViewModal from './QuoteViewModal';
+import logger from '../utils/logger';
 
 const QuotesManager = () => {
   const [quotes, setQuotes] = useState([]);
@@ -25,7 +26,7 @@ const QuotesManager = () => {
       setQuotes(response.data.data || []);
       setPagination(response.data.pagination || { total: 0, totalPages: 0 });
     } catch (error) {
-      console.error('Error fetching quotes:', error);
+      logger.error('Error fetching quotes:', error);
       toast.error('Failed to load quotes');
     }
   };
@@ -46,7 +47,7 @@ const QuotesManager = () => {
       setFormData({ text: '', author: '', is_active: 1 });
       fetchQuotes();
     } catch (error) {
-      console.error('Error saving quote:', error);
+      logger.error('Error saving quote:', error);
       toast.error('Failed to save quote');
     }
   };
@@ -74,7 +75,7 @@ const QuotesManager = () => {
           fetchQuotes();
         }
       } catch (error) {
-        console.error('Error deleting quote:', error);
+        logger.error('Error deleting quote:', error);
         toast.error('Failed to delete quote');
       }
     }
@@ -89,7 +90,7 @@ const QuotesManager = () => {
       toast.success('Quote status updated!');
       fetchQuotes();
     } catch (error) {
-      console.error('Error updating quote:', error);
+      logger.error('Error updating quote:', error);
       toast.error('Failed to update quote');
     }
   };

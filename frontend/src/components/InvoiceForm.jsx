@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { MdAdd, MdDelete, MdAccessTime } from 'react-icons/md';
+import logger from '../utils/logger';
 
 // Consistent styling matching Login page
 const styles = {
@@ -69,7 +70,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       const nextNumber = generateNextInvoiceNumber(invoices);
       setFormData(prev => ({ ...prev, invoice_number: nextNumber }));
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      logger.error('Error fetching invoices:', error);
     }
   };
 
@@ -115,7 +116,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       const response = await api.get('/api/clients');
       setClients(response.data.data || response.data);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      logger.error('Error fetching clients:', error);
     }
   };
 
@@ -124,7 +125,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       const response = await api.get('/api/projects');
       setProjects(response.data.data || response.data);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      logger.error('Error fetching projects:', error);
     }
   };
 
@@ -133,7 +134,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       const response = await api.get('/api/tasks');
       setTasks(response.data.data || response.data);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
     }
   };
 
@@ -142,7 +143,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       const response = await api.get(`/api/invoices/${invoice.id}/items`);
       setItems(response.data);
     } catch (error) {
-      console.error('Error fetching invoice items:', error);
+      logger.error('Error fetching invoice items:', error);
     }
   };
 
@@ -258,7 +259,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
           amount: subtotal
         };
         
-        console.log('Updating invoice with:', updateData);
+        logger.log('Updating invoice with:', updateData);
         await api.put(`/api/invoices/${invoice.id}`, updateData);
         toast.success('Invoice updated!');
         invoiceId = invoice.id;
@@ -273,7 +274,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
           amount: subtotal
         };
         
-        console.log('Creating invoice with:', createData);
+        logger.log('Creating invoice with:', createData);
         const response = await api.post('/api/invoices', createData);
         invoiceId = response.data.id;
         toast.success('Invoice created!');
@@ -297,7 +298,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Error saving invoice:', error);
+      logger.error('Error saving invoice:', error);
       toast.error(error.response?.data?.error || 'Failed to save invoice');
     }
   };

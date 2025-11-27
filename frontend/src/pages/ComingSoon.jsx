@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const ComingSoon = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -23,7 +24,7 @@ const ComingSoon = () => {
         setContent(response.data);
       }
     } catch (err) {
-      console.log('Using default content');
+      logger.log('Using default content');
     }
   };
 

@@ -5,6 +5,7 @@ import QuotesManager from '../components/QuotesManager';
 import MaintenanceEditor from '../components/MaintenanceEditor';
 import LegalEditor from '../components/LegalEditor';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -23,7 +24,7 @@ const AdminPanel = () => {
       const response = await api.get('/api/status');
       setSystemStatus(response.data);
     } catch (error) {
-      console.error('Error fetching system status:', error);
+      logger.error('Error fetching system status:', error);
     }
   };
 
@@ -32,7 +33,7 @@ const AdminPanel = () => {
       const response = await api.get('/api/admin/users');
       setUsers(response.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users:', error);
     }
   };
 
@@ -41,7 +42,7 @@ const AdminPanel = () => {
       const response = await api.get('/api/admin/reports');
       setStats(response.data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     }
   };
 
@@ -50,7 +51,7 @@ const AdminPanel = () => {
       await api.put(`/api/admin/users/${userId}/role`, { role: newRole });
       fetchUsers();
     } catch (error) {
-      console.error('Error updating role:', error);
+      logger.error('Error updating role:', error);
     }
   };
 
@@ -60,7 +61,7 @@ const AdminPanel = () => {
         await api.delete(`/api/admin/users/${userId}`);
         fetchUsers();
       } catch (error) {
-        console.error('Error deleting user:', error);
+        logger.error('Error deleting user:', error);
       }
     }
   };

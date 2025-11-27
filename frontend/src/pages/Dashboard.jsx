@@ -5,6 +5,7 @@ import api from '../utils/api';
 import DashboardCharts from '../components/DashboardCharts';
 import LogoLoader from '../components/LogoLoader';
 import { MdPeople, MdFolder, MdCheckCircle, MdAttachMoney, MdAccessTime } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -33,7 +34,7 @@ const Dashboard = () => {
       const response = await api.get('/api/dashboard/stats');
       setStats(response.data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     }
   };
 
@@ -46,7 +47,7 @@ const Dashboard = () => {
       }));
       setRecentTasks(tasks);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      logger.error('Error fetching tasks:', error);
       setRecentTasks([]);
     }
   };
@@ -57,7 +58,7 @@ const Dashboard = () => {
       setTaskData(response.data.taskData || []);
       setInvoiceData(response.data.invoiceData || []);
     } catch (error) {
-      console.error('Error fetching chart data:', error);
+      logger.error('Error fetching chart data:', error);
       setTaskData([]);
       setInvoiceData([]);
     }

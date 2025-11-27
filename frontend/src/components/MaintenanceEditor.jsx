@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
+import logger from '../utils/logger';
 
 const MaintenanceEditor = () => {
   const [content, setContent] = useState({
@@ -24,7 +25,7 @@ const MaintenanceEditor = () => {
         launch_date: response.data.launch_date ? response.data.launch_date.split('T')[0] : ''
       });
     } catch (error) {
-      console.error('Error fetching maintenance content:', error);
+      logger.error('Error fetching maintenance content:', error);
     }
   };
 

@@ -7,6 +7,7 @@ import InvoiceForm from '../components/InvoiceForm';
 import { MdReceipt, MdAttachMoney, MdFileDownload } from 'react-icons/md';
 import { exportInvoicesCSV } from '../utils/exportCSV';
 import { generateInvoiceNumber } from '../utils/invoiceGenerator';
+import logger from '../utils/logger';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -28,7 +29,7 @@ const Invoices = () => {
       const data = response.data.data || response.data;
       setInvoices(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      logger.error('Error fetching invoices:', error);
       toast.error('Failed to load invoices');
     } finally {
       setLoading(false);
@@ -41,7 +42,7 @@ const Invoices = () => {
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      logger.error('Error fetching clients:', error);
     }
   };
 
@@ -78,7 +79,7 @@ const Invoices = () => {
       setDeleteDialog({ isOpen: false, invoiceId: null });
       fetchInvoices();
     } catch (error) {
-      console.error('Error deleting invoice:', error);
+      logger.error('Error deleting invoice:', error);
       toast.error('Failed to delete invoice');
     }
   };
@@ -101,7 +102,7 @@ const Invoices = () => {
       
       toast.success('PDF downloaded!');
     } catch (error) {
-      console.error('Error downloading PDF:', error);
+      logger.error('Error downloading PDF:', error);
       toast.error('Failed to download PDF');
     }
   };

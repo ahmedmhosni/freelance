@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { MdArrowBack, MdEdit, MdDelete, MdBusiness, MdEmail, MdPhone, MdFolder, MdTask } from 'react-icons/md';
 import ConfirmDialog from '../components/ConfirmDialog';
+import logger from '../utils/logger';
 
 const ClientDetail = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const ClientDetail = () => {
       setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : projectsRes.data.data || []);
       setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : tasksRes.data.data || []);
     } catch (error) {
-      console.error('Error fetching client data:', error);
+      logger.error('Error fetching client data:', error);
       toast.error('Failed to load client details');
     } finally {
       setLoading(false);
@@ -47,7 +48,7 @@ const ClientDetail = () => {
       setDeleteDialog({ isOpen: false, type: null, itemId: null });
       fetchClientData();
     } catch (error) {
-      console.error('Error deleting project:', error);
+      logger.error('Error deleting project:', error);
       toast.error('Failed to delete project');
     }
   };
@@ -59,7 +60,7 @@ const ClientDetail = () => {
       setDeleteDialog({ isOpen: false, type: null, itemId: null });
       fetchClientData();
     } catch (error) {
-      console.error('Error deleting task:', error);
+      logger.error('Error deleting task:', error);
       toast.error('Failed to delete task');
     }
   };

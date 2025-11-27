@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
 import LogoLoader from '../components/LogoLoader';
+import logger from '../utils/logger';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -35,7 +36,7 @@ const Login = () => {
       const response = await api.get('/api/maintenance/status');
       setIsMaintenanceMode(response.data.is_active);
     } catch (err) {
-      console.error('Error checking maintenance status:', err);
+      logger.error('Error checking maintenance status:', err);
     }
   };
 

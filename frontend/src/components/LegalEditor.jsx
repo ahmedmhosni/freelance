@@ -3,6 +3,7 @@ import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { MdSave, MdPreview, MdEdit } from 'react-icons/md';
+import logger from '../utils/logger';
 
 const LegalEditor = () => {
   const { isDark } = useTheme();
@@ -22,7 +23,7 @@ const LegalEditor = () => {
       const response = await api.get(`/api/legal/${activeType}`);
       setContent(response.data.content || '');
     } catch (error) {
-      console.error('Error fetching legal content:', error);
+      logger.error('Error fetching legal content:', error);
       toast.error('Failed to load content');
     } finally {
       setIsLoading(false);
@@ -40,7 +41,7 @@ const LegalEditor = () => {
       await api.put(`/api/legal/${activeType}`, { content });
       toast.success(`${activeType === 'terms' ? 'Terms' : 'Privacy Policy'} updated successfully!`);
     } catch (error) {
-      console.error('Error saving legal content:', error);
+      logger.error('Error saving legal content:', error);
       toast.error('Failed to save content');
     } finally {
       setIsSaving(false);
