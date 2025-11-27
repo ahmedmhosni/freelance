@@ -186,7 +186,7 @@ router.get('/verify-email/:token',
     request.input('token', sql.NVarChar, token);
 
     const result = await request.query(`
-      SELECT id, name, email, email_verification_expires
+      SELECT id, name, email, email_verification_expires, email_verified
       FROM users
       WHERE email_verification_token = @token
     `);
@@ -194,7 +194,21 @@ router.get('/verify-email/:token',
     const user = result.recordset[0];
 
     if (!user) {
-      throw new AppError('Invalid verification token', 400, 'INVALID_TOKEN');
+      // Check if user exists but token was already used (already verified)
+      const checkRequest = pool.request();
+      checkRequest.input('token', sql.NVarChar, token);
+      
+      // This won't find anything, but let's check if there's a verified user
+      // We can't really check this without storing used tokens, so just return generic error
+      throw new AppError('Invalid or expired verification token', 400, 'INVALID_TOKEN');
+    }
+
+    // Check if already verified (token still exists but user is verified)
+    if (user.email_verified) {
+      return res.json({
+        success: true,
+        message: 'Email already verified! You can log in.'
+      });
     }
 
     // Check if token expired

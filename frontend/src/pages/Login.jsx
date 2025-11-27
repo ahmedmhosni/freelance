@@ -4,12 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
+import LogoLoader from '../components/LogoLoader';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const [quote, setQuote] = useState({ text: 'Loading...', author: '' });
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
   const { login } = useAuth();
@@ -65,6 +67,12 @@ const Login = () => {
         return;
       }
       
+      // Show full-page loader
+      setShowLoader(true);
+      
+      // Add a small delay to show the loader (1.5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       navigate('/dashboard');
     } catch (err) {
       const errorCode = err.response?.data?.code;
@@ -86,7 +94,27 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container" style={{
+    <>
+      {/* Full Page Loader Overlay */}
+      {showLoader && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: isDark ? '#191919' : '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          animation: 'fadeIn 0.3s ease'
+        }}>
+          <LogoLoader size={48} text="Loading your workspace..." />
+        </div>
+      )}
+
+      <div className="login-container" style={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -344,7 +372,12 @@ const Login = () => {
               cursor: isLoading ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s ease',
               marginBottom: '16px',
-              opacity: isLoading ? 0.6 : 1
+              opacity: isLoading ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              minHeight: '40px'
             }}
             onMouseEnter={(e) => {
               if (!isLoading) {
@@ -357,7 +390,19 @@ const Login = () => {
               }
             }}
           >
-            {isLoading ? 'Signing in...' : 'Continue'}
+            {isLoading ? (
+              <>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  border: `2px solid ${isDark ? '#191919' : '#ffffff'}`,
+                  borderTop: '2px solid transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite'
+                }} />
+                <span>Signing in...</span>
+              </>
+            ) : 'Continue'}
           </button>
 
           <div style={{
@@ -406,7 +451,19 @@ const Login = () => {
           )}
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
+    </>
   );
 };
 

@@ -1,5 +1,8 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+const path = require('path');
+
+// Load environment variables from .env.local if it exists
+require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
 
 // PostgreSQL connection configuration
 const config = {
@@ -7,7 +10,7 @@ const config = {
   port: parseInt(process.env.PG_PORT || '5432'),
   database: process.env.PG_DATABASE || 'roastify',
   user: process.env.PG_USER || 'postgres',
-  password: process.env.PG_PASSWORD,
+  password: process.env.PG_PASSWORD || 'postgres',
   ssl: process.env.PG_SSL === 'true' ? {
     rejectUnauthorized: false
   } : false,

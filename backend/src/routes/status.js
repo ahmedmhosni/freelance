@@ -16,12 +16,19 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   const startTime = Date.now();
-  const status = {
-    status: 'operational',
-    timestamp: new Date().toISOString(),
+  
+  // Internal detailed status (not exposed to public)
+  const internalStatus = {
     uptime: process.uptime(),
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
+    errors: []
+  };
+  
+  // Public status (sanitized)
+  const status = {
+    status: 'operational',
+    timestamp: new Date().toISOString(),
     services: {
       api: {
         status: 'operational',
@@ -36,8 +43,7 @@ router.get('/', async (req, res) => {
         responseTime: 0
       },
       websocket: {
-        status: 'operational',
-        connections: 0
+        status: 'operational'
       }
     }
   };
@@ -50,8 +56,8 @@ router.get('/', async (req, res) => {
     status.services.database.responseTime = Date.now() - dbStart;
   } catch (error) {
     status.services.database.status = 'degraded';
-    status.services.database.error = error.message;
     status.status = 'degraded';
+    internalStatus.errors.push({ service: 'database', error: error.message });
   }
 
   // Check email service
@@ -59,11 +65,11 @@ router.get('/', async (req, res) => {
     if (emailService.client) {
       status.services.email.status = 'operational';
     } else {
-      status.services.email.status = 'not_configured';
+      status.services.email.status = 'operational'; // Don't expose "not_configured"
     }
   } catch (error) {
     status.services.email.status = 'degraded';
-    status.services.email.error = error.message;
+    internalStatus.errors.push({ service: 'email', error: error.message });
   }
 
   // API response time
@@ -71,27 +77,142 @@ router.get('/', async (req, res) => {
 
   // Overall status
   const allOperational = Object.values(status.services).every(
-    service => service.status === 'operational' || service.status === 'not_configured'
+    service => service.status === 'operational'
   );
   
   if (!allOperational) {
     status.status = 'degraded';
   }
 
+  // Save status to history (async, don't wait)
+  saveStatusHistory(status.services).catch(err => 
+    console.error('Failed to save status history:', err)
+  );
+
+  // If admin is requesting (has auth header), include internal details
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    // Add system metrics for authenticated users
+    status.uptime = internalStatus.uptime;
+    status.version = internalStatus.version;
+    status.environment = internalStatus.environment;
+  }
+
   res.json(status);
+});
+
+// Helper function to save status history
+async function saveStatusHistory(services) {
+  try {
+    // Check if table exists first
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'status_history'
+      )
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      return; // Table doesn't exist yet, skip saving
+    }
+
+    for (const [serviceName, serviceData] of Object.entries(services)) {
+      await query(
+        `INSERT INTO status_history (service_name, status, response_time, checked_at)
+         VALUES ($1, $2, $3, NOW())`,
+        [serviceName, serviceData.status, serviceData.responseTime || null]
+      );
+    }
+  } catch (error) {
+    // Silently fail - don't break the status endpoint
+    console.error('Error saving status history:', error.message);
+  }
+}
+
+/**
+ * @swagger
+ * /api/status/history:
+ *   get:
+ *     summary: Get status history for the last 24 hours (Public)
+ *     tags: [Status]
+ *     responses:
+ *       200:
+ *         description: Status history data
+ */
+router.get('/history', async (req, res) => {
+  try {
+    // Check if table exists
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'status_history'
+      )
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      return res.json({ history: {}, message: 'History tracking not yet enabled' });
+    }
+
+    // Get history for last 24 hours, grouped by hour
+    const history = await query(`
+      SELECT 
+        service_name,
+        DATE_TRUNC('hour', checked_at) as hour,
+        COUNT(*) as total_checks,
+        COUNT(CASE WHEN status = 'operational' THEN 1 END) as successful_checks,
+        AVG(response_time) as avg_response_time,
+        MAX(checked_at) as last_check
+      FROM status_history
+      WHERE checked_at >= NOW() - INTERVAL '24 hours'
+      GROUP BY service_name, DATE_TRUNC('hour', checked_at)
+      ORDER BY service_name, hour DESC
+    `);
+
+    // Format data by service
+    const formattedHistory = {};
+    history.rows.forEach(row => {
+      if (!formattedHistory[row.service_name]) {
+        formattedHistory[row.service_name] = [];
+      }
+      formattedHistory[row.service_name].push({
+        hour: row.hour,
+        uptime: ((row.successful_checks / row.total_checks) * 100).toFixed(2),
+        avgResponseTime: row.avg_response_time ? Math.round(row.avg_response_time) : null,
+        checks: row.total_checks
+      });
+    });
+
+    res.json({ history: formattedHistory });
+  } catch (error) {
+    console.error('Error fetching status history:', error);
+    res.status(500).json({ error: 'Failed to fetch status history' });
+  }
 });
 
 /**
  * @swagger
  * /api/status/detailed:
  *   get:
- *     summary: Get detailed system metrics (Public)
+ *     summary: Get detailed system metrics (Admin Only)
  *     tags: [Status]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Detailed system metrics
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/detailed', async (req, res) => {
+  // Check for admin authentication (optional - can be made required)
+  const isAdmin = req.headers.authorization && req.user?.role === 'admin';
+  
+  if (!isAdmin) {
+    return res.status(401).json({ 
+      error: 'Unauthorized',
+      message: 'Admin access required for detailed metrics' 
+    });
+  }
   const status = {
     timestamp: new Date().toISOString(),
     system: {

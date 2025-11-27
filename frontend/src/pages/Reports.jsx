@@ -6,6 +6,9 @@ const Reports = () => {
   const [financialReport, setFinancialReport] = useState(null);
   const [projectReport, setProjectReport] = useState(null);
   const [clientReport, setClientReport] = useState(null);
+  const [timeTrackingTasks, setTimeTrackingTasks] = useState([]);
+  const [timeTrackingProjects, setTimeTrackingProjects] = useState([]);
+  const [timeTrackingClients, setTimeTrackingClients] = useState([]);
 
   useEffect(() => {
     fetchReports();
@@ -13,14 +16,20 @@ const Reports = () => {
 
   const fetchReports = async () => {
     try {
-      const [financial, projects, clients] = await Promise.all([
+      const [financial, projects, clients, timeTasks, timeProjects, timeClients] = await Promise.all([
         api.get('/api/reports/financial'),
         api.get('/api/reports/projects'),
-        api.get('/api/reports/clients')
+        api.get('/api/reports/clients'),
+        api.get('/api/reports/time-tracking/tasks'),
+        api.get('/api/reports/time-tracking/projects'),
+        api.get('/api/reports/time-tracking/clients')
       ]);
       setFinancialReport(financial.data);
       setProjectReport(projects.data);
       setClientReport(clients.data);
+      setTimeTrackingTasks(timeTasks.data || []);
+      setTimeTrackingProjects(timeProjects.data || []);
+      setTimeTrackingClients(timeClients.data || []);
     } catch (error) {
       console.error('Error fetching reports:', error);
     }
@@ -70,6 +79,12 @@ const Reports = () => {
           className={`view-toggle ${activeTab === 'clients' ? 'active' : ''}`}
         >
           Clients
+        </button>
+        <button
+          onClick={() => setActiveTab('time-tracking')}
+          className={`view-toggle ${activeTab === 'time-tracking' ? 'active' : ''}`}
+        >
+          Time Tracking
         </button>
       </div>
 
@@ -219,6 +234,148 @@ const Reports = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {activeTab === 'time-tracking' && (
+        <div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
+            <div className="card" style={{ padding: '16px' }}>
+              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+                TOTAL HOURS (TASKS)
+              </div>
+              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+                {timeTrackingTasks.reduce((sum, t) => sum + parseFloat(t.total_hours || 0), 0).toFixed(1)}h
+              </div>
+              <div className="stat-description" style={{ fontSize: '13px' }}>
+                Across {timeTrackingTasks.length} tasks
+              </div>
+            </div>
+            <div className="card" style={{ padding: '16px' }}>
+              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+                TOTAL HOURS (PROJECTS)
+              </div>
+              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+                {timeTrackingProjects.reduce((sum, p) => sum + parseFloat(p.total_hours || 0), 0).toFixed(1)}h
+              </div>
+              <div className="stat-description" style={{ fontSize: '13px' }}>
+                Across {timeTrackingProjects.length} projects
+              </div>
+            </div>
+            <div className="card" style={{ padding: '16px' }}>
+              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+                TOTAL HOURS (CLIENTS)
+              </div>
+              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+                {timeTrackingClients.reduce((sum, c) => sum + parseFloat(c.total_hours || 0), 0).toFixed(1)}h
+              </div>
+              <div className="stat-description" style={{ fontSize: '13px' }}>
+                Across {timeTrackingClients.length} clients
+              </div>
+            </div>
+          </div>
+
+          <div className="card" style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Time by Task</h2>
+              <button
+                onClick={() => exportToCSV(timeTrackingTasks, 'time-by-task.csv')}
+                className="btn-primary"
+              >
+                Export CSV
+              </button>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Task</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Project</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Client</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Sessions</th>
+                  <th style={{ textAlign: 'right', padding: '10px' }}>Total Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timeTrackingTasks.map((task, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '10px', fontWeight: '500' }}>{task.task_title || 'No Task'}</td>
+                    <td style={{ padding: '10px' }}>{task.project_name || '-'}</td>
+                    <td style={{ padding: '10px' }}>{task.client_name || '-'}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{task.session_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'right', fontWeight: '600' }}>{task.total_hours}h</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="card" style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Time by Project</h2>
+              <button
+                onClick={() => exportToCSV(timeTrackingProjects, 'time-by-project.csv')}
+                className="btn-primary"
+              >
+                Export CSV
+              </button>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Project</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Client</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Tasks</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Sessions</th>
+                  <th style={{ textAlign: 'right', padding: '10px' }}>Total Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timeTrackingProjects.map((project, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '10px', fontWeight: '500' }}>{project.project_name || 'No Project'}</td>
+                    <td style={{ padding: '10px' }}>{project.client_name || '-'}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{project.task_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{project.session_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'right', fontWeight: '600' }}>{project.total_hours}h</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Time by Client</h2>
+              <button
+                onClick={() => exportToCSV(timeTrackingClients, 'time-by-client.csv')}
+                className="btn-primary"
+              >
+                Export CSV
+              </button>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Client</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Projects</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Tasks</th>
+                  <th style={{ textAlign: 'center', padding: '10px' }}>Sessions</th>
+                  <th style={{ textAlign: 'right', padding: '10px' }}>Total Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timeTrackingClients.map((client, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '10px', fontWeight: '500' }}>{client.client_name || 'No Client'}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{client.project_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{client.task_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>{client.session_count}</td>
+                    <td style={{ padding: '10px', textAlign: 'right', fontWeight: '600' }}>{client.total_hours}h</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const LogoLoader = ({ size = 40, text = '' }) => {
   const { isDark } = useTheme();
+  const dotColor = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
 
   return (
     <div style={{
@@ -10,37 +11,85 @@ const LogoLoader = ({ size = 40, text = '' }) => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '12px',
+      gap: '16px',
       padding: '12px'
     }}>
-      {/* Minimal Spinner */}
+      {/* Logo SVG */}
       <div style={{
-        width: size,
-        height: size,
-        border: '2px solid rgba(55, 53, 47, 0.1)',
-        borderTop: `2px solid ${isDark ? '#fff' : '#37352f'}`,
-        borderRadius: '50%',
-        animation: 'spin 0.8s linear infinite'
-      }} />
+        animation: 'pulse 2s ease-in-out infinite'
+      }}>
+        <img 
+          src="/Asset 7.svg" 
+          alt="Logo" 
+          style={{ 
+            height: size,
+            filter: isDark ? 'brightness(0) invert(1)' : 'none',
+            display: 'block'
+          }} 
+        />
+      </div>
 
-      {/* Minimal Loading Text */}
+      {/* Animated Dots */}
+      <div style={{
+        display: 'flex',
+        gap: '6px',
+        alignItems: 'center'
+      }}>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: dotColor,
+          animation: 'bounce 1.4s ease-in-out infinite'
+        }} />
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: dotColor,
+          animation: 'bounce 1.4s ease-in-out 0.2s infinite'
+        }} />
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: dotColor,
+          animation: 'bounce 1.4s ease-in-out 0.4s infinite'
+        }} />
+      </div>
+
+      {/* Loading Text */}
       {text && (
         <div style={{
-          fontSize: '12px',
+          fontSize: '13px',
           fontWeight: '400',
-          color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
+          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+          marginTop: '4px'
         }}>
           {text}
         </div>
       )}
 
       <style>{`
-        @keyframes spin {
-          0% { 
-            transform: rotate(0deg);
+        @keyframes pulse {
+          0%, 100% { 
+            opacity: 1;
+            transform: scale(1);
           }
-          100% { 
-            transform: rotate(360deg);
+          50% { 
+            opacity: 0.7;
+            transform: scale(0.95);
+          }
+        }
+
+        @keyframes bounce {
+          0%, 80%, 100% { 
+            transform: translateY(0);
+            opacity: 1;
+          }
+          40% { 
+            transform: translateY(-10px);
+            opacity: 0.7;
           }
         }
       `}</style>

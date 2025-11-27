@@ -24,7 +24,7 @@ const VerifyEmail = () => {
     const token = searchParams.get('token');
     const emailParam = searchParams.get('email');
     
-    if (token) {
+    if (token && !isVerifying && verificationStatus === null) {
       verifyByToken(token);
     }
     
@@ -38,13 +38,14 @@ const VerifyEmail = () => {
     try {
       const response = await api.get(`/api/auth/verify-email/${token}`);
       setVerificationStatus('success');
-      setMessage(response.data.message);
-      toast.success('Email verified successfully!');
+      setMessage(response.data.message || 'Email verified successfully!');
+      toast.success(response.data.message || 'Email verified successfully!');
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
+      const errorMsg = error.response?.data?.error || 'Verification failed';
       setVerificationStatus('error');
-      setMessage(error.response?.data?.error || 'Verification failed');
-      toast.error(error.response?.data?.error || 'Verification failed');
+      setMessage(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsVerifying(false);
     }

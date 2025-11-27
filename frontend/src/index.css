@@ -5,6 +5,11 @@
 }
 
 :root {
+  /* Brand Colors - Blue to Purple Gradient */
+  --brand-primary: #6366f1;
+  --brand-secondary: #8b5cf6;
+  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  
   /* Status Colors - Bright and visible in both themes */
   --status-active: #10b981;
   --status-completed: #3b82f6;
@@ -18,7 +23,7 @@
   --priority-low: #10b981;
   
   /* Theme Colors */
-  --primary-color: #007bff;
+  --primary-color: #6366f1;
   --text-secondary: #6b7280;
   --border-color: #e5e7eb;
   --card-bg-secondary: #f9fafb;
@@ -39,7 +44,9 @@ body.dark-mode {
   color: rgba(255, 255, 255, 0.9);
   
   /* Dark mode theme colors */
-  --primary-color: #60a5fa;
+  --primary-color: #818cf8;
+  --brand-primary: #818cf8;
+  --brand-secondary: #a78bfa;
   --text-secondary: #9ca3af;
   --border-color: rgba(255, 255, 255, 0.1);
   --card-bg-secondary: #2a2a2a;
@@ -1502,4 +1509,25 @@ body.dark-mode .rbc-current-time-indicator {
   75% {
     transform: translateX(-5%) translateY(-2%);
   }
+}
+
+/* Timer Widget - Force green when active in both light and dark mode */
+button.timer-active {
+  background: #28a745 !important;
+  color: white !important;
+  border: 1px solid #28a745 !important;
+}
+
+button.timer-active:hover {
+  background: #218838 !important;
+}
+
+body.dark-mode button.timer-active {
+  background: #28a745 !important;
+  color: white !important;
+  border: 1px solid #28a745 !important;
+}
+
+body.dark-mode button.timer-active:hover {
+  background: #218838 !important;
 }

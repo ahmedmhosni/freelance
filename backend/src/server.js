@@ -42,6 +42,7 @@ const maintenanceRoutes = require('./routes/maintenance');
 const statusRoutes = require('./routes/status');
 const profileRoutes = require('./routes/profile');
 const userPreferencesRoutes = require('./routes/userPreferences');
+const legalRoutes = require('./routes/legal');
 
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -179,6 +180,7 @@ app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/status', statusRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/user', userPreferencesRoutes);
+app.use('/api/legal', legalRoutes);
 
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {

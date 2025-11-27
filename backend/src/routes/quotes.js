@@ -33,32 +33,24 @@ router.get('/daily', async (req, res) => {
 // Get all quotes (admin only) with pagination
 router.get('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const db = require('../db/index');
-    const pool = await db;
+    const pool = require('../db/postgresql');
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     // Get total count
-    const countRequest = pool.request();
-    const countResult = await countRequest.query('SELECT COUNT(*) as total FROM quotes');
-    const total = countResult.recordset[0].total;
+    const countResult = await pool.query('SELECT COUNT(*) as total FROM quotes');
+    const total = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(total / limit);
 
     // Get paginated quotes
-    const request = pool.request();
-    request.input('limit', sql.Int, limit);
-    request.input('offset', sql.Int, offset);
-    
-    const result = await request.query(`
-      SELECT * FROM quotes 
-      ORDER BY id DESC 
-      OFFSET @offset ROWS 
-      FETCH NEXT @limit ROWS ONLY
-    `);
+    const result = await pool.query(
+      'SELECT * FROM quotes ORDER BY id DESC LIMIT $1 OFFSET $2',
+      [limit, offset]
+    );
 
     res.json({ 
-      data: result.recordset,
+      data: result.rows,
       pagination: {
         page,
         limit,
@@ -75,22 +67,19 @@ router.get('/', authenticateToken, requireAdmin, async (req, res) => {
 // Create quote (admin only)
 router.post('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { text, author, is_active = 1 } = req.body;
+    const pool = require('../db/postgresql');
+    const { text, author, category, is_active = true } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Quote text is required' });
     }
 
-    const result = await queries.createQuote(text, author || '', is_active ? 1 : 0);
-    
-    // Get the created quote
-    const db = require('../db/index');
-    const pool = await db;
-    const request = pool.request();
-    request.input('id', sql.Int, result.id || result.recordset[0].id);
-    const quoteResult = await request.query('SELECT * FROM quotes WHERE id = @id');
+    const result = await pool.query(
+      'INSERT INTO quotes (text, author, category, is_active) VALUES ($1, $2, $3, $4) RETURNING *',
+      [text, author || '', category || 'general', is_active]
+    );
 
-    res.status(201).json(quoteResult.recordset[0]);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating quote:', error);
     res.status(500).json({ error: 'Server error' });
@@ -100,23 +89,24 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
 // Update quote (admin only)
 router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    const pool = require('../db/postgresql');
     const { id } = req.params;
-    const { text, author, is_active } = req.body;
+    const { text, author, category, is_active } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Quote text is required' });
     }
 
-    await queries.updateQuote(id, text, author || '', is_active !== undefined ? (is_active ? 1 : 0) : 1);
-
-    // Get updated quote
-    const quote = await queries.getQuoteById(id);
+    const result = await pool.query(
+      'UPDATE quotes SET text = $1, author = $2, category = $3, is_active = $4 WHERE id = $5 RETURNING *',
+      [text, author || '', category || 'general', is_active !== undefined ? is_active : true, id]
+    );
     
-    if (!quote) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Quote not found' });
     }
 
-    res.json(quote);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating quote:', error);
     res.status(500).json({ error: 'Server error' });
@@ -126,11 +116,12 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
 // Delete quote (admin only)
 router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    const pool = require('../db/postgresql');
     const { id } = req.params;
 
-    const result = await queries.deleteQuote(id);
+    const result = await pool.query('DELETE FROM quotes WHERE id = $1', [id]);
 
-    if (result.changes === 0 && result.rowsAffected && result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Quote not found' });
     }
 

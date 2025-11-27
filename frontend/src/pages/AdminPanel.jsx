@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import QuotesManager from '../components/QuotesManager';
 import MaintenanceEditor from '../components/MaintenanceEditor';
+import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({ users: 0, projects: 0, invoices: 0, revenue: 0 });
+  const [systemStatus, setSystemStatus] = useState(null);
   const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
     fetchUsers();
     fetchStats();
+    fetchSystemStatus();
   }, []);
+
+  const fetchSystemStatus = async () => {
+    try {
+      const response = await api.get('/api/status');
+      setSystemStatus(response.data);
+    } catch (error) {
+      console.error('Error fetching system status:', error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -82,7 +95,7 @@ const AdminPanel = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>
         <div className="card" style={{ padding: '16px' }}>
           <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
             TOTAL USERS
@@ -127,6 +140,54 @@ const AdminPanel = () => {
             System-wide
           </div>
         </div>
+        
+        {/* System Status Card */}
+        <Link to="/admin/status" style={{ textDecoration: 'none' }}>
+          <div className="card" style={{ 
+            padding: '16px', 
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            height: '100%'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '';
+          }}>
+            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+              SYSTEM STATUS
+            </div>
+            <div style={{ 
+              fontSize: '32px', 
+              marginBottom: '4px',
+              color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107'
+            }}>
+              {systemStatus?.status === 'operational' ? <MdCheckCircle /> : 
+               systemStatus?.status === 'degraded' ? <MdWarning /> : <MdError />}
+            </div>
+            <div className="stat-description" style={{ 
+              fontSize: '13px',
+              color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107',
+              fontWeight: '500',
+              textTransform: 'capitalize'
+            }}>
+              {systemStatus?.status || 'Loading...'}
+            </div>
+            <div style={{ 
+              fontSize: '11px', 
+              marginTop: '8px',
+              opacity: 0.7,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <MdTrendingUp /> View Details
+            </div>
+          </div>
+        </Link>
       </div>
 
       {activeTab === 'users' && (

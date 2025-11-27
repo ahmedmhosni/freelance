@@ -99,4 +99,113 @@ router.get('/clients', async (req, res) => {
   }
 });
 
+// Time tracking report - grouped by tasks
+router.get('/time-tracking/tasks', async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    
+    let queryText = `
+      SELECT 
+        t.id as task_id,
+        t.title as task_title,
+        p.id as project_id,
+        p.name as project_name,
+        c.id as client_id,
+        c.name as client_name,
+        COUNT(te.id) as session_count,
+        COALESCE(SUM(te.duration), 0) as total_minutes,
+        ROUND(COALESCE(SUM(te.duration), 0) / 60.0, 2) as total_hours
+      FROM time_entries te
+      LEFT JOIN tasks t ON te.task_id = t.id
+      LEFT JOIN projects p ON te.project_id = p.id
+      LEFT JOIN clients c ON p.client_id = c.id
+      WHERE te.user_id = $1 AND te.end_time IS NOT NULL
+    `;
+    const params = [req.user.id];
+
+    if (start_date && end_date) {
+      queryText += ' AND te.start_time::date BETWEEN $2 AND $3';
+      params.push(start_date, end_date);
+    }
+
+    queryText += ' GROUP BY t.id, t.title, p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
+    
+    const result = await getAll(queryText, params);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Time tracking report - grouped by projects
+router.get('/time-tracking/projects', async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    
+    let queryText = `
+      SELECT 
+        p.id as project_id,
+        p.name as project_name,
+        c.id as client_id,
+        c.name as client_name,
+        COUNT(DISTINCT te.task_id) as task_count,
+        COUNT(te.id) as session_count,
+        COALESCE(SUM(te.duration), 0) as total_minutes,
+        ROUND(COALESCE(SUM(te.duration), 0) / 60.0, 2) as total_hours
+      FROM time_entries te
+      LEFT JOIN projects p ON te.project_id = p.id
+      LEFT JOIN clients c ON p.client_id = c.id
+      WHERE te.user_id = $1 AND te.end_time IS NOT NULL AND p.id IS NOT NULL
+    `;
+    const params = [req.user.id];
+
+    if (start_date && end_date) {
+      queryText += ' AND te.start_time::date BETWEEN $2 AND $3';
+      params.push(start_date, end_date);
+    }
+
+    queryText += ' GROUP BY p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
+    
+    const result = await getAll(queryText, params);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Time tracking report - grouped by clients
+router.get('/time-tracking/clients', async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    
+    let queryText = `
+      SELECT 
+        c.id as client_id,
+        c.name as client_name,
+        COUNT(DISTINCT p.id) as project_count,
+        COUNT(DISTINCT te.task_id) as task_count,
+        COUNT(te.id) as session_count,
+        COALESCE(SUM(te.duration), 0) as total_minutes,
+        ROUND(COALESCE(SUM(te.duration), 0) / 60.0, 2) as total_hours
+      FROM time_entries te
+      LEFT JOIN projects p ON te.project_id = p.id
+      LEFT JOIN clients c ON p.client_id = c.id
+      WHERE te.user_id = $1 AND te.end_time IS NOT NULL AND c.id IS NOT NULL
+    `;
+    const params = [req.user.id];
+
+    if (start_date && end_date) {
+      queryText += ' AND te.start_time::date BETWEEN $2 AND $3';
+      params.push(start_date, end_date);
+    }
+
+    queryText += ' GROUP BY c.id, c.name ORDER BY total_minutes DESC';
+    
+    const result = await getAll(queryText, params);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

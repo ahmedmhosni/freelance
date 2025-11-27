@@ -30,12 +30,13 @@
     "@storybook/addon-vitest": "^10.0.8",
     "@storybook/react-vite": "^10.0.8",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/browser-playwright": "^4.0.13",
+    "@vitest/coverage-v8": "^4.0.13",
+    "playwright": "^1.57.0",
     "prop-types": "^15.8.1",
+    "sharp": "^0.34.5",
     "storybook": "^10.0.8",
     "vite": "^5.0.8",
-    "vitest": "^4.0.13",
-    "playwright": "^1.57.0",
-    "@vitest/browser-playwright": "^4.0.13",
-    "@vitest/coverage-v8": "^4.0.13"
+    "vitest": "^4.0.13"
   }
 }

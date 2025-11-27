@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { MaintenanceProvider } from './context/MaintenanceContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import FullPageLoader from './components/FullPageLoader';
+import PageTransition from './components/PageTransition';
 import './styles/responsive-fixes.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -14,7 +15,8 @@ import VerifyEmail from './pages/VerifyEmail';
 import ResendVerification from './pages/ResendVerification';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import Status from './pages/Status';
+import PublicStatus from './pages/PublicStatus';
+import AdminStatus from './pages/Status';
 import ComingSoon from './pages/ComingSoon';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
@@ -28,6 +30,7 @@ import AdminPanel from './pages/AdminPanel';
 import LoaderTest from './pages/LoaderTest';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
+import Terms from './pages/Terms';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -56,7 +59,8 @@ function App() {
             }}
           >
             <MaintenanceProvider>
-              <Toaster
+              <PageTransition>
+                <Toaster
               position="top-right"
               toastOptions={{
                 duration: 3000,
@@ -88,7 +92,8 @@ function App() {
               <Route path="/resend-verification" element={<ResendVerification />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/status" element={<Status />} />
+              <Route path="/status" element={<PublicStatus />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/profile/:username" element={<PublicProfile />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
@@ -103,9 +108,11 @@ function App() {
                 <Route path="time-tracking" element={<TimeTracking />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+                <Route path="admin/status" element={<PrivateRoute adminOnly><AdminStatus /></PrivateRoute>} />
                 <Route path="loader-test" element={<PrivateRoute adminOnly><LoaderTest /></PrivateRoute>} />
               </Route>
             </Routes>
+              </PageTransition>
             </MaintenanceProvider>
           </BrowserRouter>
         </SocketProvider>

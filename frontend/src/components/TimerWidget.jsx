@@ -24,10 +24,9 @@ const TimerWidget = () => {
   useEffect(() => {
     if (activeEntry) {
       const calculateElapsed = () => {
-        const now = new Date();
-        const today = now.toISOString().split('T')[0];
-        const startDateTime = new Date(`${today}T${activeEntry.start_time}`);
-        const elapsed = Math.floor((now - startDateTime) / 1000);
+        const now = Date.now(); // Current time in milliseconds
+        const startDateTime = new Date(activeEntry.start_time).getTime(); // Convert to milliseconds
+        const elapsed = Math.floor((now - startDateTime) / 1000); // Convert to seconds
         setElapsedTime(elapsed > 0 ? elapsed : 0);
       };
       
@@ -122,15 +121,16 @@ const TimerWidget = () => {
     <div ref={popupRef} style={{ position: 'relative' }}>
       <button
         onClick={() => setShowPopup(!showPopup)}
+        className={activeEntry ? 'timer-active' : ''}
         style={{
           background: activeEntry 
-            ? (isDark ? 'rgba(46, 170, 220, 0.2)' : 'rgba(46, 170, 220, 0.1)')
+            ? '#28a745'
             : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)'),
           color: activeEntry 
-            ? '#2eaadc' 
+            ? 'white' 
             : (isDark ? 'rgba(255, 255, 255, 0.8)' : '#37352f'),
           border: activeEntry
-            ? '1px solid rgba(46, 170, 220, 0.3)'
+            ? '1px solid #28a745'
             : (isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)'),
           padding: '8px 12px',
           borderRadius: '3px',
@@ -145,14 +145,18 @@ const TimerWidget = () => {
           height: '40px'
         }}
         onMouseEnter={(e) => {
-          e.target.style.background = activeEntry
-            ? (isDark ? 'rgba(46, 170, 220, 0.25)' : 'rgba(46, 170, 220, 0.15)')
-            : (isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(55, 53, 47, 0.12)');
+          if (activeEntry) {
+            e.target.style.setProperty('background', '#218838', 'important');
+          } else {
+            e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(55, 53, 47, 0.12)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.target.style.background = activeEntry
-            ? (isDark ? 'rgba(46, 170, 220, 0.2)' : 'rgba(46, 170, 220, 0.1)')
-            : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)');
+          if (activeEntry) {
+            e.target.style.setProperty('background', '#28a745', 'important');
+          } else {
+            e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)';
+          }
         }}
       >
         <MdAccessTime size={16} />
@@ -184,14 +188,14 @@ const TimerWidget = () => {
               <div style={{
                 textAlign: 'center',
                 padding: '20px',
-                background: isDark ? 'rgba(46, 170, 220, 0.1)' : 'rgba(46, 170, 220, 0.05)',
+                background: isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(40, 167, 69, 0.05)',
                 borderRadius: '3px',
                 marginBottom: '16px'
               }}>
                 <div style={{
                   fontSize: '32px',
                   fontWeight: '600',
-                  color: '#2eaadc',
+                  color: '#28a745',
                   fontVariantNumeric: 'tabular-nums',
                   marginBottom: '8px'
                 }}>
@@ -283,7 +287,7 @@ const TimerWidget = () => {
                 style={{
                   width: '100%',
                   padding: '10px',
-                  background: '#2eaadc',
+                  background: '#28a745',
                   color: 'white',
                   border: 'none',
                   borderRadius: '3px',
