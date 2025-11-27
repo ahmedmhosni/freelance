@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { MdCheckCircle, MdError, MdWarning, MdRefresh } from 'react-icons/md';
+import { 
+  MdCheckCircle, 
+  MdError, 
+  MdWarning, 
+  MdRefresh, 
+  MdStorage, 
+  MdCloud, 
+  MdSpeed,
+  MdTimer,
+  MdTrendingUp
+} from 'react-icons/md';
 
 const Status = () => {
   const [status, setStatus] = useState(null);
@@ -85,6 +95,25 @@ const Status = () => {
     if (days > 0) return `${days}d ${hours}h ${minutes}m`;
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
+  };
+
+  const getServiceIcon = (name) => {
+    switch (name.toLowerCase()) {
+      case 'database':
+        return <MdStorage />;
+      case 'api':
+        return <MdCloud />;
+      case 'email':
+        return <MdSpeed />;
+      default:
+        return <MdCheckCircle />;
+    }
+  };
+
+  const getResponseTimeColor = (ms) => {
+    if (ms < 100) return '#28a745';
+    if (ms < 300) return '#ffc107';
+    return '#dc3545';
   };
 
   if (loading) {
@@ -198,127 +227,296 @@ const Status = () => {
 
         {/* Services Status */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : 'repeat(2, 1fr)',
-          gap: '16px',
           marginBottom: '32px'
         }}>
-          {status?.services && Object.entries(status.services).map(([name, service]) => (
-            <div
-              key={name}
-              style={{
-                background: isDark ? '#1a1a1a' : '#ffffff',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                borderRadius: '8px',
-                padding: '20px',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '12px'
-              }}>
-                <h3 style={{
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                  textTransform: 'capitalize'
-                }}>
-                  {name}
-                </h3>
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: '600',
+            color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <MdTrendingUp /> Service Health
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : 'repeat(2, 1fr)',
+            gap: '16px'
+          }}>
+            {status?.services && Object.entries(status.services).map(([name, service]) => (
+              <div
+                key={name}
+                style={{
+                  background: isDark ? '#1a1a1a' : '#ffffff',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  cursor: 'default',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                }}
+              >
+                {/* Status indicator bar */}
                 <div style={{
-                  fontSize: '24px',
-                  color: getStatusColor(service.status)
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: getStatusColor(service.status)
+                }} />
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  marginBottom: '16px'
                 }}>
-                  {getStatusIcon(service.status)}
-                </div>
-              </div>
-              <div style={{
-                fontSize: '13px',
-                color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
-              }}>
-                <div style={{ marginBottom: '4px' }}>
-                  Status: <span style={{ 
-                    color: getStatusColor(service.status),
-                    fontWeight: '500',
-                    textTransform: 'capitalize'
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      fontSize: '32px',
+                      color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)'
+                    }}>
+                      {getServiceIcon(name)}
+                    </div>
+                    <div>
+                      <h3 style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                        textTransform: 'capitalize',
+                        marginBottom: '4px'
+                      }}>
+                        {name}
+                      </h3>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        background: `${getStatusColor(service.status)}15`,
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        color: getStatusColor(service.status),
+                        textTransform: 'capitalize'
+                      }}>
+                        <div style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: getStatusColor(service.status),
+                          animation: service.status === 'operational' ? 'pulse 2s ease-in-out infinite' : 'none'
+                        }} />
+                        {service.status}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '28px',
+                    color: getStatusColor(service.status)
                   }}>
-                    {service.status}
-                  </span>
+                    {getStatusIcon(service.status)}
+                  </div>
                 </div>
-                {service.responseTime !== undefined && (
-                  <div>
-                    Response Time: <span style={{ fontWeight: '500' }}>
-                      {service.responseTime}ms
-                    </span>
-                  </div>
-                )}
-                {service.connections !== undefined && (
-                  <div>
-                    Connections: <span style={{ fontWeight: '500' }}>
-                      {service.connections}
-                    </span>
-                  </div>
-                )}
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '12px',
+                  paddingTop: '16px',
+                  borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
+                }}>
+                  {service.responseTime !== undefined && (
+                    <div>
+                      <div style={{
+                        fontSize: '11px',
+                        color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <MdTimer style={{ fontSize: '14px' }} /> Response
+                      </div>
+                      <div style={{ 
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: getResponseTimeColor(service.responseTime)
+                      }}>
+                        {service.responseTime}ms
+                      </div>
+                    </div>
+                  )}
+                  {service.connections !== undefined && (
+                    <div>
+                      <div style={{
+                        fontSize: '11px',
+                        color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        Connections
+                      </div>
+                      <div style={{ 
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+                      }}>
+                        {service.connections}
+                      </div>
+                    </div>
+                  )}
+                  {service.message && (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <div style={{
+                        fontSize: '12px',
+                        color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
+                        fontStyle: 'italic'
+                      }}>
+                        {service.message}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* System Info */}
         <div style={{
           background: isDark ? '#1a1a1a' : '#ffffff',
           border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+          borderRadius: '12px',
+          padding: '32px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
         }}>
           <h3 style={{
-            fontSize: '18px',
+            fontSize: '20px',
             fontWeight: '600',
             color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-            marginBottom: '16px'
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}>
-            System Information
+            <MdSpeed /> System Metrics
           </h3>
           <div style={{
             display: 'grid',
             gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : 'repeat(3, 1fr)',
-            gap: '16px',
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
+            gap: '24px'
           }}>
-            <div>
-              <div style={{ marginBottom: '4px', opacity: 0.7 }}>Uptime</div>
+            <div style={{
+              padding: '20px',
+              background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
+              borderRadius: '8px',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
+            }}>
               <div style={{ 
-                fontSize: '16px', 
-                fontWeight: '600',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+                fontSize: '11px',
+                color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500'
+              }}>
+                System Uptime
+              </div>
+              <div style={{ 
+                fontSize: '28px', 
+                fontWeight: '700',
+                color: '#28a745',
+                marginBottom: '4px'
               }}>
                 {status?.uptime ? formatUptime(status.uptime) : 'N/A'}
               </div>
+              <div style={{
+                fontSize: '12px',
+                color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)'
+              }}>
+                Running smoothly
+              </div>
             </div>
-            <div>
-              <div style={{ marginBottom: '4px', opacity: 0.7 }}>Version</div>
+            
+            <div style={{
+              padding: '20px',
+              background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
+              borderRadius: '8px',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
+            }}>
               <div style={{ 
-                fontSize: '16px', 
-                fontWeight: '600',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+                fontSize: '11px',
+                color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500'
+              }}>
+                Version
+              </div>
+              <div style={{ 
+                fontSize: '28px', 
+                fontWeight: '700',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                marginBottom: '4px'
               }}>
                 {status?.version || 'N/A'}
               </div>
+              <div style={{
+                fontSize: '12px',
+                color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)'
+              }}>
+                Latest stable
+              </div>
             </div>
-            <div>
-              <div style={{ marginBottom: '4px', opacity: 0.7 }}>Environment</div>
+            
+            <div style={{
+              padding: '20px',
+              background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
+              borderRadius: '8px',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
+            }}>
               <div style={{ 
-                fontSize: '16px', 
-                fontWeight: '600',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                fontSize: '11px',
+                color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500'
+              }}>
+                Environment
+              </div>
+              <div style={{ 
+                fontSize: '28px', 
+                fontWeight: '700',
+                color: status?.environment === 'production' ? '#007bff' : '#ffc107',
+                marginBottom: '4px',
                 textTransform: 'capitalize'
               }}>
                 {status?.environment || 'N/A'}
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)'
+              }}>
+                {status?.environment === 'production' ? 'Live system' : 'Test environment'}
               </div>
             </div>
           </div>
@@ -360,6 +558,17 @@ const Status = () => {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(1.2);
+          }
         }
       `}</style>
     </div>
