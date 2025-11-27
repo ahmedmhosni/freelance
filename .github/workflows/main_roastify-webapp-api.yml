@@ -29,12 +29,13 @@ jobs:
           npm install
           npm run build --if-present
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: ./backend
-          retention-days: 1  # Auto-delete after 1 day to save storage
+      # Temporarily disabled due to storage quota - deploy directly
+      # - name: Upload artifact for deployment job
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: node-app
+      #     path: ./backend
+      #     retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,10 +45,21 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
         with:
-          name: node-app
+          node-version: '22.x'
+
+      - name: npm install
+        working-directory: ./backend
+        run: npm install
+      
+      # - name: Download artifact from build job
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: node-app
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -62,5 +74,5 @@ jobs:
         with:
           app-name: 'roastify-webapp-api'
           slot-name: 'Production'
-          package: .
+          package: ./backend
           
