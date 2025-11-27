@@ -29,33 +29,67 @@ const Home = () => {
         opacity: isDark ? 0.6 : 1
       }} />
       
+      {/* Animated Orb 1 - Blue/Indigo */}
       <div style={{
         position: 'absolute',
-        top: '-10%',
-        left: '-5%',
-        width: '500px',
-        height: '500px',
+        top: '10%',
+        left: '5%',
+        width: '400px',
+        height: '400px',
         borderRadius: '50%',
         background: isDark
-          ? 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%)'
-          : 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%)',
+          ? 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%)',
         filter: 'blur(80px)',
         animation: 'float 20s ease-in-out infinite',
         pointerEvents: 'none'
       }} />
       
+      {/* Animated Orb 2 - Purple */}
       <div style={{
         position: 'absolute',
-        bottom: '-10%',
-        right: '-5%',
-        width: '600px',
-        height: '600px',
+        top: '30%',
+        right: '10%',
+        width: '500px',
+        height: '500px',
         borderRadius: '50%',
         background: isDark
-          ? 'radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)'
-          : 'radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%)',
+          ? 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%)',
         filter: 'blur(90px)',
         animation: 'float 25s ease-in-out infinite reverse',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Animated Orb 3 - Cyan */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20%',
+        left: '15%',
+        width: '350px',
+        height: '350px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)',
+        filter: 'blur(70px)',
+        animation: 'float 18s ease-in-out infinite',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Animated Orb 4 - Pink */}
+      <div style={{
+        position: 'absolute',
+        bottom: '10%',
+        right: '5%',
+        width: '450px',
+        height: '450px',
+        borderRadius: '50%',
+        background: isDark
+          ? 'radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%)',
+        filter: 'blur(85px)',
+        animation: 'float 22s ease-in-out infinite reverse',
         pointerEvents: 'none'
       }} />
 
@@ -290,30 +324,31 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '100px 40px 80px',
+        padding: '120px 40px',
         position: 'relative',
         zIndex: 1
       }}>
         <div style={{
           textAlign: 'center',
-          marginBottom: '48px'
+          marginBottom: '64px'
         }}>
           <h2 style={{
-            fontSize: window.innerWidth <= 768 ? '24px' : '32px',
+            fontSize: window.innerWidth <= 768 ? '28px' : '36px',
             fontWeight: '600',
             color: isDark ? '#ffffff' : '#37352f',
-            marginBottom: '8px',
-            letterSpacing: '-0.01em'
+            marginBottom: '16px',
+            letterSpacing: '-0.02em'
           }}>
-            Built for your role
+            Built for every freelancer
           </h2>
           <p style={{
-            fontSize: '14px',
-            color: isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(55, 53, 47, 0.55)',
-            maxWidth: '480px',
-            margin: '0 auto'
+            fontSize: '16px',
+            color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+            maxWidth: '640px',
+            margin: '0 auto',
+            lineHeight: '1.6'
           }}>
-            For every freelancer
+            Manage clients, track time, create invoices, and grow your business — all in one place
           </p>
         </div>
 
@@ -329,37 +364,43 @@ const Home = () => {
               role: 'Designers',
               image: '/roles/designer.jpg',
               gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              description: 'Manage design projects, track revisions, and invoice clients seamlessly'
+              hoverColor: '#764ba2',
+              description: 'Track design projects, manage revisions, bill by milestone, and create professional invoices'
             },
             {
               role: 'Marketers',
               image: '/roles/marketer.jpg',
               gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-              description: 'Campaign tracking, client reporting, and performance analytics in one place'
+              hoverColor: '#00f2fe',
+              description: 'Manage campaigns, track client hours, generate reports, and invoice marketing services'
             },
             {
               role: 'Consultants',
               image: '/roles/consultant.jpg',
               gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-              description: 'Session scheduling, time billing, and professional client management'
+              hoverColor: '#38f9d7',
+              description: 'Schedule sessions, track billable hours, manage clients, and create professional invoices'
             },
             {
               role: 'Account Managers',
               image: '/roles/account-manager.jpg',
               gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-              description: 'Client relationship management, project oversight, and seamless communication'
+              hoverColor: '#fa709a',
+              description: 'Oversee client relationships, track project progress, manage tasks, and handle billing'
             },
             {
               role: 'Cyber Security',
               image: '/roles/cybersecurity.jpg',
               gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-              description: 'Security audits, compliance tracking, and client vulnerability assessments'
+              hoverColor: '#30cfd0',
+              description: 'Manage security audits, track assessment hours, organize reports, and invoice clients'
             },
             {
               role: 'Data Engineers',
               image: '/roles/data-engineer.jpg',
               gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-              description: 'Pipeline projects, data analysis tracking, and technical documentation'
+              hoverColor: '#fed6e3',
+              description: 'Track data projects, manage pipeline tasks, log development time, and create invoices'
             }
           ].map((item, i) => (
             <div
@@ -376,16 +417,14 @@ const Home = () => {
               onMouseEnter={(e) => {
                 const overlay = e.currentTarget.querySelector('.role-overlay');
                 if (overlay) overlay.style.opacity = '1';
-                e.currentTarget.style.transform = 'translateY(-8px)';
-                e.currentTarget.style.boxShadow = isDark 
-                  ? '0 12px 32px rgba(0, 0, 0, 0.4)' 
-                  : '0 12px 32px rgba(0, 0, 0, 0.12)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.border = `1px solid ${item.hoverColor}`;
               }}
               onMouseLeave={(e) => {
                 const overlay = e.currentTarget.querySelector('.role-overlay');
                 if (overlay) overlay.style.opacity = '0';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.border = isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)';
               }}
             >
               {/* Background Image or Gradient */}
@@ -450,31 +489,32 @@ const Home = () => {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'rgba(0, 0, 0, 0.9)',
-                  backdropFilter: 'blur(8px)',
+                  background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)',
+                  backdropFilter: 'blur(12px)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '24px',
+                  padding: '28px',
                   opacity: 0,
-                  transition: 'opacity 0.3s ease',
+                  transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   zIndex: 3
                 }}
               >
                 <h4 style={{
-                  fontSize: '16px',
+                  fontSize: '18px',
                   fontWeight: '600',
                   color: '#ffffff',
-                  marginBottom: '10px',
-                  textAlign: 'center'
+                  marginBottom: '12px',
+                  textAlign: 'center',
+                  letterSpacing: '-0.01em'
                 }}>
                   {item.role}
                 </h4>
                 <p style={{
-                  fontSize: '13px',
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  lineHeight: '1.5',
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  lineHeight: '1.6',
                   textAlign: 'center'
                 }}>
                   {item.description}
@@ -494,7 +534,6 @@ const Home = () => {
         borderBottom: isDark ? '1px solid rgba(168, 85, 247, 0.1)' : '1px solid rgba(168, 85, 247, 0.08)',
         position: 'relative',
         zIndex: 1,
-        marginTop: '60px',
         boxShadow: isDark 
           ? '0 -4px 20px rgba(99, 102, 241, 0.1), 0 4px 20px rgba(168, 85, 247, 0.1)'
           : '0 -4px 20px rgba(99, 102, 241, 0.05), 0 4px 20px rgba(168, 85, 247, 0.05)'
@@ -502,7 +541,7 @@ const Home = () => {
         <div style={{
           maxWidth: '800px',
           margin: '0 auto',
-          padding: '80px 40px 100px',
+          padding: '120px 40px',
           textAlign: 'center'
       }}>
         <div style={{
