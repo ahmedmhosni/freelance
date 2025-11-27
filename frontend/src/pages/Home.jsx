@@ -198,8 +198,19 @@ const Home = () => {
         </h1>
 
         <p style={{
+          fontSize: '18px',
+          fontWeight: '500',
+          color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(55, 53, 47, 0.7)',
+          maxWidth: '520px',
+          margin: '0 auto 12px',
+          lineHeight: '1.5'
+        }}>
+          Everything you need. Nothing you don't.
+        </p>
+        
+        <p style={{
           fontSize: '15px',
-          color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.6)',
+          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.55)',
           maxWidth: '520px',
           margin: '0 auto 32px',
           lineHeight: '1.5'
@@ -225,7 +236,7 @@ const Home = () => {
               gap: '8px'
             }}
           >
-            Get started free
+            Join the early access
             <MdArrowForward size={18} />
           </Link>
           
@@ -266,7 +277,11 @@ const Home = () => {
         borderBottom: isDark ? '1px solid rgba(168, 85, 247, 0.1)' : '1px solid rgba(168, 85, 247, 0.08)',
         position: 'relative',
         zIndex: 1,
-        marginTop: '40px'
+        marginTop: '60px',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
         <FeatureSlider isDark={isDark} />
       </div>
@@ -611,7 +626,8 @@ const Home = () => {
         }}>
           <div>© 2024 Roastify. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '20px' }}>
-            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms & Privacy</Link>
+            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</Link>
+            <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</Link>
             <Link to="/public-status" style={{ color: 'inherit', textDecoration: 'none' }}>Status</Link>
           </div>
         </div>

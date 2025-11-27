@@ -31,6 +31,7 @@ import LoaderTest from './pages/LoaderTest';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -95,6 +96,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/public-status" element={<PublicStatus />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/profile/:username" element={<PublicProfile />} />
               

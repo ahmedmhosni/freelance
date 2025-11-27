@@ -92,12 +92,29 @@ const Layout = () => {
                 alt="Logo" 
                 style={{ 
                   height: '28px', 
-                  marginBottom: '8px',
+                  marginBottom: '12px',
                   filter: isDark ? 'brightness(0) invert(1)' : 'none',
                   display: 'block'
                 }} 
               />
-              <div className="sidebar-subtitle">
+              <div style={{
+                fontSize: '13px',
+                color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                marginBottom: '4px',
+                fontWeight: '400'
+              }}>
+                {(() => {
+                  const hour = new Date().getHours();
+                  if (hour < 12) return 'Good morning';
+                  if (hour < 18) return 'Good afternoon';
+                  return 'Good evening';
+                })()}
+              </div>
+              <div style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
+              }}>
                 {user?.name}
               </div>
             </>
@@ -314,7 +331,24 @@ const Layout = () => {
                   e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
                 }}
               >
-                Terms & Privacy
+                Terms
+              </Link>
+              <Link
+                to="/privacy"
+                style={{
+                  fontSize: '11px',
+                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                  textDecoration: 'none',
+                  transition: 'color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                }}
+              >
+                Privacy
               </Link>
             </div>
           )}
