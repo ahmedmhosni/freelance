@@ -1,8 +1,26 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { BlobServiceClient } = require('@azure/storage-blob');
 const { authenticateToken } = require('../middleware/auth');
 const { query } = require('../db/postgresql');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.'));
+    }
+  }
+});
 
 /**
  * @swagger
@@ -266,6 +284,175 @@ router.get('/check-username/:username', asyncHandler(async (req, res) => {
   res.json({
     available: !result.rows || result.rows.length === 0,
     message: result.rows && result.rows.length > 0 ? 'Username already taken' : 'Username available'
+  });
+}));
+
+/**
+ * @swagger
+ * /api/profile/upload-picture:
+ *   post:
+ *     summary: Upload profile picture to Azure Blob Storage
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profilePicture:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Picture uploaded successfully
+ *       400:
+ *         description: Invalid file or missing file
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/upload-picture', authenticateToken, upload.single('profilePicture'), asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new AppError('No file uploaded', 400);
+  }
+
+  const userId = req.user.id;
+  const file = req.file;
+
+  try {
+    // Check if Azure Blob Storage is configured
+    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+
+    if (!connectionString) {
+      throw new AppError('Azure Blob Storage not configured', 500);
+    }
+
+    // Create blob service client
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    // Generate unique blob name
+    const timestamp = Date.now();
+    const extension = file.originalname.split('.').pop();
+    const blobName = `user-${userId}-${timestamp}.${extension}`;
+
+    // Get blob client
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    // Upload file buffer to blob
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype
+      }
+    });
+
+    // Generate blob URL
+    const blobUrl = blockBlobClient.url;
+
+    // Delete old profile picture from blob storage if it exists and is not a DiceBear avatar
+    const oldPictureResult = await query(
+      'SELECT profile_picture FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (oldPictureResult.rows[0]?.profile_picture) {
+      const oldPicture = oldPictureResult.rows[0].profile_picture;
+      
+      // Only delete if it's a blob storage URL (not DiceBear)
+      if (oldPicture.includes('blob.core.windows.net') && !oldPicture.includes('dicebear.com')) {
+        try {
+          const oldBlobName = oldPicture.split('/').pop();
+          const oldBlobClient = containerClient.getBlockBlobClient(oldBlobName);
+          await oldBlobClient.deleteIfExists();
+        } catch (error) {
+          // Log but don't fail if old picture deletion fails
+          console.error('Error deleting old picture:', error);
+        }
+      }
+    }
+
+    // Update user's profile picture in database
+    await query(
+      'UPDATE users SET profile_picture = $1 WHERE id = $2',
+      [blobUrl, userId]
+    );
+
+    res.json({
+      success: true,
+      url: blobUrl,
+      message: 'Profile picture uploaded successfully'
+    });
+
+  } catch (error) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      throw new AppError('File too large. Maximum size is 5MB.', 400);
+    }
+    
+    if (error.message?.includes('Invalid file type')) {
+      throw new AppError(error.message, 400);
+    }
+
+    throw error;
+  }
+}));
+
+/**
+ * @swagger
+ * /api/profile/delete-picture:
+ *   delete:
+ *     summary: Delete profile picture from Azure Blob Storage
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Picture deleted successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.delete('/delete-picture', authenticateToken, asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  // Get current profile picture
+  const result = await query(
+    'SELECT profile_picture FROM users WHERE id = $1',
+    [userId]
+  );
+
+  const user = result.rows[0];
+  
+  // Delete from blob storage if it's a blob URL (not DiceBear)
+  if (user?.profile_picture && user.profile_picture.includes('blob.core.windows.net')) {
+    try {
+      const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+      const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+
+      if (connectionString) {
+        const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobName = user.profile_picture.split('/').pop();
+        const blobClient = containerClient.getBlockBlobClient(blobName);
+        
+        await blobClient.deleteIfExists();
+      }
+    } catch (error) {
+      console.error('Error deleting blob:', error);
+      // Continue even if blob deletion fails
+    }
+  }
+
+  // Clear profile picture from database
+  await query(
+    'UPDATE users SET profile_picture = NULL WHERE id = $1',
+    [userId]
+  );
+
+  res.json({
+    success: true,
+    message: 'Profile picture deleted successfully'
   });
 }));
 
