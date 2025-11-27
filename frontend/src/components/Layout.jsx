@@ -31,17 +31,17 @@ const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: MdDashboard },
-    { path: '/clients', label: 'Clients', icon: MdPeople },
-    { path: '/projects', label: 'Projects', icon: MdFolder },
-    { path: '/tasks', label: 'Tasks', icon: MdCheckCircle },
-    { path: '/invoices', label: 'Invoices', icon: MdReceipt },
-    { path: '/time-tracking', label: 'Time', icon: MdAccessTime },
-    { path: '/reports', label: 'Reports', icon: MdBarChart },
+    { path: '/app/dashboard', label: 'Dashboard', icon: MdDashboard },
+    { path: '/app/clients', label: 'Clients', icon: MdPeople },
+    { path: '/app/projects', label: 'Projects', icon: MdFolder },
+    { path: '/app/tasks', label: 'Tasks', icon: MdCheckCircle },
+    { path: '/app/invoices', label: 'Invoices', icon: MdReceipt },
+    { path: '/app/time-tracking', label: 'Time', icon: MdAccessTime },
+    { path: '/app/reports', label: 'Reports', icon: MdBarChart },
   ];
 
   if (user?.role === 'admin') {
-    navItems.push({ path: '/admin', label: 'Admin', icon: MdAdminPanelSettings });
+    navItems.push({ path: '/app/admin', label: 'Admin', icon: MdAdminPanelSettings });
   }
 
   return (
@@ -222,7 +222,7 @@ const Layout = () => {
           </button>
           
           <Link
-            to="/profile"
+            to="/app/profile"
             title={isCollapsed ? 'Profile' : ''}
             style={{
               width: '100%',

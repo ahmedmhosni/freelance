@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode, MdCheck, MdClose } from 'react-icons/md';
 import api from '../utils/api';
@@ -11,8 +12,16 @@ const Register = () => {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const { user } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/app/dashboard');
+    }
+  }, [user, navigate]);
 
   const passwordReqs = getPasswordRequirements(formData.password);
 

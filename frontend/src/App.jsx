@@ -41,7 +41,7 @@ const PrivateRoute = ({ children, adminOnly = false }) => {
   }
   
   if (!user) return <Navigate to="/login" />;
-  if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" />;
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/app/dashboard" />;
   
   return children;
 };
@@ -85,19 +85,22 @@ function App() {
               }}
             />
             <Routes>
-              <Route path="/home" element={<Home />} />
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/resend-verification" element={<ResendVerification />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/status" element={<PublicStatus />} />
+              <Route path="/public-status" element={<PublicStatus />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/profile/:username" element={<PublicProfile />} />
-              <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-                <Route index element={<Navigate to="/dashboard" />} />
+              
+              {/* Protected Routes */}
+              <Route path="/app" element={<PrivateRoute><Layout /></PrivateRoute>}>
+                <Route index element={<Navigate to="/app/dashboard" />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="clients" element={<Clients />} />
                 <Route path="clients/:id" element={<ClientDetail />} />
@@ -111,6 +114,9 @@ function App() {
                 <Route path="admin/status" element={<PrivateRoute adminOnly><AdminStatus /></PrivateRoute>} />
                 <Route path="loader-test" element={<PrivateRoute adminOnly><LoaderTest /></PrivateRoute>} />
               </Route>
+              
+              {/* Legacy redirects for backward compatibility */}
+              <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
             </Routes>
               </PageTransition>
             </MaintenanceProvider>

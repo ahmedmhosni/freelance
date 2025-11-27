@@ -14,9 +14,16 @@ const Login = () => {
   const [showLoader, setShowLoader] = useState(false);
   const [quote, setQuote] = useState({ text: 'Loading...', author: '' });
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/app/dashboard');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     fetchDailyQuote();
@@ -73,7 +80,7 @@ const Login = () => {
       // Add a small delay to show the loader (1.5 seconds)
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      navigate('/dashboard');
+      navigate('/app/dashboard');
     } catch (err) {
       const errorCode = err.response?.data?.code;
       const errorMessage = err.response?.data?.error || 'Login failed';

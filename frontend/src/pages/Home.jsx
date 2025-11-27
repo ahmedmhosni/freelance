@@ -611,9 +611,8 @@ const Home = () => {
         }}>
           <div>© 2024 Roastify. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '20px' }}>
-            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
-            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
-            <Link to="/status" style={{ color: 'inherit', textDecoration: 'none' }}>Status</Link>
+            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms & Privacy</Link>
+            <Link to="/public-status" style={{ color: 'inherit', textDecoration: 'none' }}>Status</Link>
           </div>
         </div>
       </footer>
