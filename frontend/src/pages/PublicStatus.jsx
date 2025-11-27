@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { MdCheckCircle, MdError, MdWarning, MdRefresh, MdHistory } from 'react-icons/md';
+import { MdCheckCircle, MdError, MdWarning, MdRefresh, MdHistory, MdTrendingUp } from 'react-icons/md';
 
 const PublicStatus = () => {
   const [status, setStatus] = useState(null);
@@ -13,15 +13,11 @@ const PublicStatus = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       
-      // Fetch current status
       const response = await fetch(`${apiUrl}/api/status`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       setStatus(data);
       
-      // Fetch history
       try {
         const historyResponse = await fetch(`${apiUrl}/api/status/history`);
         if (historyResponse.ok) {
@@ -43,49 +39,47 @@ const PublicStatus = () => {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 60000); // Update every 60 seconds
+    const interval = setInterval(fetchStatus, 60000);
     return () => clearInterval(interval);
   }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'operational':
-        return '#28a745';
-      case 'degraded':
-        return '#ffc107';
+      case 'operational': return '#10b981';
+      case 'degraded': return '#f59e0b';
       case 'error':
-      case 'down':
-        return '#dc3545';
-      default:
-        return '#6c757d';
+      case 'down': return '#ef4444';
+      default: return '#6b7280';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'operational':
-        return <MdCheckCircle />;
-      case 'degraded':
-        return <MdWarning />;
+      case 'operational': return <MdCheckCircle />;
+      case 'degraded': return <MdWarning />;
       case 'error':
-      case 'down':
-        return <MdError />;
-      default:
-        return <MdWarning />;
+      case 'down': return <MdError />;
+      default: return <MdWarning />;
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'operational':
-        return 'All Systems Operational';
-      case 'degraded':
-        return 'Partial System Outage';
+      case 'operational': return 'All Systems Operational';
+      case 'degraded': return 'Partial System Outage';
       case 'error':
-      case 'down':
-        return 'System Outage';
-      default:
-        return 'Checking Status...';
+      case 'down': return 'System Outage';
+      default: return 'Checking Status...';
+    }
+  };
+
+  const getStatusDescription = (status) => {
+    switch (status) {
+      case 'operational': return 'All services are running smoothly';
+      case 'degraded': return 'Some services may be experiencing issues';
+      case 'error':
+      case 'down': return 'We are working to restore service';
+      default: return 'Loading system status...';
     }
   };
 
@@ -96,29 +90,41 @@ const PublicStatus = () => {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: isDark ? '#0a0a0a' : '#ffffff'
+        background: isDark ? '#0f172a' : '#f8fafc'
       }}>
         <div style={{
-          fontSize: '48px',
-          animation: 'spin 1s linear infinite',
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
+          textAlign: 'center'
         }}>
-          ⚙️
+          <div style={{
+            fontSize: '48px',
+            animation: 'spin 1s linear infinite',
+            color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(15, 23, 42, 0.4)',
+            marginBottom: '16px'
+          }}>
+            ⚙️
+          </div>
+          <p style={{
+            fontSize: '14px',
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(15, 23, 42, 0.6)'
+          }}>
+            Loading status...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: isDark ? '#0a0a0a' : '#ffffff',
-      padding: '40px 20px'
-    }}>
+    <>
       <div style={{
-        maxWidth: '800px',
-        margin: '0 auto'
+        minHeight: '100vh',
+        background: isDark ? '#0f172a' : '#f8fafc',
+        padding: '40px 20px'
       }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
         {/* Header */}
         <div style={{
           textAlign: 'center',
@@ -455,6 +461,7 @@ const PublicStatus = () => {
             </a>
           </p>
         </div>
+        </div>
       </div>
 
       <style>{`
@@ -463,7 +470,7 @@ const PublicStatus = () => {
           to { transform: rotate(360deg); }
         }
       `}</style>
-    </div>
+    </>
   );
 };
 
