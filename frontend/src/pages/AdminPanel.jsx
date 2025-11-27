@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import QuotesManager from '../components/QuotesManager';
 import MaintenanceEditor from '../components/MaintenanceEditor';
+import LegalEditor from '../components/LegalEditor';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 
 const AdminPanel = () => {
@@ -69,12 +70,12 @@ const AdminPanel = () => {
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ marginBottom: '4px' }}>Admin Panel</h1>
         <p className="page-subtitle">
-          Manage users, quotes, and view system stats
+          Manage users, content, and view system stats
         </p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <button
           onClick={() => setActiveTab('users')}
           className={`view-toggle ${activeTab === 'users' ? 'active' : ''}`}
@@ -92,6 +93,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'maintenance' ? 'active' : ''}`}
         >
           Maintenance Page
+        </button>
+        <button
+          onClick={() => setActiveTab('legal')}
+          className={`view-toggle ${activeTab === 'legal' ? 'active' : ''}`}
+        >
+          Terms & Privacy
         </button>
       </div>
 
@@ -232,6 +239,8 @@ const AdminPanel = () => {
       {activeTab === 'quotes' && <QuotesManager />}
       
       {activeTab === 'maintenance' && <MaintenanceEditor />}
+      
+      {activeTab === 'legal' && <LegalEditor />}
     </div>
   );
 };

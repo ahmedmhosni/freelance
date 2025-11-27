@@ -269,16 +269,19 @@ const Layout = () => {
             )}
           </button>
 
-          {/* Status Link */}
+          {/* Footer Links */}
           {!isCollapsed && (
             <div style={{
               marginTop: '12px',
               paddingTop: '12px',
               borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-              textAlign: 'center'
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
             }}>
               <a
-                href="/status"
+                href="/public-status"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -296,6 +299,23 @@ const Layout = () => {
               >
                 System Status
               </a>
+              <Link
+                to="/terms"
+                style={{
+                  fontSize: '11px',
+                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                  textDecoration: 'none',
+                  transition: 'color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                }}
+              >
+                Terms & Privacy
+              </Link>
             </div>
           )}
         </div>
