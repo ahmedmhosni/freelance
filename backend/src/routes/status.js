@@ -1,5 +1,5 @@
 const express = require('express');
-const { query } = require('../db/pg-helper');
+const { query } = require('../db/postgresql');
 const emailService = require('../services/emailService');
 
 const router = express.Router();

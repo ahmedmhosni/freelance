@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getOne } = require('../db/pg-helper');
+const { getOne } = require('../db/postgresql');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 // Get daily quote (public endpoint)

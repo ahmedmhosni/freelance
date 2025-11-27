@@ -25,7 +25,7 @@ const socketIo = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth-pg');
 const clientRoutes = require('./routes/clients');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');

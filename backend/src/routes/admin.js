@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
-const { query, getAll, getOne } = require('../db/pg-helper');
+const { query, getAll, getOne } = require('../db/postgresql');
 
 const router = express.Router();
 router.use(authenticateToken);
