@@ -320,56 +320,98 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
 
   const userId = req.user.id;
   const file = req.file;
+  const path = require('path');
+  const fs = require('fs');
 
   try {
-    // Check if Azure Blob Storage is configured
     const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
     const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    let fileUrl;
 
-    if (!connectionString) {
-      throw new AppError('Azure Blob Storage not configured', 500);
-    }
+    // Use Azure Blob Storage if connection string is available
+    if (connectionString) {
+      // PRODUCTION: Upload to Azure Blob Storage
+      const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+      const containerClient = blobServiceClient.getContainerClient(containerName);
 
-    // Create blob service client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+      // Generate unique blob name
+      const timestamp = Date.now();
+      const extension = file.originalname.split('.').pop();
+      const blobName = `user-${userId}-${timestamp}.${extension}`;
 
-    // Generate unique blob name
-    const timestamp = Date.now();
-    const extension = file.originalname.split('.').pop();
-    const blobName = `user-${userId}-${timestamp}.${extension}`;
+      // Get blob client
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-    // Get blob client
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+      // Upload file buffer to blob
+      await blockBlobClient.uploadData(file.buffer, {
+        blobHTTPHeaders: {
+          blobContentType: file.mimetype
+        }
+      });
 
-    // Upload file buffer to blob
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype
+      fileUrl = blockBlobClient.url;
+
+      // Delete old profile picture from blob storage if it exists
+      const oldPictureResult = await query(
+        'SELECT profile_picture FROM users WHERE id = $1',
+        [userId]
+      );
+
+      if (oldPictureResult.rows[0]?.profile_picture) {
+        const oldPicture = oldPictureResult.rows[0].profile_picture;
+        
+        if (oldPicture.includes('blob.core.windows.net') && !oldPicture.includes('dicebear.com')) {
+          try {
+            const oldBlobName = oldPicture.split('/').pop();
+            const oldBlobClient = containerClient.getBlockBlobClient(oldBlobName);
+            await oldBlobClient.deleteIfExists();
+          } catch (error) {
+            console.error('Error deleting old picture:', error);
+          }
+        }
       }
-    });
-
-    // Generate blob URL
-    const blobUrl = blockBlobClient.url;
-
-    // Delete old profile picture from blob storage if it exists and is not a DiceBear avatar
-    const oldPictureResult = await query(
-      'SELECT profile_picture FROM users WHERE id = $1',
-      [userId]
-    );
-
-    if (oldPictureResult.rows[0]?.profile_picture) {
-      const oldPicture = oldPictureResult.rows[0].profile_picture;
+    } else {
+      // DEVELOPMENT: Save to local uploads directory
+      const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
       
-      // Only delete if it's a blob storage URL (not DiceBear)
-      if (oldPicture.includes('blob.core.windows.net') && !oldPicture.includes('dicebear.com')) {
-        try {
-          const oldBlobName = oldPicture.split('/').pop();
-          const oldBlobClient = containerClient.getBlockBlobClient(oldBlobName);
-          await oldBlobClient.deleteIfExists();
-        } catch (error) {
-          // Log but don't fail if old picture deletion fails
-          console.error('Error deleting old picture:', error);
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const extension = file.originalname.split('.').pop();
+      const filename = `user-${userId}-${timestamp}.${extension}`;
+      const filepath = path.join(uploadsDir, filename);
+
+      // Save file
+      fs.writeFileSync(filepath, file.buffer);
+
+      // Generate local URL
+      fileUrl = `/uploads/profile-pictures/${filename}`;
+
+      // Delete old local file if it exists
+      const oldPictureResult = await query(
+        'SELECT profile_picture FROM users WHERE id = $1',
+        [userId]
+      );
+
+      if (oldPictureResult.rows[0]?.profile_picture) {
+        const oldPicture = oldPictureResult.rows[0].profile_picture;
+        
+        if (oldPicture.startsWith('/uploads/') && !oldPicture.includes('dicebear.com')) {
+          try {
+            const oldFilename = path.basename(oldPicture);
+            const oldFilepath = path.join(uploadsDir, oldFilename);
+            if (fs.existsSync(oldFilepath)) {
+              fs.unlinkSync(oldFilepath);
+            }
+          } catch (error) {
+            console.error('Error deleting old file:', error);
+          }
         }
       }
     }
@@ -377,12 +419,12 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
     // Update user's profile picture in database
     await query(
       'UPDATE users SET profile_picture = $1 WHERE id = $2',
-      [blobUrl, userId]
+      [fileUrl, userId]
     );
 
     res.json({
       success: true,
-      url: blobUrl,
+      url: fileUrl,
       message: 'Profile picture uploaded successfully'
     });
 
@@ -415,6 +457,8 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
  */
 router.delete('/delete-picture', authenticateToken, asyncHandler(async (req, res) => {
   const userId = req.user.id;
+  const path = require('path');
+  const fs = require('fs');
 
   // Get current profile picture
   const result = await query(
@@ -424,23 +468,36 @@ router.delete('/delete-picture', authenticateToken, asyncHandler(async (req, res
 
   const user = result.rows[0];
   
-  // Delete from blob storage if it's a blob URL (not DiceBear)
-  if (user?.profile_picture && user.profile_picture.includes('blob.core.windows.net')) {
-    try {
-      const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-      const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+  if (user?.profile_picture && !user.profile_picture.includes('dicebear.com')) {
+    // Delete from blob storage if it's a blob URL
+    if (user.profile_picture.includes('blob.core.windows.net')) {
+      try {
+        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
 
-      if (connectionString) {
-        const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const blobName = user.profile_picture.split('/').pop();
-        const blobClient = containerClient.getBlockBlobClient(blobName);
-        
-        await blobClient.deleteIfExists();
+        if (connectionString) {
+          const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+          const containerClient = blobServiceClient.getContainerClient(containerName);
+          const blobName = user.profile_picture.split('/').pop();
+          const blobClient = containerClient.getBlockBlobClient(blobName);
+          
+          await blobClient.deleteIfExists();
+        }
+      } catch (error) {
+        console.error('Error deleting blob:', error);
       }
-    } catch (error) {
-      console.error('Error deleting blob:', error);
-      // Continue even if blob deletion fails
+    }
+    // Delete from local storage if it's a local file
+    else if (user.profile_picture.startsWith('/uploads/')) {
+      try {
+        const filename = path.basename(user.profile_picture);
+        const filepath = path.join(__dirname, '../../uploads/profile-pictures', filename);
+        if (fs.existsSync(filepath)) {
+          fs.unlinkSync(filepath);
+        }
+      } catch (error) {
+        console.error('Error deleting local file:', error);
+      }
     }
   }
 
