@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { query } = require('../db/pg-helper');
+const { query } = require('../db/postgresql');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 /**
