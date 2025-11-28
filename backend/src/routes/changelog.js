@@ -150,6 +150,15 @@ router.post('/admin/versions', authenticateToken, requireAdmin, async (req, res)
       RETURNING id
     `, [version, version_name || null, release_date, published || false, is_major_release || false, req.user.id]);
     
+    // Mark version name as used if provided
+    if (version_name) {
+      await pool.query(`
+        UPDATE version_names 
+        SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
+        WHERE name = $1 AND name_type = $2
+      `, [version_name, is_major_release ? 'major' : 'minor']);
+    }
+    
     res.json({ 
       message: 'Version created successfully',
       id: result.rows[0].id
@@ -172,11 +181,34 @@ router.put('/admin/versions/:id', authenticateToken, requireAdmin, async (req, r
     const { id } = req.params;
     const { version, version_name, release_date, published, is_major_release } = req.body;
     
+    // Get old version name to unmark it if changed
+    const oldVersion = await pool.query('SELECT version_name, is_major_release FROM versions WHERE id = $1', [id]);
+    const oldVersionName = oldVersion.rows[0]?.version_name;
+    const oldIsMajor = oldVersion.rows[0]?.is_major_release;
+    
     await pool.query(`
       UPDATE versions
       SET version = $1, version_name = $2, release_date = $3, is_published = $4, is_major_release = $5, updated_at = CURRENT_TIMESTAMP
       WHERE id = $6
     `, [version, version_name || null, release_date, published || false, is_major_release || false, id]);
+    
+    // Unmark old name if it changed
+    if (oldVersionName && oldVersionName !== version_name) {
+      await pool.query(`
+        UPDATE version_names 
+        SET is_used = FALSE, used_at = NULL 
+        WHERE name = $1 AND name_type = $2
+      `, [oldVersionName, oldIsMajor ? 'major' : 'minor']);
+    }
+    
+    // Mark new name as used if provided
+    if (version_name && version_name !== oldVersionName) {
+      await pool.query(`
+        UPDATE version_names 
+        SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
+        WHERE name = $1 AND name_type = $2
+      `, [version_name, is_major_release ? 'major' : 'minor']);
+    }
     
     res.json({ message: 'Version updated successfully' });
   } catch (error) {
@@ -437,7 +469,7 @@ router.post('/admin/mark-commits-processed', authenticateToken, requireAdmin, as
  */
 router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { type } = req.query; // 'minor' or 'major'
+    const { type, unused_only } = req.query; // 'minor' or 'major', 'true' or 'false'
     
     let query = 'SELECT * FROM version_names WHERE is_active = TRUE';
     const params = [];
@@ -445,6 +477,11 @@ router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, 
     if (type) {
       query += ' AND name_type = $1';
       params.push(type);
+    }
+    
+    // Only return unused names if requested
+    if (unused_only === 'true') {
+      query += ' AND is_used = FALSE';
     }
     
     query += ' ORDER BY sort_order, name';

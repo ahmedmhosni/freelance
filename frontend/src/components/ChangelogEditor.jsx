@@ -42,8 +42,8 @@ const ChangelogEditor = () => {
   const fetchVersionNames = async () => {
     try {
       const [minorRes, majorRes] = await Promise.all([
-        api.get('/api/changelog/admin/version-names?type=minor'),
-        api.get('/api/changelog/admin/version-names?type=major')
+        api.get('/api/changelog/admin/version-names?type=minor&unused_only=true'),
+        api.get('/api/changelog/admin/version-names?type=major&unused_only=true')
       ]);
       setMinorNames(minorRes.data.names.map(n => n.name));
       setMajorNames(majorRes.data.names.map(n => n.name));
@@ -52,16 +52,10 @@ const ChangelogEditor = () => {
     }
   };
 
-  // Get next suggested name based on existing versions
+  // Get next suggested name (first unused name from database)
   const getSuggestedName = (isMajor) => {
-    const usedNames = versions
-      .filter(v => v.is_major_release === isMajor && v.version_name)
-      .map(v => v.version_name);
-    
     const nameList = isMajor ? majorNames : minorNames;
-    const nextName = nameList.find(name => !usedNames.includes(name));
-    
-    return nextName || (nameList.length > 0 ? nameList[0] : '');
+    return nameList.length > 0 ? nameList[0] : '';
   };
 
   const typeOptions = [
@@ -116,6 +110,7 @@ const ChangelogEditor = () => {
         await api.post('/api/changelog/admin/versions', versionForm);
       }
       fetchVersions();
+      fetchVersionNames(); // Refresh available names
       resetVersionForm();
     } catch (error) {
       logger.error('Error saving version:', error);
