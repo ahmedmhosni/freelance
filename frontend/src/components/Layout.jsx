@@ -414,12 +414,7 @@ const Layout = () => {
                   }}
                   title="View changelog"
                 >
-                  <span>v{version.version}</span>
-                  {version.version_name && (
-                    <span style={{ fontSize: '9px' }}>
-                      {version.version_name}
-                    </span>
-                  )}
+                  v{version.version}{version.version_name && ` - ${version.version_name}`}
                 </Link>
               )}
             </div>

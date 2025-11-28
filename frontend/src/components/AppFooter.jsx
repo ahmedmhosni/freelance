@@ -138,8 +138,7 @@ const AppFooter = () => {
             }}
             title="View changelog"
           >
-            v{version?.version || '1.0.0'}
-            {version?.release_date && ` • ${new Date(version.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+            v{version?.version || '1.0.0'}{version?.version_name && ` - ${version.version_name}`}
           </Link>
         </div>
       </div>

@@ -9,7 +9,7 @@ const { authenticateToken, requireAdmin } = require('../middleware/auth');
 router.get('/current-version', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT version, release_date
+      SELECT version, version_name, release_date
       FROM versions
       WHERE is_published = TRUE
       ORDER BY release_date DESC, id DESC
@@ -18,12 +18,14 @@ router.get('/current-version', async (req, res) => {
     
     res.json({ 
       version: result.rows[0]?.version || '1.0.0',
+      version_name: result.rows[0]?.version_name || null,
       release_date: result.rows[0]?.release_date || new Date().toISOString().split('T')[0]
     });
   } catch (error) {
     console.error('Error fetching current version:', error);
     res.json({ 
       version: '1.0.0',
+      version_name: null,
       release_date: new Date().toISOString().split('T')[0]
     });
   }
