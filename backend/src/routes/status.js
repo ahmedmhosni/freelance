@@ -153,19 +153,19 @@ router.get('/history', async (req, res) => {
       return res.json({ history: {}, message: 'History tracking not yet enabled' });
     }
 
-    // Get history for last 24 hours, grouped by hour
+    // Get history for last 90 days, grouped by day
     const history = await query(`
       SELECT 
         service_name,
-        DATE_TRUNC('hour', checked_at) as hour,
+        DATE_TRUNC('day', checked_at) as day,
         COUNT(*) as total_checks,
         COUNT(CASE WHEN status = 'operational' THEN 1 END) as successful_checks,
         AVG(response_time) as avg_response_time,
         MAX(checked_at) as last_check
       FROM status_history
-      WHERE checked_at >= NOW() - INTERVAL '24 hours'
-      GROUP BY service_name, DATE_TRUNC('hour', checked_at)
-      ORDER BY service_name, hour DESC
+      WHERE checked_at >= NOW() - INTERVAL '90 days'
+      GROUP BY service_name, DATE_TRUNC('day', checked_at)
+      ORDER BY service_name, day DESC
     `);
 
     // Format data by service
@@ -175,7 +175,7 @@ router.get('/history', async (req, res) => {
         formattedHistory[row.service_name] = [];
       }
       formattedHistory[row.service_name].push({
-        hour: row.hour,
+        hour: row.day, // Keep 'hour' key for frontend compatibility
         uptime: ((row.successful_checks / row.total_checks) * 100).toFixed(2),
         avgResponseTime: row.avg_response_time ? Math.round(row.avg_response_time) : null,
         checks: row.total_checks

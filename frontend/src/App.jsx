@@ -119,6 +119,8 @@ function App() {
               
               {/* Legacy redirects for backward compatibility */}
               <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="/status" element={<Navigate to="/public-status" replace />} />
+              <Route path="/admin/status" element={<Navigate to="/app/admin/status" replace />} />
             </Routes>
               </PageTransition>
             </MaintenanceProvider>

@@ -333,50 +333,67 @@ const PublicStatus = () => {
                   
                   {/* 90-day uptime bars */}
                   <div style={{
-                    display: 'flex',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(90, 1fr)',
                     gap: '3px',
                     marginBottom: '8px'
                   }}>
                     {[...Array(90)].map((_, index) => {
+                      // Calculate the date for this bar (90 days ago to today)
+                      const targetDate = new Date();
+                      targetDate.setDate(targetDate.getDate() - (89 - index));
+                      targetDate.setHours(0, 0, 0, 0);
+                      
+                      // Find data for this specific day
                       const dayData = serviceHistory.find(h => {
-                        const dayDiff = Math.floor((new Date() - new Date(h.hour)) / (1000 * 60 * 60 * 24));
-                        return dayDiff === (89 - index);
+                        const historyDate = new Date(h.hour);
+                        historyDate.setHours(0, 0, 0, 0);
+                        return historyDate.getTime() === targetDate.getTime();
                       });
                       
                       const uptime = dayData ? parseFloat(dayData.uptime) : null;
                       const hasData = uptime !== null;
                       
+                      // Format date for tooltip
+                      const dateStr = targetDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                      });
+                      
                       let barColor;
                       if (!hasData) {
-                        barColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.05)';
-                      } else if (uptime >= 99) {
-                        barColor = '#28a745';
-                      } else if (uptime >= 90) {
-                        barColor = '#ffc107';
+                        barColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.08)';
+                      } else if (uptime >= 99.5) {
+                        barColor = '#10b981'; // Green - excellent
+                      } else if (uptime >= 95) {
+                        barColor = '#fbbf24'; // Yellow - degraded
                       } else {
-                        barColor = '#dc3545';
+                        barColor = '#ef4444'; // Red - down
                       }
                       
                       return (
                         <div
                           key={index}
-                          title={hasData ? `${uptime}% uptime` : 'No data'}
+                          title={hasData ? `${dateStr}\n${uptime}% uptime\n${dayData.checks} checks` : `${dateStr}\nNo data`}
                           style={{
-                            flex: 1,
                             height: '34px',
                             background: barColor,
-                            borderRadius: '3px',
+                            borderRadius: '2px',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            opacity: hasData ? 1 : 0.3
+                            transition: 'all 0.15s ease',
+                            border: hasData ? 'none' : `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.1)'}`,
+                            position: 'relative'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.opacity = '0.7';
-                            e.currentTarget.style.transform = 'scaleY(1.1)';
+                            e.currentTarget.style.transform = 'scaleY(1.15)';
+                            e.currentTarget.style.filter = 'brightness(1.1)';
+                            e.currentTarget.style.zIndex = '10';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.opacity = hasData ? '1' : '0.3';
                             e.currentTarget.style.transform = 'scaleY(1)';
+                            e.currentTarget.style.filter = 'brightness(1)';
+                            e.currentTarget.style.zIndex = '1';
                           }}
                         />
                       );
@@ -408,23 +425,24 @@ const PublicStatus = () => {
               color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '14px', height: '14px', background: '#28a745', borderRadius: '3px' }} />
-                <span>Operational (≥99%)</span>
+                <div style={{ width: '14px', height: '14px', background: '#10b981', borderRadius: '2px' }} />
+                <span>Operational (≥99.5%)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '14px', height: '14px', background: '#ffc107', borderRadius: '3px' }} />
-                <span>Degraded (90-99%)</span>
+                <div style={{ width: '14px', height: '14px', background: '#fbbf24', borderRadius: '2px' }} />
+                <span>Degraded (95-99.5%)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '14px', height: '14px', background: '#dc3545', borderRadius: '3px' }} />
-                <span>Down (&lt;90%)</span>
+                <div style={{ width: '14px', height: '14px', background: '#ef4444', borderRadius: '2px' }} />
+                <span>Down (&lt;95%)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ 
                   width: '14px', 
                   height: '14px', 
-                  background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.05)', 
-                  borderRadius: '3px' 
+                  background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.08)',
+                  border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.1)'}`,
+                  borderRadius: '2px' 
                 }} />
                 <span>No data</span>
               </div>

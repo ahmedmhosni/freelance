@@ -14,12 +14,12 @@ CREATE INDEX IF NOT EXISTS idx_status_history_service ON status_history(service_
 CREATE INDEX IF NOT EXISTS idx_status_history_checked_at ON status_history(checked_at);
 CREATE INDEX IF NOT EXISTS idx_status_history_service_time ON status_history(service_name, checked_at DESC);
 
--- Create function to clean old history (keep last 30 days)
+-- Create function to clean old history (keep last 90 days)
 CREATE OR REPLACE FUNCTION cleanup_old_status_history()
 RETURNS void AS $$
 BEGIN
   DELETE FROM status_history 
-  WHERE checked_at < NOW() - INTERVAL '30 days';
+  WHERE checked_at < NOW() - INTERVAL '90 days';
 END;
 $$ LANGUAGE plpgsql;
 
