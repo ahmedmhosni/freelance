@@ -5,6 +5,8 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import LogoLoader from '../components/LogoLoader';
 import AvatarPicker from '../components/AvatarPicker';
+import EmailPreferences from '../components/EmailPreferences';
+import DataPrivacy from '../components/DataPrivacy';
 import logger from '../utils/logger';
 import { 
   MdPerson, MdWork, MdLocationOn, MdLanguage,
@@ -506,6 +508,16 @@ const Profile = () => {
           </button>
         </div>
       </form>
+
+      {/* Email Preferences */}
+      <div style={{ marginTop: '24px' }}>
+        <EmailPreferences />
+      </div>
+
+      {/* Data & Privacy (GDPR) */}
+      <div style={{ marginTop: '24px' }}>
+        <DataPrivacy />
+      </div>
 
       {/* Avatar Picker Modal */}
       {showAvatarPicker && (
