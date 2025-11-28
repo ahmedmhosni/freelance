@@ -150,13 +150,18 @@ router.post('/admin/versions', authenticateToken, requireAdmin, async (req, res)
       RETURNING id
     `, [version, version_name || null, release_date, published || false, is_major_release || false, req.user.id]);
     
-    // Mark version name as used if provided
+    // Mark version name as used if provided (only if column exists)
     if (version_name) {
-      await pool.query(`
-        UPDATE version_names 
-        SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
-        WHERE name = $1 AND name_type = $2
-      `, [version_name, is_major_release ? 'major' : 'minor']);
+      try {
+        await pool.query(`
+          UPDATE version_names 
+          SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
+          WHERE name = $1 AND name_type = $2
+        `, [version_name, is_major_release ? 'major' : 'minor']);
+      } catch (err) {
+        // Column might not exist yet, ignore error
+        console.log('Note: is_used column not available yet');
+      }
     }
     
     res.json({ 
@@ -192,22 +197,30 @@ router.put('/admin/versions/:id', authenticateToken, requireAdmin, async (req, r
       WHERE id = $6
     `, [version, version_name || null, release_date, published || false, is_major_release || false, id]);
     
-    // Unmark old name if it changed
+    // Unmark old name if it changed (only if column exists)
     if (oldVersionName && oldVersionName !== version_name) {
-      await pool.query(`
-        UPDATE version_names 
-        SET is_used = FALSE, used_at = NULL 
-        WHERE name = $1 AND name_type = $2
-      `, [oldVersionName, oldIsMajor ? 'major' : 'minor']);
+      try {
+        await pool.query(`
+          UPDATE version_names 
+          SET is_used = FALSE, used_at = NULL 
+          WHERE name = $1 AND name_type = $2
+        `, [oldVersionName, oldIsMajor ? 'major' : 'minor']);
+      } catch (err) {
+        console.log('Note: is_used column not available yet');
+      }
     }
     
-    // Mark new name as used if provided
+    // Mark new name as used if provided (only if column exists)
     if (version_name && version_name !== oldVersionName) {
-      await pool.query(`
-        UPDATE version_names 
-        SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
-        WHERE name = $1 AND name_type = $2
-      `, [version_name, is_major_release ? 'major' : 'minor']);
+      try {
+        await pool.query(`
+          UPDATE version_names 
+          SET is_used = TRUE, used_at = CURRENT_TIMESTAMP 
+          WHERE name = $1 AND name_type = $2
+        `, [version_name, is_major_release ? 'major' : 'minor']);
+      } catch (err) {
+        console.log('Note: is_used column not available yet');
+      }
     }
     
     res.json({ message: 'Version updated successfully' });
@@ -471,6 +484,14 @@ router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, 
   try {
     const { type, unused_only } = req.query; // 'minor' or 'major', 'true' or 'false'
     
+    // Check if is_used column exists
+    const columnCheck = await pool.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'version_names' AND column_name = 'is_used'
+    `);
+    const hasIsUsedColumn = columnCheck.rows.length > 0;
+    
     let query = 'SELECT * FROM version_names WHERE is_active = TRUE';
     const params = [];
     
@@ -479,18 +500,32 @@ router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, 
       params.push(type);
     }
     
-    // Only return unused names if requested
-    if (unused_only === 'true') {
+    // Only return unused names if requested and column exists
+    if (unused_only === 'true' && hasIsUsedColumn) {
       query += ' AND is_used = FALSE';
     }
     
     query += ' ORDER BY sort_order, name';
     
     const result = await pool.query(query, params);
-    res.json({ names: result.rows });
+    
+    // If column doesn't exist and unused_only requested, filter manually
+    let names = result.rows;
+    if (unused_only === 'true' && !hasIsUsedColumn) {
+      // Get used names from versions table
+      const usedNames = await pool.query(`
+        SELECT DISTINCT version_name 
+        FROM versions 
+        WHERE version_name IS NOT NULL
+      `);
+      const usedNamesSet = new Set(usedNames.rows.map(r => r.version_name));
+      names = names.filter(n => !usedNamesSet.has(n.name));
+    }
+    
+    res.json({ names });
   } catch (error) {
     console.error('Error fetching version names:', error);
-    res.status(500).json({ error: 'Failed to fetch version names' });
+    res.status(500).json({ error: 'Failed to fetch version names', message: error.message });
   }
 });
 
