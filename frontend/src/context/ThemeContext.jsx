@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../utils/api';
 import logger from '../utils/logger';
+import { updateFavicon } from '../utils/favicon';
 
 const ThemeContext = createContext();
 
@@ -22,6 +23,8 @@ export const ThemeProvider = ({ children }) => {
       } else {
         document.body.classList.remove('dark-mode');
       }
+      // Update favicon
+      updateFavicon(savedTheme === 'dark');
     }
     setLoading(false);
 
@@ -45,6 +48,8 @@ export const ThemeProvider = ({ children }) => {
         } else {
           document.body.classList.remove('dark-mode');
         }
+        // Update favicon
+        updateFavicon(response.data.theme === 'dark');
       }
     } catch (error) {
       // Silently fail - user might not be logged in or endpoint doesn't exist yet
@@ -64,6 +69,9 @@ export const ThemeProvider = ({ children }) => {
     } else {
       document.body.classList.remove('dark-mode');
     }
+    
+    // Update favicon
+    updateFavicon(newTheme === 'dark');
 
     // Save to server if user is logged in
     const token = localStorage.getItem('token');

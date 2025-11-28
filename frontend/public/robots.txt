@@ -1,0 +1,12 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and dashboard pages
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /settings
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://roastify.online/sitemap.xml

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import LogoLoader from '../components/LogoLoader';
+import SEO from '../components/SEO';
 import { 
   MdWork, MdLocationOn, MdLanguage, MdArrowBack
 } from 'react-icons/md';
@@ -120,16 +121,32 @@ const PublicProfile = () => {
     );
   }
 
+  // Generate SEO meta tags
+  const profileTitle = profile?.name ? `${profile.name} - ${profile.job_title || 'Freelancer'}` : 'Freelancer Profile';
+  const profileDescription = profile?.bio || `View ${profile?.name || 'freelancer'}'s professional profile on Roastify. ${profile?.job_title ? `${profile.job_title} specializing in professional services.` : ''}`;
+  const profileUrl = `https://roastify.online/profile/${username}`;
+  const profileImage = profile?.profile_picture || 'https://roastify.online/og-image.png';
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: isDark ? '#1a1a2e' : '#f8f9fa',
-      padding: '40px 20px'
-    }}>
+    <>
+      <SEO 
+        title={profileTitle}
+        description={profileDescription}
+        url={profileUrl}
+        image={profileImage}
+        type="profile"
+        keywords={`${profile?.name}, ${profile?.job_title}, freelancer, ${profile?.location}, professional profile`}
+      />
+      
       <div style={{
-        maxWidth: '900px',
-        margin: '0 auto'
+        minHeight: '100vh',
+        backgroundColor: isDark ? '#1a1a2e' : '#f8f9fa',
+        padding: '40px 20px'
       }}>
+        <div style={{
+          maxWidth: '900px',
+          margin: '0 auto'
+        }}>
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -384,7 +401,8 @@ const PublicProfile = () => {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

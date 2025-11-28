@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode, MdArrowForward } from 'react-icons/md';
 import FeatureSlider from '../components/home/FeatureSlider';
+import SEO from '../components/SEO';
 import axios from 'axios';
 
 const Home = () => {
@@ -29,14 +30,22 @@ const Home = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      fontFamily: '-apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Roboto\', sans-serif',
-      position: 'relative',
-      overflow: 'hidden',
-      background: isDark ? '#0a0a0a' : '#ffffff'
-    }}>
-      {/* Background Effects */}
+    <>
+      <SEO 
+        title="Roastify - Every brilliant idea needs to be roasted | Freelancer Management"
+        description="Everything you need to run your freelance business. Manage clients, track time, create invoices, and get paid faster. Simple tools for freelancers, designers, consultants, and more."
+        keywords="freelancer management, time tracking, invoicing, client management, project management, freelance tools, invoice generator, time tracker, freelancer software, freelance business"
+        url="https://roastify.online"
+      />
+      
+      <div style={{
+        minHeight: '100vh',
+        fontFamily: '-apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Roboto\', sans-serif',
+        position: 'relative',
+        overflow: 'hidden',
+        background: isDark ? '#0a0a0a' : '#ffffff'
+      }}>
+        {/* Background Effects */}
       <div style={{
         position: 'absolute',
         top: '-50%',
@@ -924,7 +933,8 @@ const Home = () => {
           opacity: 0.85;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 
