@@ -196,7 +196,7 @@ function getDefaultPrivacy() {
       </ul>
 
       <h2>6. Contact Us</h2>
-      <p>For privacy-related questions, contact us at privacy@roastify.com</p>
+      <p>For privacy-related questions, contact us at support@roastify.com</p>
     </div>
   `;
 }

@@ -61,5 +61,5 @@ INSERT INTO legal_content (type, content, is_active) VALUES
   <p>We use the information we collect to provide and improve our services.</p>
 
   <h2>3. Contact Us</h2>
-  <p>For privacy-related questions, contact us at privacy@roastify.com</p>
+  <p>For privacy-related questions, contact us at support@roastify.com</p>
 </div>', true);
