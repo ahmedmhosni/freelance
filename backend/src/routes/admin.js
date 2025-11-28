@@ -10,7 +10,12 @@ router.use(requireAdmin);
 router.get('/users', async (req, res) => {
   try {
     const users = await getAll(
-      'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC'
+      `SELECT 
+        id, name, email, role, created_at,
+        last_login_at, last_activity_at, login_count, last_login_ip
+      FROM users 
+      WHERE deleted_at IS NULL
+      ORDER BY created_at DESC`
     );
     res.json(users);
   } catch (error) {

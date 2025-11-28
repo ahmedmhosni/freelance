@@ -88,52 +88,22 @@ const AdminGDPR = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <h1 style={{
-        fontSize: '28px',
-        fontWeight: '600',
-        color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-        marginBottom: '8px'
-      }}>
-        GDPR Management
-      </h1>
-      <p style={{
-        fontSize: '14px',
-        color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
-        marginBottom: '24px'
-      }}>
-        Monitor data exports, deleted accounts, and email preferences
-      </p>
+    <div className="container">
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ marginBottom: '4px' }}>GDPR Management</h1>
+        <p className="page-subtitle">
+          Monitor data exports, deleted accounts, and email preferences
+        </p>
+      </div>
 
       {/* Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '24px',
-        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-        overflowX: 'auto'
-      }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: '12px 20px',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #8b5cf6' : '2px solid transparent',
-              color: activeTab === tab.id 
-                ? (isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f')
-                : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'),
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.2s ease',
-              whiteSpace: 'nowrap'
-            }}
+            className={`view-toggle ${activeTab === tab.id ? 'active' : ''}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
           >
             {tab.icon}
             {tab.label}
@@ -162,38 +132,15 @@ const AdminGDPR = () => {
                 marginBottom: '24px'
               }}>
                 {Object.entries(exportStats).map(([key, value]) => (
-                  <div key={key} style={{
-                    padding: '20px',
-                    background: isDark ? '#1a1a1a' : '#ffffff',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                    borderRadius: '8px'
-                  }}>
-                    <div style={{
-                      fontSize: '24px',
-                      fontWeight: '600',
-                      color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                      marginBottom: '4px'
-                    }}>
-                      {value}
-                    </div>
-                    <div style={{
-                      fontSize: '13px',
-                      color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
-                      textTransform: 'capitalize'
-                    }}>
-                      {key}
-                    </div>
+                  <div key={key} className="card" style={{ padding: '16px' }}>
+                    <div className="stat-label" style={{ textTransform: 'uppercase' }}>{key}</div>
+                    <div className="stat-value">{value}</div>
                   </div>
                 ))}
               </div>
 
               {/* Requests Table */}
-              <div style={{
-                background: isDark ? '#1a1a1a' : '#ffffff',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                borderRadius: '12px',
-                overflow: 'hidden'
-              }}>
+              <div className="card" style={{ overflow: 'hidden' }}>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
@@ -270,78 +217,22 @@ const AdminGDPR = () => {
                 gap: '16px',
                 marginBottom: '24px'
               }}>
-                <div style={{
-                  padding: '20px',
-                  background: isDark ? '#1a1a1a' : '#ffffff',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                    marginBottom: '4px'
-                  }}>
-                    {deletedStats.total_deleted || 0}
-                  </div>
-                  <div style={{
-                    fontSize: '13px',
-                    color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
-                  }}>
-                    Total Deleted
-                  </div>
+                <div className="card" style={{ padding: '16px' }}>
+                  <div className="stat-label">TOTAL DELETED</div>
+                  <div className="stat-value">{deletedStats.total_deleted || 0}</div>
                 </div>
-                <div style={{
-                  padding: '20px',
-                  background: isDark ? '#1a1a1a' : '#ffffff',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                    marginBottom: '4px'
-                  }}>
-                    {deletedStats.deleted_last_7_days || 0}
-                  </div>
-                  <div style={{
-                    fontSize: '13px',
-                    color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
-                  }}>
-                    Last 7 Days
-                  </div>
+                <div className="card" style={{ padding: '16px' }}>
+                  <div className="stat-label">LAST 7 DAYS</div>
+                  <div className="stat-value">{deletedStats.deleted_last_7_days || 0}</div>
                 </div>
-                <div style={{
-                  padding: '20px',
-                  background: isDark ? '#1a1a1a' : '#ffffff',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                    marginBottom: '4px'
-                  }}>
-                    {deletedStats.deleted_last_30_days || 0}
-                  </div>
-                  <div style={{
-                    fontSize: '13px',
-                    color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
-                  }}>
-                    Last 30 Days
-                  </div>
+                <div className="card" style={{ padding: '16px' }}>
+                  <div className="stat-label">LAST 30 DAYS</div>
+                  <div className="stat-value">{deletedStats.deleted_last_30_days || 0}</div>
                 </div>
               </div>
 
               {/* Accounts Table */}
-              <div style={{
-                background: isDark ? '#1a1a1a' : '#ffffff',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                borderRadius: '12px',
-                overflow: 'hidden'
-              }}>
+              <div className="card" style={{ overflow: 'hidden' }}>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
@@ -379,15 +270,10 @@ const AdminGDPR = () => {
                           <td style={{ padding: '12px' }}>
                             <button
                               onClick={() => handleRestoreAccount(account.id, account.email)}
+                              className="btn-primary"
                               style={{
                                 padding: '6px 12px',
-                                background: '#8b5cf6',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '6px',
                                 fontSize: '12px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '4px'
@@ -413,12 +299,7 @@ const AdminGDPR = () => {
               gap: '24px'
             }}>
               {['marketing', 'notifications', 'updates'].map(type => (
-                <div key={type} style={{
-                  padding: '24px',
-                  background: isDark ? '#1a1a1a' : '#ffffff',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-                  borderRadius: '12px'
-                }}>
+                <div key={type} className="card" style={{ padding: '24px' }}>
                   <h3 style={{
                     fontSize: '16px',
                     fontWeight: '600',
@@ -483,12 +364,7 @@ const AdminGDPR = () => {
 
           {/* Deletion Reasons Tab */}
           {activeTab === 'reasons' && (
-            <div style={{
-              background: isDark ? '#1a1a1a' : '#ffffff',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-              borderRadius: '12px',
-              padding: '24px'
-            }}>
+            <div className="card" style={{ padding: '24px' }}>
               <h3 style={{
                 fontSize: '18px',
                 fontWeight: '600',

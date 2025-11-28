@@ -89,13 +89,32 @@ router.post('/login',
       throw new AppError('Please verify your email before logging in. Check your inbox for the verification code.', 403, 'EMAIL_NOT_VERIFIED');
     }
 
+    // Update last login tracking
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    await query(
+      `UPDATE users 
+       SET last_login_at = NOW(), 
+           last_activity_at = NOW(),
+           login_count = COALESCE(login_count, 0) + 1,
+           last_login_ip = $1
+       WHERE id = $2`,
+      [ipAddress, user.id]
+    );
+
+    // Log activity
+    await query(
+      `INSERT INTO activity_logs (user_id, action, ip_address, user_agent)
+       VALUES ($1, $2, $3, $4)`,
+      [user.id, 'login', ipAddress, req.headers['user-agent'] || null]
+    );
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
-    logger.info(`User logged in: ${email}`);
+    logger.info(`User logged in: ${email} from IP: ${ipAddress}`);
 
     res.json({
       success: true,
