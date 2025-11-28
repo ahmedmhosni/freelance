@@ -5,6 +5,7 @@ import QuotesManager from '../components/QuotesManager';
 import MaintenanceEditor from '../components/MaintenanceEditor';
 import LegalEditor from '../components/LegalEditor';
 import ChangelogEditor from '../components/ChangelogEditor';
+import VersionNamesManager from '../components/VersionNamesManager';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 import logger from '../utils/logger';
 
@@ -170,6 +171,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'changelog' ? 'active' : ''}`}
         >
           Changelog
+        </button>
+        <button
+          onClick={() => setActiveTab('version-names')}
+          className={`view-toggle ${activeTab === 'version-names' ? 'active' : ''}`}
+        >
+          Version Names
         </button>
         <Link to="/app/admin/gdpr" style={{ textDecoration: 'none' }}>
           <button className="view-toggle" style={{ width: '100%' }}>
@@ -450,6 +457,8 @@ const AdminPanel = () => {
       {activeTab === 'legal' && <LegalEditor />}
       
       {activeTab === 'changelog' && <ChangelogEditor />}
+      
+      {activeTab === 'version-names' && <VersionNamesManager />}
     </div>
   );
 };

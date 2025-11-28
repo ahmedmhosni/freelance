@@ -38,7 +38,7 @@ router.get('/public', async (req, res) => {
     
     // Get published versions
     const versionsResult = await pool.query(`
-      SELECT id, version, release_date
+      SELECT id, version, version_name, release_date, is_major_release
       FROM versions
       WHERE is_published = TRUE
       ORDER BY release_date DESC, id DESC
@@ -140,13 +140,13 @@ router.get('/admin/versions/:id', authenticateToken, requireAdmin, async (req, r
  */
 router.post('/admin/versions', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { version, release_date, published } = req.body;
+    const { version, version_name, release_date, published, is_major_release } = req.body;
     
     const result = await pool.query(`
-      INSERT INTO versions (version, release_date, is_published, created_by)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO versions (version, version_name, release_date, is_published, is_major_release, created_by)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id
-    `, [version, release_date, published || false, req.user.id]);
+    `, [version, version_name || null, release_date, published || false, is_major_release || false, req.user.id]);
     
     res.json({ 
       message: 'Version created successfully',
@@ -168,13 +168,13 @@ router.post('/admin/versions', authenticateToken, requireAdmin, async (req, res)
 router.put('/admin/versions/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { version, release_date, published } = req.body;
+    const { version, version_name, release_date, published, is_major_release } = req.body;
     
     await pool.query(`
       UPDATE versions
-      SET version = $1, release_date = $2, is_published = $3, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $4
-    `, [version, release_date, published || false, id]);
+      SET version = $1, version_name = $2, release_date = $3, is_published = $4, is_major_release = $5, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $6
+    `, [version, version_name || null, release_date, published || false, is_major_release || false, id]);
     
     res.json({ message: 'Version updated successfully' });
   } catch (error) {
@@ -392,6 +392,99 @@ router.post('/admin/mark-commits-processed', authenticateToken, requireAdmin, as
   } catch (error) {
     console.error('Error marking commits:', error);
     res.status(500).json({ error: 'Failed to mark commits' });
+  }
+});
+
+/**
+ * Get version names (admin only)
+ */
+router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { type } = req.query; // 'minor' or 'major'
+    
+    let query = 'SELECT * FROM version_names WHERE is_active = TRUE';
+    const params = [];
+    
+    if (type) {
+      query += ' AND name_type = $1';
+      params.push(type);
+    }
+    
+    query += ' ORDER BY sort_order, name';
+    
+    const result = await pool.query(query, params);
+    res.json({ names: result.rows });
+  } catch (error) {
+    console.error('Error fetching version names:', error);
+    res.status(500).json({ error: 'Failed to fetch version names' });
+  }
+});
+
+/**
+ * Add version name (admin only)
+ */
+router.post('/admin/version-names', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { name, name_type, description } = req.body;
+    
+    // Get max sort_order for this type
+    const maxOrder = await pool.query(
+      'SELECT COALESCE(MAX(sort_order), 0) as max FROM version_names WHERE name_type = $1',
+      [name_type]
+    );
+    
+    const result = await pool.query(`
+      INSERT INTO version_names (name, name_type, sort_order, description)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `, [name, name_type, maxOrder.rows[0].max + 1, description || null]);
+    
+    res.json({ 
+      message: 'Version name added successfully',
+      name: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error adding version name:', error);
+    if (error.message.includes('unique')) {
+      res.status(400).json({ error: 'Name already exists' });
+    } else {
+      res.status(500).json({ error: 'Failed to add version name' });
+    }
+  }
+});
+
+/**
+ * Update version name (admin only)
+ */
+router.put('/admin/version-names/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, sort_order } = req.body;
+    
+    await pool.query(`
+      UPDATE version_names
+      SET name = $1, description = $2, sort_order = $3, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $4
+    `, [name, description || null, sort_order, id]);
+    
+    res.json({ message: 'Version name updated successfully' });
+  } catch (error) {
+    console.error('Error updating version name:', error);
+    res.status(500).json({ error: 'Failed to update version name' });
+  }
+});
+
+/**
+ * Delete version name (admin only)
+ */
+router.delete('/admin/version-names/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM version_names WHERE id = $1', [id]);
+    res.json({ message: 'Version name deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting version name:', error);
+    res.status(500).json({ error: 'Failed to delete version name' });
   }
 });
 

@@ -89,32 +89,68 @@ const Changelog = () => {
         <div className="card" style={{ padding: '48px' }}>
           {changelog && changelog.versions && changelog.versions.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-              {changelog.versions.map(version => (
+              {changelog.versions.map((version, index) => (
                 <div key={version.id}>
                   {/* Version Header */}
                   <div style={{ 
                     marginBottom: '24px',
                     paddingBottom: '16px',
-                    borderBottom: '2px solid var(--primary-color)'
+                    borderBottom: version.is_major_release 
+                      ? '3px solid transparent'
+                      : '2px solid var(--primary-color)',
+                    borderImage: version.is_major_release 
+                      ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%) 1'
+                      : 'none',
+                    background: version.is_major_release
+                      ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)'
+                      : 'transparent',
+                    padding: version.is_major_release ? '16px' : '0',
+                    borderRadius: version.is_major_release ? '8px' : '0',
+                    marginTop: version.is_major_release ? '8px' : '0'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
                       <h2 style={{ 
                         margin: 0,
-                        fontSize: '24px', 
+                        fontSize: version.is_major_release ? '28px' : '24px', 
                         fontWeight: '700'
                       }}>
                         Version {version.version}
                       </h2>
-                      <span style={{ 
-                        fontSize: '12px',
-                        padding: '4px 10px',
-                        borderRadius: '12px',
-                        background: 'var(--primary-color)',
-                        color: 'white',
-                        fontWeight: '500'
-                      }}>
-                        Latest
-                      </span>
+                      {version.version_name && (
+                        <span style={{ 
+                          fontSize: version.is_major_release ? '20px' : '16px',
+                          fontWeight: '600',
+                          color: 'var(--text-secondary)',
+                          fontStyle: 'italic'
+                        }}>
+                          "{version.version_name}"
+                        </span>
+                      )}
+                      {version.is_major_release && (
+                        <span style={{ 
+                          fontSize: '14px',
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          fontWeight: '600',
+                          boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                        }}>
+                          🎉 MAJOR RELEASE
+                        </span>
+                      )}
+                      {index === 0 && !version.is_major_release && (
+                        <span style={{ 
+                          fontSize: '12px',
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          background: 'var(--primary-color)',
+                          color: 'white',
+                          fontWeight: '500'
+                        }}>
+                          Latest
+                        </span>
+                      )}
                     </div>
                     <p style={{ 
                       margin: 0,

@@ -16,8 +16,10 @@ const ChangelogEditor = () => {
   
   const [versionForm, setVersionForm] = useState({
     version: '',
+    version_name: '',
     release_date: new Date().toISOString().split('T')[0],
-    published: false
+    published: false,
+    is_major_release: false
   });
   
   const [itemForm, setItemForm] = useState({
@@ -27,7 +29,40 @@ const ChangelogEditor = () => {
   });
   
   const [editingItem, setEditingItem] = useState(null);
+  const [editingVersionId, setEditingVersionId] = useState(null);
   const [nextVersion, setNextVersion] = useState('1.0.0');
+  const [minorNames, setMinorNames] = useState([]);
+  const [majorNames, setMajorNames] = useState([]);
+
+  // Fetch version names from database
+  useEffect(() => {
+    fetchVersionNames();
+  }, []);
+
+  const fetchVersionNames = async () => {
+    try {
+      const [minorRes, majorRes] = await Promise.all([
+        api.get('/api/changelog/admin/version-names?type=minor'),
+        api.get('/api/changelog/admin/version-names?type=major')
+      ]);
+      setMinorNames(minorRes.data.names.map(n => n.name));
+      setMajorNames(majorRes.data.names.map(n => n.name));
+    } catch (error) {
+      logger.error('Error fetching version names:', error);
+    }
+  };
+
+  // Get next suggested name based on existing versions
+  const getSuggestedName = (isMajor) => {
+    const usedNames = versions
+      .filter(v => v.is_major_release === isMajor && v.version_name)
+      .map(v => v.version_name);
+    
+    const nameList = isMajor ? majorNames : minorNames;
+    const nextName = nameList.find(name => !usedNames.includes(name));
+    
+    return nextName || (nameList.length > 0 ? nameList[0] : '');
+  };
 
   const typeOptions = [
     { value: 'feature', label: '✨ New Feature', icon: '✨' },
@@ -75,12 +110,16 @@ const ChangelogEditor = () => {
   const handleCreateVersion = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/changelog/admin/versions', versionForm);
+      if (editingVersionId) {
+        await api.put(`/api/changelog/admin/versions/${editingVersionId}`, versionForm);
+      } else {
+        await api.post('/api/changelog/admin/versions', versionForm);
+      }
       fetchVersions();
       resetVersionForm();
     } catch (error) {
-      logger.error('Error creating version:', error);
-      alert(error.response?.data?.error || 'Failed to create version');
+      logger.error('Error saving version:', error);
+      alert(error.response?.data?.error || 'Failed to save version');
     }
   };
 
@@ -164,10 +203,26 @@ const ChangelogEditor = () => {
   const resetVersionForm = () => {
     setVersionForm({
       version: nextVersion,
+      version_name: '',
       release_date: new Date().toISOString().split('T')[0],
-      published: false
+      published: false,
+      is_major_release: false
     });
     setShowVersionForm(false);
+    setEditingVersionId(null);
+  };
+
+  const handleEditVersion = (version) => {
+    setEditingVersionId(version.id);
+    setVersionForm({
+      version: version.version,
+      version_name: version.version_name || '',
+      release_date: version.release_date,
+      published: version.is_published,
+      is_major_release: version.is_major_release || false
+    });
+    setShowVersionForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const resetItemForm = () => {
@@ -179,22 +234,66 @@ const ChangelogEditor = () => {
     setEditingItem(null);
   };
 
-  const handleCreateFromCommits = (selectedCommits) => {
-    // Pre-fill version form and show it
-    setVersionForm({
-      version: nextVersion,
-      release_date: new Date().toISOString().split('T')[0],
-      published: false
-    });
-    setShowVersionForm(true);
-    
-    // Store selected commits for later use
-    sessionStorage.setItem('pendingCommits', JSON.stringify(selectedCommits));
-    
-    // Scroll to version form
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+  const handleCreateFromCommits = async (selectedCommits) => {
+    try {
+      // Create the version first
+      const versionData = {
+        version: nextVersion,
+        version_name: '',
+        release_date: new Date().toISOString().split('T')[0],
+        published: false,
+        is_major_release: false
+      };
+      
+      const versionResponse = await api.post('/api/changelog/admin/versions', versionData);
+      const newVersionId = versionResponse.data.id;
+      
+      // Add each commit as an item
+      for (const commit of selectedCommits) {
+        // Determine category from commit message
+        const message = commit.commit_message.toLowerCase();
+        let category = 'improvement';
+        
+        if (message.includes('fix') || message.includes('bug')) {
+          category = 'fix';
+        } else if (message.includes('add') || message.includes('new') || message.includes('feature')) {
+          category = 'feature';
+        } else if (message.includes('design') || message.includes('style') || message.includes('ui')) {
+          category = 'design';
+        } else if (message.includes('security') || message.includes('auth')) {
+          category = 'security';
+        }
+        
+        await api.post(`/api/changelog/admin/versions/${newVersionId}/items`, {
+          category,
+          title: commit.commit_message,
+          description: `By ${commit.author_name} on ${new Date(commit.commit_date).toLocaleDateString()}`
+        });
+      }
+      
+      // Mark commits as processed
+      await api.post('/api/changelog/admin/mark-commits-processed', {
+        commitIds: selectedCommits.map(c => c.id),
+        versionId: newVersionId
+      });
+      
+      // Refresh everything
+      fetchVersions();
+      
+      // Expand the new version
+      setExpandedVersions({ [newVersionId]: true });
+      fetchVersionDetails(newVersionId);
+      
+      alert(`Version ${nextVersion} created with ${selectedCommits.length} items!`);
+      
+      // Scroll to versions section
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }, 500);
+    } catch (error) {
+      logger.error('Error creating version from commits:', error);
+      alert('Failed to create version from commits');
+    }
   };
 
   if (loading) {
@@ -229,7 +328,13 @@ const ChangelogEditor = () => {
         
         <button
           onClick={() => {
-            setVersionForm({ ...versionForm, version: nextVersion });
+            const suggestedName = getSuggestedName(false); // Default to minor
+            setVersionForm({ 
+              ...versionForm, 
+              version: nextVersion,
+              version_name: suggestedName,
+              is_major_release: false
+            });
             setShowVersionForm(true);
           }}
           className="btn-primary"
@@ -255,7 +360,9 @@ const ChangelogEditor = () => {
           background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
           border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
         }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Create New Version</h3>
+          <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>
+            {editingVersionId ? 'Edit Version' : 'Create New Version'}
+          </h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
             <div>
@@ -283,6 +390,65 @@ const ChangelogEditor = () => {
           </div>
 
           <div style={{ marginBottom: '16px' }}>
+            <label className="form-label">Version Name (Optional)</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                className="form-input"
+                value={versionForm.version_name}
+                onChange={(e) => setVersionForm({ ...versionForm, version_name: e.target.value })}
+                placeholder={versionForm.is_major_release ? 'e.g., "Espresso", "Cappuccino"' : 'e.g., "Nordic", "Vienna"'}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const suggested = getSuggestedName(versionForm.is_major_release);
+                  setVersionForm({ ...versionForm, version_name: suggested });
+                }}
+                className="btn-secondary"
+                style={{ padding: '8px 16px', fontSize: '13px', whiteSpace: 'nowrap' }}
+              >
+                ☕ Suggest
+              </button>
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              {versionForm.is_major_release 
+                ? '🔥 Major release: Specialty coffee drink names' 
+                : '☕ Minor update: Coffee roasting level names'}
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}>
+              <input
+                type="checkbox"
+                checked={versionForm.is_major_release}
+                onChange={(e) => {
+                  const isMajor = e.target.checked;
+                  const suggestedName = getSuggestedName(isMajor);
+                  setVersionForm({ 
+                    ...versionForm, 
+                    is_major_release: isMajor,
+                    version_name: suggestedName
+                  });
+                }}
+                style={{ 
+                  cursor: 'pointer',
+                  width: '16px',
+                  height: '16px',
+                  flexShrink: 0
+                }}
+              />
+              🎉 Major Release (special highlight)
+            </label>
+            
             <label style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -294,7 +460,12 @@ const ChangelogEditor = () => {
                 type="checkbox"
                 checked={versionForm.published}
                 onChange={(e) => setVersionForm({ ...versionForm, published: e.target.checked })}
-                style={{ cursor: 'pointer' }}
+                style={{ 
+                  cursor: 'pointer',
+                  width: '16px',
+                  height: '16px',
+                  flexShrink: 0
+                }}
               />
               Publish immediately
             </label>
@@ -302,7 +473,7 @@ const ChangelogEditor = () => {
 
           <div style={{ display: 'flex', gap: '8px' }}>
             <button type="submit" className="btn-primary">
-              Create Version
+              {editingVersionId ? 'Update Version' : 'Create Version'}
             </button>
             <button 
               type="button" 
@@ -364,10 +535,31 @@ const ChangelogEditor = () => {
                     </button>
                     
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ fontSize: '16px', fontWeight: '600' }}>
                           v{version.version}
                         </span>
+                        {version.version_name && (
+                          <span style={{ 
+                            fontSize: '14px', 
+                            fontWeight: '500',
+                            color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)'
+                          }}>
+                            "{version.version_name}"
+                          </span>
+                        )}
+                        {version.is_major_release && (
+                          <span style={{
+                            fontSize: '11px',
+                            padding: '2px 8px',
+                            borderRadius: '3px',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            fontWeight: '600'
+                          }}>
+                            🎉 MAJOR
+                          </span>
+                        )}
                         <span style={{
                           fontSize: '11px',
                           padding: '2px 8px',
@@ -390,6 +582,21 @@ const ChangelogEditor = () => {
                   </div>
                   
                   <div style={{ display: 'flex', gap: '4px' }}>
+                    <button
+                      onClick={() => handleEditVersion(version)}
+                      title="Edit version"
+                      style={{
+                        padding: '6px',
+                        borderRadius: '3px',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                        background: 'transparent',
+                        color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <MdEdit size={16} />
+                    </button>
+                    
                     <button
                       onClick={() => handleTogglePublish(version.id, version.is_published)}
                       title={version.is_published ? 'Unpublish' : 'Publish'}
