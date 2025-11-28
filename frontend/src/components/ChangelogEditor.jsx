@@ -302,10 +302,13 @@ const ChangelogEditor = () => {
     return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
   }
 
+  // Check if we're in development (git sync only works locally)
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
   return (
     <div>
-      {/* Pending Commits Section */}
-      <PendingCommits onCreateVersion={handleCreateFromCommits} />
+      {/* Pending Commits Section - Only show in development */}
+      {isDevelopment && <PendingCommits onCreateVersion={handleCreateFromCommits} />}
       
       {/* Changelog Management */}
       <div className="card" style={{ padding: '24px' }}>
