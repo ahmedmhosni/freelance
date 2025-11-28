@@ -287,7 +287,7 @@ const Layout = () => {
             )}
           </button>
 
-          {/* Footer Links */}
+          {/* Footer Links - Compact */}
           {!isCollapsed && (
             <div style={{
               marginTop: '12px',
@@ -295,15 +295,17 @@ const Layout = () => {
               borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
               textAlign: 'center',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '6px'
+              flexDirection: 'row',
+              justifyContent: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              fontSize: '11px'
             }}>
               <a
                 href="/public-status"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  fontSize: '11px',
                   color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
                   textDecoration: 'none',
                   transition: 'color 0.15s ease'
@@ -315,12 +317,12 @@ const Layout = () => {
                   e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
                 }}
               >
-                System Status
+                Status
               </a>
+              <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
               <Link
                 to="/terms"
                 style={{
-                  fontSize: '11px',
                   color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
                   textDecoration: 'none',
                   transition: 'color 0.15s ease'
@@ -334,10 +336,10 @@ const Layout = () => {
               >
                 Terms
               </Link>
+              <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
               <Link
                 to="/privacy"
                 style={{
-                  fontSize: '11px',
                   color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
                   textDecoration: 'none',
                   transition: 'color 0.15s ease'
