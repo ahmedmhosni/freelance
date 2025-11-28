@@ -184,10 +184,14 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '140px 40px 80px',
+        padding: '160px 40px 100px',
         textAlign: 'center',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        minHeight: '85vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
       }}>
         <div style={{
           display: 'inline-flex',
@@ -213,10 +217,10 @@ const Home = () => {
         </div>
 
         <h1 style={{
-          fontSize: window.innerWidth <= 768 ? '36px' : '48px',
+          fontSize: window.innerWidth <= 768 ? '40px' : '56px',
           fontWeight: '600',
           color: isDark ? '#ffffff' : '#37352f',
-          marginBottom: '16px',
+          marginBottom: '20px',
           lineHeight: '1.2',
           letterSpacing: '-0.02em'
         }}>
@@ -235,7 +239,7 @@ const Home = () => {
           fontSize: '18px',
           fontWeight: '500',
           color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(55, 53, 47, 0.7)',
-          maxWidth: '520px',
+          maxWidth: '560px',
           margin: '0 auto 12px',
           lineHeight: '1.5'
         }}>
@@ -252,15 +256,15 @@ const Home = () => {
           Manage clients, track time, get paid. Simple tools for freelancers.
         </p>
 
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
           <Link
             to="/register"
             style={{
-              padding: '12px 24px',
-              fontSize: '14px',
+              padding: '16px 32px',
+              fontSize: '15px',
               fontWeight: '600',
-              color: isDark ? '#191919' : '#ffffff',
-              background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               border: 'none',
               borderRadius: '3px',
               textDecoration: 'none',
@@ -271,14 +275,14 @@ const Home = () => {
             }}
           >
             Join the early access
-            <MdArrowForward size={18} />
+            <MdArrowForward size={20} />
           </Link>
           
           <Link
             to="/login"
             style={{
-              padding: '12px 24px',
-              fontSize: '14px',
+              padding: '16px 32px',
+              fontSize: '15px',
               fontWeight: '600',
               color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
               background: 'transparent',
@@ -293,13 +297,25 @@ const Home = () => {
           </Link>
         </div>
 
-        <p style={{
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '24px',
+          flexWrap: 'wrap',
           fontSize: '13px',
-          color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-          marginTop: '20px'
+          color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
         }}>
-          🔥 Early access • Free registration • Limited spots
-        </p>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '16px' }}>🔥</span> Early access
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '16px' }}>✨</span> Free registration
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '16px' }}>⚡</span> Limited spots
+          </span>
+        </div>
       </div>
 
       {/* Feature Carousel Section */}
@@ -324,29 +340,31 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '120px 40px',
+        padding: '100px 40px',
         position: 'relative',
         zIndex: 1
       }}>
         <div style={{
           textAlign: 'center',
-          marginBottom: '64px'
+          marginBottom: '56px'
         }}>
           <h2 style={{
-            fontSize: window.innerWidth <= 768 ? '28px' : '36px',
+            fontSize: window.innerWidth <= 768 ? '32px' : '42px',
             fontWeight: '600',
             color: isDark ? '#ffffff' : '#37352f',
-            marginBottom: '16px',
-            letterSpacing: '-0.02em'
+            marginBottom: '12px',
+            letterSpacing: '-0.02em',
+            lineHeight: '1.2'
           }}>
             Built for every freelancer
           </h2>
           <p style={{
-            fontSize: '16px',
-            color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
-            maxWidth: '640px',
+            fontSize: '15px',
+            fontWeight: '400',
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+            maxWidth: '600px',
             margin: '0 auto',
-            lineHeight: '1.6'
+            lineHeight: '1.5'
           }}>
             Manage clients, track time, create invoices, and grow your business — all in one place
           </p>
@@ -528,56 +546,62 @@ const Home = () => {
       {/* CTA Section */}
       <div style={{
         background: isDark 
-          ? 'linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)'
-          : 'linear-gradient(180deg, rgba(99, 102, 241, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%)',
-        borderTop: isDark ? '2px solid rgba(99, 102, 241, 0.15)' : '2px solid rgba(99, 102, 241, 0.12)',
-        borderBottom: isDark ? '1px solid rgba(168, 85, 247, 0.1)' : '1px solid rgba(168, 85, 247, 0.08)',
+          ? 'linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)'
+          : 'linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, rgba(168, 85, 247, 0.06) 100%)',
+        borderTop: isDark ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid rgba(99, 102, 241, 0.15)',
+        borderBottom: isDark ? '1px solid rgba(168, 85, 247, 0.15)' : '1px solid rgba(168, 85, 247, 0.12)',
         position: 'relative',
         zIndex: 1,
         boxShadow: isDark 
-          ? '0 -4px 20px rgba(99, 102, 241, 0.1), 0 4px 20px rgba(168, 85, 247, 0.1)'
-          : '0 -4px 20px rgba(99, 102, 241, 0.05), 0 4px 20px rgba(168, 85, 247, 0.05)'
+          ? '0 -8px 32px rgba(99, 102, 241, 0.15), 0 8px 32px rgba(168, 85, 247, 0.15)'
+          : '0 -8px 32px rgba(99, 102, 241, 0.08), 0 8px 32px rgba(168, 85, 247, 0.08)'
       }}>
         <div style={{
-          maxWidth: '800px',
+          maxWidth: '900px',
           margin: '0 auto',
-          padding: '120px 40px',
+          padding: '100px 40px',
           textAlign: 'center'
       }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '4px 10px',
-          background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.1)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
-          borderRadius: '16px',
-          fontSize: '11px',
-          fontWeight: '500',
+          padding: '8px 16px',
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)'
+            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%)',
+          border: '1px solid rgba(99, 102, 241, 0.4)',
+          borderRadius: '24px',
+          fontSize: '12px',
+          fontWeight: '600',
           color: '#6366f1',
-          marginBottom: '20px'
+          marginBottom: '32px',
+          boxShadow: isDark 
+            ? '0 4px 16px rgba(99, 102, 241, 0.2)'
+            : '0 4px 16px rgba(99, 102, 241, 0.15)'
         }}>
           <span style={{
-            width: '6px',
-            height: '6px',
+            width: '8px',
+            height: '8px',
             borderRadius: '50%',
-            background: '#6366f1',
-            animation: 'pulse 2s ease-in-out infinite'
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            animation: 'pulse 2s ease-in-out infinite',
+            boxShadow: '0 0 12px rgba(99, 102, 241, 0.6)'
           }} />
           Early Access Program
         </div>
 
         <h2 style={{
-          fontSize: window.innerWidth <= 768 ? '28px' : '40px',
-          fontWeight: '600',
+          fontSize: window.innerWidth <= 768 ? '36px' : '52px',
+          fontWeight: '700',
           color: isDark ? '#ffffff' : '#37352f',
-          marginBottom: '16px',
+          marginBottom: '20px',
           lineHeight: '1.2',
-          letterSpacing: '-0.01em'
+          letterSpacing: '-0.03em'
         }}>
           Ready to{' '}
           <span style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -586,40 +610,44 @@ const Home = () => {
           </span>
         </h2>
         <p style={{
-          fontSize: '15px',
-          color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.65)',
-          marginBottom: '32px',
+          fontSize: '17px',
+          fontWeight: '400',
+          color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(55, 53, 47, 0.75)',
+          marginBottom: '40px',
           lineHeight: '1.6',
-          maxWidth: '600px',
-          margin: '0 auto 32px'
+          maxWidth: '640px',
+          margin: '0 auto 40px'
         }}>
           Join our early access program today. Free forever for early adopters. Limited spots available.
         </p>
         
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '32px' }}>
           <Link
             to="/register"
             style={{
-              padding: '8px 16px',
-              fontSize: '14px',
+              padding: '16px 32px',
+              fontSize: '15px',
               fontWeight: '600',
-              color: isDark ? '#191919' : '#ffffff',
-              background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               border: 'none',
               borderRadius: '3px',
               textDecoration: 'none',
               transition: 'all 0.15s ease',
-              display: 'inline-block'
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             Get started
+            <MdArrowForward size={20} />
           </Link>
           
           <Link
             to="/login"
             style={{
-              padding: '8px 16px',
-              fontSize: '14px',
+              padding: '16px 32px',
+              fontSize: '15px',
               fontWeight: '600',
               color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
               background: 'transparent',
@@ -635,12 +663,14 @@ const Home = () => {
         </div>
 
         <p style={{
-          fontSize: '12px',
-          color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
-          marginTop: '16px'
+          fontSize: '13px',
+          color: isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(55, 53, 47, 0.45)',
+          marginTop: '24px',
+          lineHeight: '1.5'
         }}>
-          No credit card required • Cancel anytime • By signing up, you agree to our{' '}
-          <Link to="/terms" style={{ color: 'inherit', textDecoration: 'underline' }}>Terms</Link>
+          No credit card required • Cancel anytime<br />
+          By signing up, you agree to our{' '}
+          <Link to="/terms" style={{ color: 'inherit', textDecoration: 'underline', opacity: 0.7 }}>Terms</Link>
         </p>
         </div>
       </div>
@@ -664,10 +694,57 @@ const Home = () => {
           color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
         }}>
           <div>© {new Date().getFullYear()} Roastify. All rights reserved.</div>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</Link>
-            <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</Link>
-            <Link to="/public-status" style={{ color: 'inherit', textDecoration: 'none' }}>Status</Link>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <Link 
+              to="/terms" 
+              style={{ 
+                color: 'inherit', 
+                textDecoration: 'none',
+                opacity: 0.5,
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+            >
+              Terms
+            </Link>
+            <Link 
+              to="/privacy" 
+              style={{ 
+                color: 'inherit', 
+                textDecoration: 'none',
+                opacity: 0.5,
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+            >
+              Privacy
+            </Link>
+            <Link 
+              to="/public-status" 
+              style={{ 
+                color: 'inherit', 
+                textDecoration: 'none',
+                opacity: 0.5,
+                transition: 'opacity 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+            >
+              <span style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#10b981',
+                animation: 'pulse 2s ease-in-out infinite',
+                boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)'
+              }} />
+              Status
+            </Link>
             <a 
               href="https://instagram.com/roastify.online" 
               target="_blank" 

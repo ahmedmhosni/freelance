@@ -89,14 +89,14 @@ const FeatureSlider = ({ isDark }) => {
         {/* Section Header */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '48px'
+          marginBottom: '40px'
         }}>
           <h2 style={{
-            fontSize: window.innerWidth <= 768 ? '24px' : '32px',
+            fontSize: window.innerWidth <= 768 ? '32px' : '42px',
             fontWeight: '600',
             color: isDark ? '#ffffff' : '#37352f',
-            marginBottom: '8px',
-            letterSpacing: '-0.01em',
+            marginBottom: '12px',
+            letterSpacing: '-0.02em',
             lineHeight: '1.2'
           }}>
             Everything you need.{' '}
@@ -110,7 +110,8 @@ const FeatureSlider = ({ isDark }) => {
             </span>
           </h2>
           <p style={{
-            fontSize: '14px',
+            fontSize: '15px',
+            fontWeight: '400',
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
             maxWidth: '600px',
             margin: '0 auto',
