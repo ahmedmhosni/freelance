@@ -43,15 +43,15 @@ const AppFooter = () => {
           <Link 
             to="/terms" 
             style={{ 
-              color: 'inherit', 
+              color: isDark ? '#ffffff' : '#000000',
               textDecoration: 'none',
-              transition: 'color 0.15s ease'
+              transition: 'opacity 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
+              e.target.style.opacity = '0.7';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+              e.target.style.opacity = '1';
             }}
           >
             Terms
@@ -60,15 +60,15 @@ const AppFooter = () => {
           <Link 
             to="/privacy" 
             style={{ 
-              color: 'inherit', 
+              color: isDark ? '#ffffff' : '#000000',
               textDecoration: 'none',
-              transition: 'color 0.15s ease'
+              transition: 'opacity 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
+              e.target.style.opacity = '0.7';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+              e.target.style.opacity = '1';
             }}
           >
             Privacy
@@ -77,15 +77,15 @@ const AppFooter = () => {
           <Link 
             to="/public-status" 
             style={{ 
-              color: 'inherit', 
+              color: isDark ? '#ffffff' : '#000000',
               textDecoration: 'none',
-              transition: 'color 0.15s ease'
+              transition: 'opacity 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
+              e.target.style.opacity = '0.7';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+              e.target.style.opacity = '1';
             }}
           >
             Status
@@ -94,15 +94,15 @@ const AppFooter = () => {
           <Link 
             to="/changelog" 
             style={{ 
-              color: 'inherit', 
+              color: isDark ? '#ffffff' : '#000000',
               textDecoration: 'none',
-              transition: 'color 0.15s ease'
+              transition: 'opacity 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
+              e.target.style.opacity = '0.7';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+              e.target.style.opacity = '1';
             }}
           >
             Changelog
@@ -115,25 +115,26 @@ const AppFooter = () => {
         
         <div style={{ 
           fontSize: '11px',
-          color: isDark ? 'rgba(255, 255, 255, 0.35)' : 'rgba(55, 53, 47, 0.35)',
+          color: isDark ? '#ffffff' : '#000000',
           display: 'flex',
           justifyContent: 'center',
           gap: '10px',
           alignItems: 'center',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          opacity: 0.6
         }}>
           <Link 
             to="/changelog"
             style={{ 
               color: 'inherit',
               textDecoration: 'none',
-              transition: 'color 0.15s ease'
+              transition: 'opacity 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+              e.target.style.opacity = '0.8';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.35)' : 'rgba(55, 53, 47, 0.35)';
+              e.target.style.opacity = '1';
             }}
             title="View changelog"
           >

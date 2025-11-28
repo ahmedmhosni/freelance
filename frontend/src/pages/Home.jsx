@@ -8,9 +8,13 @@ import axios from 'axios';
 const Home = () => {
   const { isDark, toggleTheme } = useTheme();
   const [version, setVersion] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     fetchVersion();
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
   }, []);
 
   const fetchVersion = async () => {
@@ -159,43 +163,66 @@ const Home = () => {
               {isDark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
             </button>
             
-            <Link
-              to="/login"
-              className="header-btn-secondary"
-              style={{
-                padding: '8px 16px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                background: 'transparent',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                borderRadius: '3px',
-                textDecoration: 'none',
-                transition: 'all 0.15s ease',
-                display: 'inline-block'
-              }}
-            >
-              Sign in
-            </Link>
-            
-            <Link
-              to="/register"
-              className="header-btn-primary"
-              style={{
-                padding: '8px 16px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: isDark ? '#191919' : '#ffffff',
-                background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                border: 'none',
-                borderRadius: '3px',
-                textDecoration: 'none',
-                transition: 'all 0.15s ease',
-                display: 'inline-block'
-              }}
-            >
-              Get started
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                to="/dashboard"
+                className="header-btn-primary"
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: isDark ? '#191919' : '#ffffff',
+                  background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                  border: 'none',
+                  borderRadius: '3px',
+                  textDecoration: 'none',
+                  transition: 'all 0.15s ease',
+                  display: 'inline-block'
+                }}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="header-btn-secondary"
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                    background: 'transparent',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                    borderRadius: '3px',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s ease',
+                    display: 'inline-block'
+                  }}
+                >
+                  Sign in
+                </Link>
+                
+                <Link
+                  to="/register"
+                  className="header-btn-primary"
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: isDark ? '#191919' : '#ffffff',
+                    background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                    border: 'none',
+                    borderRadius: '3px',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s ease',
+                    display: 'inline-block'
+                  }}
+                >
+                  Get started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -747,13 +774,12 @@ const Home = () => {
             <Link 
               to="/terms" 
               style={{ 
-                color: 'inherit', 
+                color: isDark ? '#ffffff' : '#000000',
                 textDecoration: 'none',
-                opacity: 0.5,
                 transition: 'opacity 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               Terms
             </Link>
@@ -761,13 +787,12 @@ const Home = () => {
             <Link 
               to="/privacy" 
               style={{ 
-                color: 'inherit', 
+                color: isDark ? '#ffffff' : '#000000',
                 textDecoration: 'none',
-                opacity: 0.5,
                 transition: 'opacity 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               Privacy
             </Link>
@@ -775,24 +800,22 @@ const Home = () => {
             <Link 
               to="/public-status" 
               style={{ 
-                color: 'inherit', 
+                color: isDark ? '#ffffff' : '#000000',
                 textDecoration: 'none',
-                opacity: 0.5,
                 transition: 'opacity 0.2s',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <span style={{
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
                 background: '#10b981',
-                animation: 'pulse 2s ease-in-out infinite',
-                boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)'
+                animation: 'pulse 2s ease-in-out infinite'
               }} />
               Status
             </Link>
@@ -800,13 +823,12 @@ const Home = () => {
             <Link 
               to="/changelog" 
               style={{ 
-                color: 'inherit', 
+                color: isDark ? '#ffffff' : '#000000',
                 textDecoration: 'none',
-                opacity: 0.5,
                 transition: 'opacity 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               Changelog
             </Link>

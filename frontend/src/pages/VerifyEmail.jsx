@@ -134,22 +134,97 @@ const VerifyEmail = () => {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: isDark ? '#0a0a0a' : '#ffffff'
+        background: isDark ? '#0a0a0a' : '#ffffff',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ textAlign: 'center', maxWidth: '400px', padding: '20px' }}>
-          <div style={{ fontSize: '64px', color: '#2eaadc', marginBottom: '20px' }}>
+        {/* Background Effects - Match website theme */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: isDark
+            ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 50%)',
+          animation: 'wave 20s ease-in-out infinite',
+          pointerEvents: 'none',
+          opacity: isDark ? 0.6 : 1
+        }} />
+        
+        {/* Floating Orbs */}
+        <div style={{
+          position: 'absolute',
+          top: '10%',
+          left: '5%',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'float 20s ease-in-out infinite',
+          pointerEvents: 'none'
+        }} />
+        
+        <div style={{
+          position: 'absolute',
+          bottom: '10%',
+          right: '5%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%)',
+          filter: 'blur(90px)',
+          animation: 'float 25s ease-in-out infinite reverse',
+          pointerEvents: 'none'
+        }} />
+
+        <div style={{ textAlign: 'center', maxWidth: '400px', padding: '20px', position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: '64px', color: '#10b981', marginBottom: '20px' }}>
             <MdCheckCircle />
           </div>
-          <h2 style={{ color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f', marginBottom: '10px' }}>
+          <h2 style={{ 
+            color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f', 
+            marginBottom: '10px',
+            fontSize: '24px',
+            fontWeight: '600'
+          }}>
             Email Verified!
           </h2>
-          <p style={{ color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)', marginBottom: '20px' }}>
+          <p style={{ 
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)', 
+            marginBottom: '20px',
+            fontSize: '15px',
+            lineHeight: '1.5'
+          }}>
             {message}
           </p>
-          <p style={{ fontSize: '14px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)' }}>
+          <p style={{ 
+            fontSize: '14px', 
+            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)' 
+          }}>
             Redirecting to login...
           </p>
         </div>
+
+        <style>{`
+          @keyframes wave {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+          }
+        `}</style>
       </div>
     );
   }
