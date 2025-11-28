@@ -111,7 +111,7 @@ const Login = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: isDark ? '#191919' : '#ffffff',
+          background: isDark ? '#0a0a0a' : '#ffffff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
