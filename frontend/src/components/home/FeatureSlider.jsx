@@ -89,19 +89,19 @@ const FeatureSlider = ({ isDark }) => {
         {/* Section Header */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '40px'
+          marginBottom: '48px'
         }}>
           <h2 style={{
-            fontSize: window.innerWidth <= 768 ? '32px' : '42px',
-            fontWeight: '600',
+            fontSize: window.innerWidth <= 768 ? '36px' : '48px',
+            fontWeight: '700',
             color: isDark ? '#ffffff' : '#37352f',
-            marginBottom: '12px',
-            letterSpacing: '-0.02em',
+            marginBottom: '16px',
+            letterSpacing: '-0.03em',
             lineHeight: '1.2'
           }}>
             Everything you need.{' '}
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -110,12 +110,12 @@ const FeatureSlider = ({ isDark }) => {
             </span>
           </h2>
           <p style={{
-            fontSize: '15px',
+            fontSize: '16px',
             fontWeight: '400',
-            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
-            maxWidth: '600px',
+            color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.65)',
+            maxWidth: '620px',
             margin: '0 auto',
-            lineHeight: '1.5'
+            lineHeight: '1.6'
           }}>
             Built for freelancers who want to work, not wrestle with software.
           </p>
