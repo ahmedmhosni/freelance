@@ -6,6 +6,7 @@ import { useMaintenanceMode } from '../context/MaintenanceContext';
 import NotificationBell from './NotificationBell';
 import TimerWidget from './TimerWidget';
 import MaintenanceBanner from './MaintenanceBanner';
+import FeedbackWidget from './FeedbackWidget';
 import { 
   MdDashboard, 
   MdPeople, 
@@ -377,6 +378,9 @@ const Layout = () => {
         </div>
         <Outlet />
       </main>
+      
+      {/* Feedback Widget - appears on all pages */}
+      <FeedbackWidget />
     </div>
   );
 };
