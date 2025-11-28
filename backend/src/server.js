@@ -47,6 +47,7 @@ const healthRoutes = require('./routes/health');
 const feedbackRoutes = require('./routes/feedback');
 const preferencesRoutes = require('./routes/preferences');
 const gdprRoutes = require('./routes/gdpr');
+const adminGdprRoutes = require('./routes/admin-gdpr');
 
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -188,6 +189,7 @@ app.use('/api/legal', legalRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/preferences', preferencesRoutes);
 app.use('/api/gdpr', gdprRoutes);
+app.use('/api/admin/gdpr', adminGdprRoutes);
 app.use('/api', healthRoutes);
 
 // Serve static files from frontend build in production

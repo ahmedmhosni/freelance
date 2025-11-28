@@ -101,6 +101,11 @@ const AdminPanel = () => {
         >
           Terms & Privacy
         </button>
+        <Link to="/app/admin/gdpr" style={{ textDecoration: 'none' }}>
+          <button className="view-toggle" style={{ width: '100%' }}>
+            GDPR Management
+          </button>
+        </Link>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>

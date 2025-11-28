@@ -27,6 +27,7 @@ import Invoices from './pages/Invoices';
 import Reports from './pages/Reports';
 import TimeTracking from './pages/TimeTracking';
 import AdminPanel from './pages/AdminPanel';
+import AdminGDPR from './pages/AdminGDPR';
 import LoaderTest from './pages/LoaderTest';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
@@ -114,6 +115,7 @@ function App() {
                 <Route path="profile" element={<Profile />} />
                 <Route path="admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
                 <Route path="admin/status" element={<PrivateRoute adminOnly><AdminStatus /></PrivateRoute>} />
+                <Route path="admin/gdpr" element={<PrivateRoute adminOnly><AdminGDPR /></PrivateRoute>} />
                 <Route path="loader-test" element={<PrivateRoute adminOnly><LoaderTest /></PrivateRoute>} />
               </Route>
               
