@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../db/postgresql');
-const { authenticate, requireAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 /**
@@ -27,7 +27,7 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *       200:
  *         description: List of export requests
  */
-router.get('/export-requests', authenticate, requireAdmin, asyncHandler(async (req, res) => {
+router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
   const { status, limit = 50 } = req.query;
 
   let sql = `
@@ -106,7 +106,7 @@ router.get('/export-requests', authenticate, requireAdmin, asyncHandler(async (r
  *       200:
  *         description: List of deleted accounts
  */
-router.get('/deleted-accounts', authenticate, requireAdmin, asyncHandler(async (req, res) => {
+router.get('/deleted-accounts', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
   const { limit = 50 } = req.query;
 
   const result = await query(
@@ -163,7 +163,7 @@ router.get('/deleted-accounts', authenticate, requireAdmin, asyncHandler(async (
  *       200:
  *         description: Account restored
  */
-router.post('/restore-account', authenticate, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/restore-account', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
   const { userId } = req.body;
 
   if (!userId) {
@@ -219,7 +219,7 @@ router.post('/restore-account', authenticate, requireAdmin, asyncHandler(async (
  *       200:
  *         description: Email preferences statistics
  */
-router.get('/email-preferences-stats', authenticate, requireAdmin, asyncHandler(async (req, res) => {
+router.get('/email-preferences-stats', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
   const result = await query(`
     SELECT 
       COUNT(*) as total_users,
@@ -270,7 +270,7 @@ router.get('/email-preferences-stats', authenticate, requireAdmin, asyncHandler(
  *       200:
  *         description: Deletion reasons with counts
  */
-router.get('/deletion-reasons', authenticate, requireAdmin, asyncHandler(async (req, res) => {
+router.get('/deletion-reasons', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
   const result = await query(`
     SELECT 
       deletion_reason,

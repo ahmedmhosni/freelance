@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../db/postgresql');
-const { authenticate } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 const { asyncHandler } = require('../middleware/errorHandler');
 const emailService = require('../services/emailService');
 const fs = require('fs').promises;
@@ -19,7 +19,7 @@ const path = require('path');
  *       200:
  *         description: Export request created
  */
-router.post('/export', authenticate, asyncHandler(async (req, res) => {
+router.post('/export', authenticateToken, asyncHandler(async (req, res) => {
   // Check if there's already a pending request
   const existingRequest = await query(
     `SELECT id, status, requested_at 
@@ -73,7 +73,7 @@ router.post('/export', authenticate, asyncHandler(async (req, res) => {
  *       200:
  *         description: Export status
  */
-router.get('/export/status', authenticate, asyncHandler(async (req, res) => {
+router.get('/export/status', authenticateToken, asyncHandler(async (req, res) => {
   const result = await query(
     `SELECT id, status, requested_at, completed_at, expires_at, error_message
      FROM data_export_requests 
@@ -109,7 +109,7 @@ router.get('/export/status', authenticate, asyncHandler(async (req, res) => {
  *       200:
  *         description: Account deleted
  */
-router.post('/delete-account', authenticate, asyncHandler(async (req, res) => {
+router.post('/delete-account', authenticateToken, asyncHandler(async (req, res) => {
   const { password, reason } = req.body;
 
   if (!password) {
@@ -260,7 +260,7 @@ async function fetchUserData(userId) {
 /**
  * Download export file (protected)
  */
-router.get('/download/:filename', authenticate, asyncHandler(async (req, res) => {
+router.get('/download/:filename', authenticateToken, asyncHandler(async (req, res) => {
   const { filename } = req.params;
 
   // Verify this export belongs to the user

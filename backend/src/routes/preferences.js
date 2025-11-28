@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../db/postgresql');
-const { authenticate } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 /**
@@ -16,7 +16,7 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *       200:
  *         description: Email preferences
  */
-router.get('/email', authenticate, asyncHandler(async (req, res) => {
+router.get('/email', authenticateToken, asyncHandler(async (req, res) => {
   const result = await query(
     'SELECT email_preferences FROM users WHERE id = $1',
     [req.user.id]
@@ -56,7 +56,7 @@ router.get('/email', authenticate, asyncHandler(async (req, res) => {
  *       200:
  *         description: Preferences updated
  */
-router.put('/email', authenticate, asyncHandler(async (req, res) => {
+router.put('/email', authenticateToken, asyncHandler(async (req, res) => {
   const { marketing, notifications, updates } = req.body;
 
   const preferences = {
