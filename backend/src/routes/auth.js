@@ -74,7 +74,7 @@ router.post('/register',
     const { name, email, password, role = 'freelancer' } = req.body;
 
     // Check if user exists
-    const existingUser = await queries.findUserByEmail(email);
+    const existingUser = await getOne('SELECT * FROM users WHERE email = $1', [email]);
     
     if (existingUser) {
       throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
@@ -88,23 +88,16 @@ router.post('/register',
     // Hash password and create user
     const passwordHash = await bcrypt.hash(password, 12);
     
-    const pool = await db;
-    const request = pool.request();
-    request.input('name', sql.NVarChar, name);
-    request.input('email', sql.NVarChar, email);
-    request.input('password', sql.NVarChar, passwordHash);
-    request.input('role', sql.NVarChar, role);
-    request.input('verificationToken', sql.NVarChar, verificationToken);
-    request.input('verificationCode', sql.NVarChar, verificationCode);
-    request.input('verificationExpiry', sql.DateTime2, verificationExpiry);
+    const result = await query(`
+      INSERT INTO users (
+        name, email, password, role, email_verified, 
+        email_verification_token, email_verification_code, email_verification_expires
+      )
+      VALUES ($1, $2, $3, $4, false, $5, $6, $7)
+      RETURNING id, name, email
+    `, [name, email, passwordHash, role, verificationToken, verificationCode, verificationExpiry]);
 
-    const result = await request.query(`
-      INSERT INTO users (name, email, password, role, email_verified, email_verification_token, email_verification_code, email_verification_expires, created_at)
-      OUTPUT INSERTED.id, INSERTED.name, INSERTED.email
-      VALUES (@name, @email, @password, @role, 0, @verificationToken, @verificationCode, @verificationExpiry, GETDATE())
-    `);
-
-    const user = result.recordset[0];
+    const user = result.rows[0];
 
     // Send verification email with both token and code
     try {
@@ -133,7 +126,7 @@ router.post('/login',
     const { email, password } = req.body;
 
     // Get user by email
-    const user = await queries.findUserByEmail(email);
+    const user = await getOne('SELECT * FROM users WHERE email = $1', [email]);
     
     if (!user) {
       logger.warn(`Failed login attempt for non-existent user: ${email}`);
@@ -181,29 +174,17 @@ router.get('/verify-email/:token',
   asyncHandler(async (req, res) => {
     const { token } = req.params;
 
-    const pool = await db;
-    const request = pool.request();
-    request.input('token', sql.NVarChar, token);
-
-    const result = await request.query(`
+    const user = await getOne(`
       SELECT id, name, email, email_verification_expires, email_verified
       FROM users
-      WHERE email_verification_token = @token
-    `);
-
-    const user = result.recordset[0];
+      WHERE email_verification_token = $1
+    `, [token]);
 
     if (!user) {
-      // Check if user exists but token was already used (already verified)
-      const checkRequest = pool.request();
-      checkRequest.input('token', sql.NVarChar, token);
-      
-      // This won't find anything, but let's check if there's a verified user
-      // We can't really check this without storing used tokens, so just return generic error
       throw new AppError('Invalid or expired verification token', 400, 'INVALID_TOKEN');
     }
 
-    // Check if already verified (token still exists but user is verified)
+    // Check if already verified
     if (user.email_verified) {
       return res.json({
         success: true,
@@ -217,17 +198,14 @@ router.get('/verify-email/:token',
     }
 
     // Update user as verified
-    const updateRequest = pool.request();
-    updateRequest.input('userId', sql.Int, user.id);
-    
-    await updateRequest.query(`
+    await query(`
       UPDATE users
-      SET email_verified = 1,
+      SET email_verified = true,
           email_verification_token = NULL,
           email_verification_code = NULL,
           email_verification_expires = NULL
-      WHERE id = @userId
-    `);
+      WHERE id = $1
+    `, [user.id]);
 
     // Send welcome email
     try {
@@ -260,18 +238,11 @@ router.post('/verify-code',
       throw new AppError('Invalid code format. Code must be 6 digits.', 400, 'INVALID_CODE_FORMAT');
     }
 
-    const pool = await db;
-    const request = pool.request();
-    request.input('email', sql.NVarChar, email);
-    request.input('code', sql.NVarChar, code);
-
-    const result = await request.query(`
+    const user = await getOne(`
       SELECT id, name, email, email_verification_expires, email_verified
       FROM users
-      WHERE email = @email AND email_verification_code = @code
-    `);
-
-    const user = result.recordset[0];
+      WHERE email = $1 AND email_verification_code = $2
+    `, [email, code]);
 
     if (!user) {
       throw new AppError('Invalid verification code', 400, 'INVALID_CODE');
@@ -291,17 +262,14 @@ router.post('/verify-code',
     }
 
     // Update user as verified
-    const updateRequest = pool.request();
-    updateRequest.input('userId', sql.Int, user.id);
-    
-    await updateRequest.query(`
+    await query(`
       UPDATE users
-      SET email_verified = 1,
+      SET email_verified = true,
           email_verification_token = NULL,
           email_verification_code = NULL,
           email_verification_expires = NULL
-      WHERE id = @userId
-    `);
+      WHERE id = $1
+    `, [user.id]);
 
     // Send welcome email
     try {
@@ -329,17 +297,11 @@ router.post('/resend-verification',
       throw new AppError('Email is required', 400, 'EMAIL_REQUIRED');
     }
 
-    const pool = await db;
-    const request = pool.request();
-    request.input('email', sql.NVarChar, email);
-
-    const result = await request.query(`
+    const user = await getOne(`
       SELECT id, name, email, email_verified
       FROM users
-      WHERE email = @email
-    `);
-
-    const user = result.recordset[0];
+      WHERE email = $1
+    `, [email]);
 
     if (!user) {
       // Don't reveal if email exists
@@ -359,19 +321,13 @@ router.post('/resend-verification',
     const verificationCode = generateVerificationCode();
     const verificationExpiry = generateTokenExpiry(emailConfig.templates.emailVerificationExpiry);
 
-    const updateRequest = pool.request();
-    updateRequest.input('userId', sql.Int, user.id);
-    updateRequest.input('token', sql.NVarChar, verificationToken);
-    updateRequest.input('code', sql.NVarChar, verificationCode);
-    updateRequest.input('expiry', sql.DateTime2, verificationExpiry);
-
-    await updateRequest.query(`
+    await query(`
       UPDATE users
-      SET email_verification_token = @token,
-          email_verification_code = @code,
-          email_verification_expires = @expiry
-      WHERE id = @userId
-    `);
+      SET email_verification_token = $1,
+          email_verification_code = $2,
+          email_verification_expires = $3
+      WHERE id = $4
+    `, [verificationToken, verificationCode, verificationExpiry, user.id]);
 
     // Send verification email with both token and code
     await emailService.sendVerificationEmail(user, verificationToken, verificationCode);
@@ -395,17 +351,11 @@ router.post('/forgot-password',
       throw new AppError('Email is required', 400, 'EMAIL_REQUIRED');
     }
 
-    const pool = await db;
-    const request = pool.request();
-    request.input('email', sql.NVarChar, email);
-
-    const result = await request.query(`
+    const user = await getOne(`
       SELECT id, name, email
       FROM users
-      WHERE email = @email
-    `);
-
-    const user = result.recordset[0];
+      WHERE email = $1
+    `, [email]);
 
     if (!user) {
       // Don't reveal if email exists (security best practice)
@@ -420,17 +370,12 @@ router.post('/forgot-password',
     const resetToken = generateToken();
     const resetExpiry = generateTokenExpiry(emailConfig.templates.passwordResetExpiry);
 
-    const updateRequest = pool.request();
-    updateRequest.input('userId', sql.Int, user.id);
-    updateRequest.input('token', sql.NVarChar, resetToken);
-    updateRequest.input('expiry', sql.DateTime2, resetExpiry);
-
-    await updateRequest.query(`
+    await query(`
       UPDATE users
-      SET password_reset_token = @token,
-          password_reset_expires = @expiry
-      WHERE id = @userId
-    `);
+      SET password_reset_token = $1,
+          password_reset_expires = $2
+      WHERE id = $3
+    `, [resetToken, resetExpiry, user.id]);
 
     // Send password reset email
     await emailService.sendPasswordResetEmail(user, resetToken);
@@ -454,26 +399,16 @@ router.post('/reset-password',
       throw new AppError('Token and password are required', 400, 'MISSING_FIELDS');
     }
 
-    // Validate password strength
-    const validators = require('../utils/validators');
-    const { body, validationResult } = require('express-validator');
-    
     // Manual password validation
     if (password.length < 8) {
       throw new AppError('Password must be at least 8 characters long', 400, 'WEAK_PASSWORD');
     }
 
-    const pool = await db;
-    const request = pool.request();
-    request.input('token', sql.NVarChar, token);
-
-    const result = await request.query(`
+    const user = await getOne(`
       SELECT id, name, email, password_reset_expires
       FROM users
-      WHERE password_reset_token = @token
-    `);
-
-    const user = result.recordset[0];
+      WHERE password_reset_token = $1
+    `, [token]);
 
     if (!user) {
       throw new AppError('Invalid reset token', 400, 'INVALID_TOKEN');
@@ -488,17 +423,13 @@ router.post('/reset-password',
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Update password and clear reset token
-    const updateRequest = pool.request();
-    updateRequest.input('userId', sql.Int, user.id);
-    updateRequest.input('password', sql.NVarChar, passwordHash);
-
-    await updateRequest.query(`
+    await query(`
       UPDATE users
-      SET password = @password,
+      SET password = $1,
           password_reset_token = NULL,
           password_reset_expires = NULL
-      WHERE id = @userId
-    `);
+      WHERE id = $2
+    `, [passwordHash, user.id]);
 
     logger.info(`Password reset successful for user: ${user.email}`);
 
