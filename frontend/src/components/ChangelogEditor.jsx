@@ -214,10 +214,12 @@ const ChangelogEditor = () => {
 
   const handleEditVersion = (version) => {
     setEditingVersionId(version.id);
+    // Convert ISO date to yyyy-MM-dd format for date input
+    const dateOnly = version.release_date ? version.release_date.split('T')[0] : new Date().toISOString().split('T')[0];
     setVersionForm({
       version: version.version,
       version_name: version.version_name || '',
-      release_date: version.release_date,
+      release_date: dateOnly,
       published: version.is_published,
       is_major_release: version.is_major_release || false
     });
