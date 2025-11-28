@@ -1,10 +1,28 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode, MdArrowForward } from 'react-icons/md';
 import FeatureSlider from '../components/home/FeatureSlider';
+import axios from 'axios';
 
 const Home = () => {
   const { isDark, toggleTheme } = useTheme();
+  const [version, setVersion] = useState(null);
+
+  useEffect(() => {
+    fetchVersion();
+  }, []);
+
+  const fetchVersion = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await axios.get(`${apiUrl}/api/changelog/current-version`);
+      setVersion(response.data);
+    } catch (error) {
+      console.error('Failed to fetch version:', error);
+      setVersion({ version: '1.0.0' });
+    }
+  };
 
   return (
     <div style={{
@@ -714,16 +732,18 @@ const Home = () => {
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '20px',
-          fontSize: '13px',
-          color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
+          textAlign: 'center'
         }}>
-          <div>© {new Date().getFullYear()} Roastify. All rights reserved.</div>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px',
+            fontSize: '13px',
+            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+            marginBottom: '12px'
+          }}>
             <Link 
               to="/terms" 
               style={{ 
@@ -737,6 +757,7 @@ const Home = () => {
             >
               Terms
             </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
             <Link 
               to="/privacy" 
               style={{ 
@@ -750,6 +771,7 @@ const Home = () => {
             >
               Privacy
             </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
             <Link 
               to="/public-status" 
               style={{ 
@@ -774,6 +796,21 @@ const Home = () => {
               }} />
               Status
             </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <Link 
+              to="/changelog" 
+              style={{ 
+                color: 'inherit', 
+                textDecoration: 'none',
+                opacity: 0.5,
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+            >
+              Changelog
+            </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
             <a 
               href="https://instagram.com/roastify.online" 
               target="_blank" 
@@ -795,6 +832,45 @@ const Home = () => {
               </svg>
             </a>
           </div>
+          
+          <div style={{
+            fontSize: '13px',
+            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+            marginBottom: '12px'
+          }}>
+            © {new Date().getFullYear()} Roastify. All rights reserved.
+          </div>
+          
+          {version && (
+            <div style={{
+              fontSize: '11px',
+              color: isDark ? 'rgba(255, 255, 255, 0.35)' : 'rgba(55, 53, 47, 0.35)',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '10px',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <Link 
+                to="/changelog"
+                style={{ 
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  transition: 'color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.35)' : 'rgba(55, 53, 47, 0.35)';
+                }}
+                title="View changelog"
+              >
+                v{version.version}
+                {version.release_date && ` • ${new Date(version.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+              </Link>
+            </div>
+          )}
         </div>
       </footer>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -7,6 +7,8 @@ import NotificationBell from './NotificationBell';
 import TimerWidget from './TimerWidget';
 import MaintenanceBanner from './MaintenanceBanner';
 import FeedbackWidget from './FeedbackWidget';
+import AppFooter from './AppFooter';
+import axios from 'axios';
 import { 
   MdDashboard, 
   MdPeople, 
@@ -30,6 +32,22 @@ const Layout = () => {
   const { isMaintenanceMode } = useMaintenanceMode();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [version, setVersion] = useState(null);
+
+  useEffect(() => {
+    fetchVersion();
+  }, []);
+
+  const fetchVersion = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await axios.get(`${apiUrl}/api/changelog/current-version`);
+      setVersion(response.data);
+    } catch (error) {
+      console.error('Failed to fetch version:', error);
+      setVersion({ version: '1.0.0' });
+    }
+  };
 
   const navItems = [
     { path: '/app/dashboard', label: 'Dashboard', icon: MdDashboard },
@@ -287,73 +305,151 @@ const Layout = () => {
             )}
           </button>
 
-          {/* Footer Links - Compact */}
+          {/* Footer Links & Version - Compact */}
           {!isCollapsed && (
             <div style={{
               marginTop: '12px',
               paddingTop: '12px',
-              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              gap: '8px',
-              flexWrap: 'wrap',
-              fontSize: '11px'
+              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
             }}>
-              <a
-                href="/public-status"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
-                  textDecoration: 'none',
-                  transition: 'color 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
-                }}
-              >
-                Status
-              </a>
-              <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
-              <Link
-                to="/terms"
-                style={{
-                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
-                  textDecoration: 'none',
-                  transition: 'color 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
-                }}
-              >
-                Terms
-              </Link>
-              <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
-              <Link
-                to="/privacy"
-                style={{
-                  color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
-                  textDecoration: 'none',
-                  transition: 'color 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
-                }}
-              >
-                Privacy
-              </Link>
+              <div style={{
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                gap: '8px',
+                flexWrap: 'wrap',
+                fontSize: '11px',
+                marginBottom: '8px'
+              }}>
+                <a
+                  href="/public-status"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                  }}
+                >
+                  Status
+                </a>
+                <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
+                <Link
+                  to="/terms"
+                  style={{
+                    color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                  }}
+                >
+                  Terms
+                </Link>
+                <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
+                <Link
+                  to="/privacy"
+                  style={{
+                    color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                  }}
+                >
+                  Privacy
+                </Link>
+                <span style={{ color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)' }}>•</span>
+                <Link
+                  to="/changelog"
+                  style={{
+                    color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)';
+                  }}
+                >
+                  Changelog
+                </Link>
+              </div>
+              
+              {version && (
+                <Link 
+                  to="/changelog"
+                  style={{
+                    fontSize: '10px',
+                    color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(55, 53, 47, 0.3)',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    transition: 'color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(55, 53, 47, 0.3)';
+                  }}
+                  title="View changelog"
+                >
+                  <span>v{version.version}</span>
+                  {version.release_date && (
+                    <span style={{ fontSize: '9px' }}>
+                      {new Date(version.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  )}
+                </Link>
+              )}
             </div>
+          )}
+          
+          {/* Collapsed version indicator */}
+          {isCollapsed && version && (
+            <Link
+              to="/changelog"
+              title={`Version ${version.version} - ${version.release_date ? new Date(version.release_date).toLocaleDateString() : ''}`}
+              style={{
+                marginTop: '12px',
+                paddingTop: '12px',
+                borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
+                textAlign: 'center',
+                fontSize: '9px',
+                color: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(55, 53, 47, 0.3)',
+                textDecoration: 'none',
+                display: 'block',
+                transition: 'color 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(55, 53, 47, 0.3)';
+              }}
+            >
+              {version.version}
+            </Link>
           )}
         </div>
       </nav>
