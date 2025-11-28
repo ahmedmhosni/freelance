@@ -289,6 +289,17 @@ router.delete('/admin/items/:id', authenticateToken, requireAdmin, async (req, r
 router.post('/admin/sync-commits', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { execSync } = require('child_process');
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Check if .git directory exists (only works in development)
+    const gitDir = path.join(__dirname, '../../.git');
+    if (!fs.existsSync(gitDir)) {
+      return res.status(400).json({ 
+        error: 'Git repository not available',
+        message: 'Git sync only works in development environment. In production, create versions manually.'
+      });
+    }
     
     // Get last synced commit
     const syncStatus = await pool.query('SELECT last_synced_commit FROM git_sync_status WHERE id = 1');
@@ -302,15 +313,36 @@ router.post('/admin/sync-commits', authenticateToken, requireAdmin, async (req, 
       gitCommand += ' -50'; // Get last 50 commits on first sync
     }
     
-    const commits = execSync(gitCommand, { encoding: 'utf-8' })
-      .trim()
-      .split('\n')
-      .filter(line => line);
+    let commits;
+    try {
+      commits = execSync(gitCommand, { encoding: 'utf-8', cwd: path.join(__dirname, '../..') })
+        .trim()
+        .split('\n')
+        .filter(line => line);
+    } catch (gitError) {
+      return res.status(400).json({ 
+        error: 'Git command failed',
+        message: 'Unable to execute git commands. Make sure git is installed and you are in a git repository.'
+      });
+    }
+    
+    if (commits.length === 0 || (commits.length === 1 && !commits[0])) {
+      return res.json({ 
+        message: 'No new commits to sync',
+        newCommits: 0
+      });
+    }
     
     let newCommitsCount = 0;
     
     for (const line of commits) {
-      const [hash, author, email, date, message] = line.split('|');
+      if (!line) continue;
+      
+      const parts = line.split('|');
+      if (parts.length < 5) continue;
+      
+      const [hash, author, email, date, ...messageParts] = parts;
+      const message = messageParts.join('|'); // In case message contains |
       
       // Skip noise commits
       const lowerMessage = message.toLowerCase();
@@ -332,7 +364,7 @@ router.post('/admin/sync-commits', authenticateToken, requireAdmin, async (req, 
     }
     
     // Update last synced commit
-    if (commits.length > 0) {
+    if (commits.length > 0 && commits[0]) {
       const latestHash = commits[0].split('|')[0];
       await pool.query(`
         UPDATE git_sync_status 
@@ -347,7 +379,10 @@ router.post('/admin/sync-commits', authenticateToken, requireAdmin, async (req, 
     });
   } catch (error) {
     console.error('Error syncing commits:', error);
-    res.status(500).json({ error: 'Failed to sync commits' });
+    res.status(500).json({ 
+      error: 'Failed to sync commits',
+      message: error.message 
+    });
   }
 });
 

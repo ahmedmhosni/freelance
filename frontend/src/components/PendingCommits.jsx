@@ -73,12 +73,13 @@ const PendingCommits = ({ onCreateVersion }) => {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      await api.post('/api/changelog/admin/sync-commits');
+      const response = await api.post('/api/changelog/admin/sync-commits');
       fetchPendingCommits();
-      alert('Commits synced successfully!');
+      alert(response.data.message || 'Commits synced successfully!');
     } catch (error) {
       logger.error('Error syncing commits:', error);
-      alert('Failed to sync commits');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Failed to sync commits';
+      alert(errorMessage);
     } finally {
       setSyncing(false);
     }
