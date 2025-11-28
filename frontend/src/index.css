@@ -1531,3 +1531,352 @@ body.dark-mode button.timer-active {
 body.dark-mode button.timer-active:hover {
   background: #218838 !important;
 }
+
+/* Email Preferences & Privacy Components */
+.preference-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: rgba(55, 53, 47, 0.03);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.preference-item:hover {
+  background: rgba(55, 53, 47, 0.05);
+}
+
+body.dark-mode .preference-item {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .preference-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.preference-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #37352f;
+  margin-bottom: 4px;
+}
+
+body.dark-mode .preference-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.preference-description {
+  font-size: 13px;
+  color: rgba(55, 53, 47, 0.6);
+  line-height: 1.5;
+}
+
+body.dark-mode .preference-description {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(55, 53, 47, 0.2);
+  border-radius: 24px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle-slider.active {
+  background: #37352f;
+}
+
+.toggle-slider.active::before {
+  transform: translateX(24px);
+}
+
+body.dark-mode .toggle-slider {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .toggle-slider.active {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .toggle-slider.active::before {
+  background: #191919;
+}
+
+/* Privacy Sections */
+.privacy-section {
+  padding: 20px;
+  background: rgba(55, 53, 47, 0.03);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.privacy-section.danger {
+  background: rgba(239, 68, 68, 0.03);
+  border: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+body.dark-mode .privacy-section {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .privacy-section.danger {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.privacy-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 8px;
+}
+
+body.dark-mode .privacy-section-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.privacy-section-description {
+  font-size: 13px;
+  color: rgba(55, 53, 47, 0.6);
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+body.dark-mode .privacy-section-description {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Delete Button */
+.btn-delete {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Info Box */
+.info-box {
+  padding: 12px;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  color: rgba(55, 53, 47, 0.7);
+  line-height: 1.5;
+}
+
+body.dark-mode .info-box {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .modal-content {
+  background: #1a1a1a;
+}
+
+/* Legal Pages (Terms & Privacy) */
+.legal-page {
+  min-height: 100vh;
+  background: var(--background-color);
+  padding: 80px 20px 60px;
+}
+
+.legal-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.legal-header {
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 32px;
+  color: rgba(55, 53, 47, 0.6);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: rgba(55, 53, 47, 0.8);
+}
+
+body.dark-mode .back-link {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.dark-mode .back-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.legal-title {
+  font-size: 40px;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+body.dark-mode .legal-title {
+  color: #ffffff;
+}
+
+.legal-date {
+  font-size: 14px;
+  color: rgba(55, 53, 47, 0.5);
+}
+
+body.dark-mode .legal-date {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.legal-content {
+  padding: 48px;
+  line-height: 1.7;
+}
+
+.legal-footer {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(55, 53, 47, 0.5);
+}
+
+.legal-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
+  text-decoration: underline;
+}
+
+body.dark-mode .legal-footer {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Terms Content Styling */
+.terms-content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  color: #37352f;
+}
+
+.terms-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: #37352f;
+}
+
+.terms-content p {
+  margin-bottom: 16px;
+  color: rgba(55, 53, 47, 0.8);
+}
+
+.terms-content ul,
+.terms-content ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.terms-content li {
+  margin-bottom: 8px;
+  color: rgba(55, 53, 47, 0.8);
+}
+
+.terms-content strong {
+  font-weight: 600;
+  color: #37352f;
+}
+
+.terms-content a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+body.dark-mode .terms-content h2,
+body.dark-mode .terms-content h3 {
+  color: #ffffff;
+}
+
+body.dark-mode .terms-content p,
+body.dark-mode .terms-content li {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body.dark-mode .terms-content strong {
+  color: rgba(255, 255, 255, 0.9);
+}

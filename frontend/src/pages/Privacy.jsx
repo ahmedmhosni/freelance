@@ -1,173 +1,85 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdArrowBack, MdLightMode, MdDarkMode } from 'react-icons/md';
 import api from '../utils/api';
 import logger from '../utils/logger';
 
 const Privacy = () => {
-  const { isDark, toggleTheme } = useTheme();
-  const [content, setContent] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const { isDark } = useTheme();
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPrivacyPolicy();
+    fetchPrivacy();
   }, []);
 
-  const fetchPrivacyPolicy = async () => {
+  const fetchPrivacy = async () => {
     try {
       const response = await api.get('/api/legal/privacy');
-      setContent(response.data.content);
+      setContent(response.data);
     } catch (error) {
       logger.error('Error fetching privacy policy:', error);
-      setContent('<p>Privacy policy content is currently unavailable.</p>');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: isDark ? '#0a0a0a' : '#ffffff',
-      color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    }}>
-      {/* Header */}
-      <header style={{
-        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
-        padding: '16px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        background: isDark ? 'rgba(10, 10, 10, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(10px)',
-        zIndex: 100
-      }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <img 
-            src="/Asset 7.svg" 
-            alt="Roastify Logo" 
-            style={{ 
-              height: '32px',
-              filter: isDark ? 'brightness(0) invert(1)' : 'brightness(0) saturate(100%)'
-            }} 
-          />
-        </Link>
-        
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button
-            onClick={toggleTheme}
-            style={{
-              background: 'transparent',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
-              padding: '8px',
-              borderRadius: '3px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '18px'
-            }}
-          >
-            {isDark ? <MdLightMode /> : <MdDarkMode />}
-          </button>
-          
-          <Link
-            to="/"
-            style={{
-              padding: '8px 16px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-              background: 'transparent',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-              borderRadius: '3px',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <MdArrowBack /> Back to Home
-          </Link>
+  if (loading) {
+    return (
+      <div className="legal-page">
+        <div className="legal-container">
+          <p style={{ textAlign: 'center', padding: '48px' }}>Loading...</p>
         </div>
-      </header>
+      </div>
+    );
+  }
 
-      {/* Content */}
-      <main style={{
-        maxWidth: '800px',
-        margin: '0 auto',
-        padding: '60px 24px'
-      }}>
-        <h1 style={{
-          fontSize: '48px',
-          fontWeight: '700',
-          marginBottom: '12px',
-          letterSpacing: '-0.02em'
-        }}>
-          Privacy Policy
-        </h1>
-        
-        <p style={{
-          fontSize: '16px',
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-          marginBottom: '40px'
-        }}>
-          Last updated: November 27, 2025
-        </p>
+  return (
+    <div className="legal-page">
+      <div className="legal-container">
+        {/* Header */}
+        <div className="legal-header">
+          <Link to="/" className="back-link">
+            ← Back to home
+          </Link>
+          
+          <h1 className="legal-title">
+            Privacy Policy
+          </h1>
+          
+          {content?.lastUpdated && (
+            <p className="legal-date">
+              Last updated: {new Date(content.lastUpdated).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+          )}
+        </div>
 
-        {isLoading ? (
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
-          }}>
-            Loading privacy policy...
-          </div>
-        ) : (
+        {/* Content */}
+        <div className="legal-content card">
           <div 
             className="terms-content"
-            dangerouslySetInnerHTML={{ __html: content }}
-            style={{
-              fontSize: '16px',
-              lineHeight: '1.7',
-              color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.9)'
-            }}
+            dangerouslySetInnerHTML={{ __html: content?.content || '' }}
           />
-        )}
-
-        {/* Footer Links */}
-        <div style={{
-          marginTop: '60px',
-          paddingTop: '24px',
-          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
-          display: 'flex',
-          gap: '20px',
-          fontSize: '14px'
-        }}>
-          <Link 
-            to="/terms" 
-            style={{ 
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-              textDecoration: 'none'
-            }}
-          >
-            Terms & Conditions
-          </Link>
-          <Link 
-            to="/public-status" 
-            style={{ 
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-              textDecoration: 'none'
-            }}
-          >
-            System Status
-          </Link>
         </div>
-      </main>
+
+        {/* Footer */}
+        <div className="legal-footer">
+          <p>
+            Questions about privacy?{' '}
+            <a href="mailto:support@roastify.com">
+              Contact us
+            </a>
+          </p>
+          <div style={{ marginTop: '16px', display: 'flex', gap: '20px', justifyContent: 'center' }}>
+            <Link to="/terms">Terms & Conditions</Link>
+            <Link to="/public-status">System Status</Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
