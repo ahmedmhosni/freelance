@@ -415,9 +415,9 @@ const Layout = () => {
                   title="View changelog"
                 >
                   <span>v{version.version}</span>
-                  {version.release_date && (
+                  {version.version_name && (
                     <span style={{ fontSize: '9px' }}>
-                      {new Date(version.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {version.version_name}
                     </span>
                   )}
                 </Link>
@@ -429,7 +429,7 @@ const Layout = () => {
           {isCollapsed && version && (
             <Link
               to="/changelog"
-              title={`Version ${version.version} - ${version.release_date ? new Date(version.release_date).toLocaleDateString() : ''}`}
+              title={`Version ${version.version}${version.version_name ? ` - ${version.version_name}` : ''}`}
               style={{
                 marginTop: '12px',
                 paddingTop: '12px',
