@@ -196,15 +196,18 @@ const Home = () => {
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: '8px',
-          padding: '6px 12px',
+          padding: '6px 14px',
           background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.1)',
           border: '1px solid rgba(99, 102, 241, 0.3)',
           borderRadius: '20px',
           fontSize: '13px',
           fontWeight: '500',
           color: '#6366f1',
-          marginBottom: '32px'
+          marginBottom: '32px',
+          width: 'fit-content',
+          margin: '0 auto 32px'
         }}>
           <span style={{
             width: '6px',
@@ -790,6 +793,17 @@ const Home = () => {
             opacity: 0.7;
             transform: scale(1.1);
           }
+        }
+
+        /* Minimal hover effects for buttons */
+        .hero-btn-primary:hover,
+        .cta-btn-primary:hover {
+          opacity: 0.9;
+        }
+
+        .hero-btn-secondary:hover,
+        .cta-btn-secondary:hover {
+          background: ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.06)'} !important;
         }
       `}</style>
     </div>
