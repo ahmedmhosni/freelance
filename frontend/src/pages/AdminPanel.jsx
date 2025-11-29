@@ -6,6 +6,7 @@ import MaintenanceEditor from '../components/MaintenanceEditor';
 import LegalEditor from '../components/LegalEditor';
 import ChangelogEditor from '../components/ChangelogEditor';
 import VersionNamesManager from '../components/VersionNamesManager';
+import FeedbackManager from '../components/FeedbackManager';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 import logger from '../utils/logger';
 
@@ -178,6 +179,12 @@ const AdminPanel = () => {
         >
           Version Names
         </button>
+        <button
+          onClick={() => setActiveTab('feedback')}
+          className={`view-toggle ${activeTab === 'feedback' ? 'active' : ''}`}
+        >
+          Feedback
+        </button>
         <Link to="/app/admin/gdpr" style={{ textDecoration: 'none' }}>
           <button className="view-toggle" style={{ width: '100%' }}>
             GDPR Management
@@ -230,35 +237,35 @@ const AdminPanel = () => {
             System-wide
           </div>
         </div>
-        
+
         {/* System Status Card */}
         <Link to="/admin/status" style={{ textDecoration: 'none' }}>
-          <div className="card" style={{ 
-            padding: '16px', 
+          <div className="card" style={{
+            padding: '16px',
             cursor: 'pointer',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             height: '100%'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '';
-          }}>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}>
             <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
               SYSTEM STATUS
             </div>
-            <div style={{ 
-              fontSize: '32px', 
+            <div style={{
+              fontSize: '32px',
               marginBottom: '4px',
               color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107'
             }}>
-              {systemStatus?.status === 'operational' ? <MdCheckCircle /> : 
-               systemStatus?.status === 'degraded' ? <MdWarning /> : <MdError />}
+              {systemStatus?.status === 'operational' ? <MdCheckCircle /> :
+                systemStatus?.status === 'degraded' ? <MdWarning /> : <MdError />}
             </div>
-            <div className="stat-description" style={{ 
+            <div className="stat-description" style={{
               fontSize: '13px',
               color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107',
               fontWeight: '500',
@@ -266,8 +273,8 @@ const AdminPanel = () => {
             }}>
               {systemStatus?.status || 'Loading...'}
             </div>
-            <div style={{ 
-              fontSize: '11px', 
+            <div style={{
+              fontSize: '11px',
               marginTop: '8px',
               opacity: 0.7,
               display: 'flex',
@@ -314,8 +321,8 @@ const AdminPanel = () => {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <select 
-                  value={inactiveDays} 
+                <select
+                  value={inactiveDays}
                   onChange={(e) => setInactiveDays(Number(e.target.value))}
                   className="form-input"
                   style={{ width: 'auto' }}
@@ -326,7 +333,7 @@ const AdminPanel = () => {
                   <option value={180}>180 days</option>
                   <option value={365}>1 year</option>
                 </select>
-                <button 
+                <button
                   onClick={() => setShowInactive(!showInactive)}
                   className="btn-primary"
                 >
@@ -341,7 +348,7 @@ const AdminPanel = () => {
                   <p style={{ fontSize: '14px', margin: 0 }}>
                     Found <strong>{inactiveUsers.length}</strong> user(s) inactive for {inactiveDays}+ days
                   </p>
-                  <button 
+                  <button
                     onClick={handleBulkDeleteInactive}
                     className="btn-delete"
                   >
@@ -369,7 +376,7 @@ const AdminPanel = () => {
                           </td>
                           <td style={{ padding: '8px', fontSize: '13px' }}>{user.days_since_login} days</td>
                           <td style={{ padding: '8px' }}>
-                            <button 
+                            <button
                               onClick={() => handleDeleteInactiveUsers([user.id])}
                               className="btn-delete"
                               style={{ padding: '4px 8px', fontSize: '12px' }}
@@ -414,8 +421,8 @@ const AdminPanel = () => {
                       <td style={{ padding: '10px' }}>{user.name}</td>
                       <td style={{ padding: '10px' }}>{user.email}</td>
                       <td style={{ padding: '10px' }}>
-                        <select 
-                          value={user.role} 
+                        <select
+                          value={user.role}
                           onChange={(e) => handleRoleChange(user.id, e.target.value)}
                           style={{ padding: '5px' }}
                         >
@@ -451,14 +458,16 @@ const AdminPanel = () => {
       )}
 
       {activeTab === 'quotes' && <QuotesManager />}
-      
+
       {activeTab === 'maintenance' && <MaintenanceEditor />}
-      
+
       {activeTab === 'legal' && <LegalEditor />}
-      
+
       {activeTab === 'changelog' && <ChangelogEditor />}
-      
+
       {activeTab === 'version-names' && <VersionNamesManager />}
+
+      {activeTab === 'feedback' && <FeedbackManager />}
     </div>
   );
 };
