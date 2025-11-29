@@ -11,7 +11,7 @@ router.get('/users', async (req, res) => {
   try {
     const users = await getAll(
       `SELECT 
-        id, name, email, role, created_at,
+        id, name, email, role, email_verified, created_at,
         last_login_at, last_activity_at, login_count, last_login_ip
       FROM users 
       WHERE deleted_at IS NULL
@@ -28,10 +28,10 @@ router.get('/users/:id', async (req, res) => {
   try {
     // Get user
     const user = await getOne(
-      'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+      'SELECT id, name, email, role, email_verified, created_at FROM users WHERE id = $1',
       [req.params.id]
     );
-    
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Get stats
@@ -42,7 +42,7 @@ router.get('/users/:id', async (req, res) => {
         (SELECT COUNT(*) FROM tasks WHERE user_id = $1) as tasks_count,
         (SELECT COUNT(*) FROM invoices WHERE user_id = $1) as invoices_count
     `, [req.params.id]);
-    
+
     const statsData = statsResult.rows[0];
     const stats = {
       clients: { count: parseInt(statsData.clients_count) },
@@ -68,6 +68,17 @@ router.put('/users/:id/role', async (req, res) => {
   }
 });
 
+// Update user verification status
+router.put('/users/:id/verification', async (req, res) => {
+  const { email_verified } = req.body;
+  try {
+    await query('UPDATE users SET email_verified = $1 WHERE id = $2', [email_verified, req.params.id]);
+    res.json({ message: 'User verification status updated' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Delete user
 router.delete('/users/:id', async (req, res) => {
   try {
@@ -88,7 +99,7 @@ router.get('/reports', async (req, res) => {
         (SELECT COUNT(*) FROM invoices) as invoices_count,
         (SELECT COALESCE(SUM(total), 0) FROM invoices WHERE status = $1) as total_revenue
     `, ['paid']);
-    
+
     const data = result.rows[0];
 
     res.json({
@@ -112,7 +123,7 @@ router.get('/logs', async (req, res) => {
         WHERE table_name = 'activity_logs'
       )
     `);
-    
+
     if (!tableCheck.rows[0].exists) {
       return res.json([]);
     }
@@ -122,7 +133,7 @@ router.get('/logs', async (req, res) => {
       ORDER BY created_at DESC
       LIMIT 100
     `);
-    
+
     res.json(logs);
   } catch (error) {
     res.status(500).json({ error: error.message });

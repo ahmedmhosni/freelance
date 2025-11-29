@@ -77,14 +77,16 @@ const allowedOrigins = process.env.FRONTEND_URL
       'http://localhost:5173',
       process.env.FRONTEND_URL,
       'https://roastify.online',
-      'https://www.roastify.online'
+      'https://www.roastify.online',
+      'https://status.roastify.online'
     ]
   : [
       'http://localhost:3000',
       'http://localhost:5173',
       'https://white-sky-0a7e9f003.3.azurestaticapps.net',
       'https://roastify.online',
-      'https://www.roastify.online'
+      'https://www.roastify.online',
+      'https://status.roastify.online'
     ];
 
 const io = socketIo(server, {

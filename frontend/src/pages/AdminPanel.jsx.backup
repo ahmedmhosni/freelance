@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import QuotesManager from '../components/QuotesManager';
@@ -9,7 +8,6 @@ import ChangelogEditor from '../components/ChangelogEditor';
 import VersionNamesManager from '../components/VersionNamesManager';
 import FeedbackManager from '../components/FeedbackManager';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
-import { FaUsers, FaFolder, FaFileInvoice, FaDollarSign, FaServer } from 'react-icons/fa';
 import logger from '../utils/logger';
 
 const AdminPanel = () => {
@@ -81,10 +79,10 @@ const AdminPanel = () => {
       fetchUsers();
       fetchInactiveUsers();
       fetchActivityStats();
-      toast.success('Inactive users deleted successfully');
+      alert('Inactive users deleted successfully');
     } catch (error) {
       logger.error('Error deleting inactive users:', error);
-      toast.error('Failed to delete inactive users');
+      alert('Failed to delete inactive users');
     }
   };
 
@@ -98,10 +96,10 @@ const AdminPanel = () => {
       fetchUsers();
       fetchInactiveUsers();
       fetchActivityStats();
-      toast.success('Inactive users deleted successfully');
+      alert('Inactive users deleted successfully');
     } catch (error) {
       logger.error('Error deleting inactive users:', error);
-      toast.error('Failed to delete inactive users');
+      alert('Failed to delete inactive users');
     }
   };
 
@@ -118,10 +116,8 @@ const AdminPanel = () => {
     try {
       await api.put(`/api/admin/users/${userId}/role`, { role: newRole });
       fetchUsers();
-      toast.success('User role updated');
     } catch (error) {
       logger.error('Error updating role:', error);
-      toast.error('Failed to update user role');
     }
   };
 
@@ -130,29 +126,9 @@ const AdminPanel = () => {
       try {
         await api.delete(`/api/admin/users/${userId}`);
         fetchUsers();
-        toast.success('User deleted successfully');
       } catch (error) {
         logger.error('Error deleting user:', error);
-        toast.error('Failed to delete user');
       }
-    }
-  };
-
-  const handleVerificationChange = async (userId, newStatus) => {
-    // Optimistic update
-    setUsers(users.map(user =>
-      user.id === userId ? { ...user, email_verified: newStatus } : user
-    ));
-
-    try {
-      await api.put(`/api/admin/users/${userId}/verification`, { email_verified: newStatus });
-      // No need to fetchUsers() because we already updated the state
-      toast.success('Verification status updated');
-    } catch (error) {
-      logger.error('Error updating verification status:', error);
-      // Revert on error
-      fetchUsers();
-      toast.error('Failed to update verification status');
     }
   };
 
@@ -217,53 +193,54 @@ const AdminPanel = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>
-        <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
-          <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
-            <FaUsers />
+        <div className="card">
+          <div className="stat-label">
+            TOTAL USERS
           </div>
-          <div style={{ flex: 1 }}>
-            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL USERS</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.users}</div>
-            <div className="stat-description" style={{ fontSize: '13px' }}>Registered accounts</div>
+          <div className="stat-value">
+            {stats.users}
           </div>
-        </div>
-        <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
-          <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
-            <FaFolder />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL PROJECTS</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.projects}</div>
-            <div className="stat-description" style={{ fontSize: '13px' }}>All projects</div>
+          <div className="stat-description">
+            Registered accounts
           </div>
         </div>
-        <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
-          <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
-            <FaFileInvoice />
+        <div className="card">
+          <div className="stat-label">
+            TOTAL PROJECTS
           </div>
-          <div style={{ flex: 1 }}>
-            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL INVOICES</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.invoices}</div>
-            <div className="stat-description" style={{ fontSize: '13px' }}>All invoices</div>
+          <div className="stat-value">
+            {stats.projects}
+          </div>
+          <div className="stat-description">
+            All projects
           </div>
         </div>
-        <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
-          <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
-            <FaDollarSign />
+        <div className="card">
+          <div className="stat-label">
+            TOTAL INVOICES
           </div>
-          <div style={{ flex: 1 }}>
-            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL REVENUE</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>${stats.revenue}</div>
-            <div className="stat-description" style={{ fontSize: '13px' }}>System-wide</div>
+          <div className="stat-value">
+            {stats.invoices}
+          </div>
+          <div className="stat-description">
+            All invoices
+          </div>
+        </div>
+        <div className="card">
+          <div className="stat-label">
+            TOTAL REVENUE
+          </div>
+          <div className="stat-value">
+            ${stats.revenue}
+          </div>
+          <div className="stat-description">
+            System-wide
           </div>
         </div>
 
         {/* System Status Card */}
         <Link to="/admin/status" style={{ textDecoration: 'none' }}>
           <div className="card" style={{
-            display: 'flex',
-            alignItems: 'start',
-            gap: '12px',
             cursor: 'pointer',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             height: '100%'
@@ -276,37 +253,34 @@ const AdminPanel = () => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '';
             }}>
-            <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
-              <FaServer />
+            <div className="stat-label">
+              SYSTEM STATUS
             </div>
-            <div style={{ flex: 1 }}>
-              <div className="stat-label">SYSTEM STATUS</div>
-              <div style={{
-                fontSize: '32px',
-                marginBottom: '4px',
-                color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107'
-              }}>
-                {systemStatus?.status === 'operational' ? <MdCheckCircle /> :
-                  systemStatus?.status === 'degraded' ? <MdWarning /> : <MdError />}
-              </div>
-              <div className="stat-description" style={{
-                fontSize: '13px',
-                color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107',
-                fontWeight: '500',
-                textTransform: 'capitalize'
-              }}>
-                {systemStatus?.status || 'Loading...'}
-              </div>
-              <div style={{
-                fontSize: '11px',
-                marginTop: '8px',
-                opacity: 0.7,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <MdTrendingUp /> View Details
-              </div>
+            <div style={{
+              fontSize: '32px',
+              marginBottom: '4px',
+              color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107'
+            }}>
+              {systemStatus?.status === 'operational' ? <MdCheckCircle /> :
+                systemStatus?.status === 'degraded' ? <MdWarning /> : <MdError />}
+            </div>
+            <div className="stat-description" style={{
+              fontSize: '13px',
+              color: systemStatus?.status === 'operational' ? '#28a745' : '#ffc107',
+              fontWeight: '500',
+              textTransform: 'capitalize'
+            }}>
+              {systemStatus?.status || 'Loading...'}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              marginTop: '8px',
+              opacity: 0.7,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <MdTrendingUp /> View Details
             </div>
           </div>
         </Link>
@@ -434,7 +408,6 @@ const AdminPanel = () => {
                     <th style={{ textAlign: 'left', padding: '10px' }}>Name</th>
                     <th style={{ textAlign: 'left', padding: '10px' }}>Email</th>
                     <th style={{ textAlign: 'left', padding: '10px' }}>Role</th>
-                    <th style={{ textAlign: 'left', padding: '10px' }}>Verification</th>
                     <th style={{ textAlign: 'left', padding: '10px' }}>Last Login</th>
                     <th style={{ textAlign: 'left', padding: '10px' }}>Login Count</th>
                     <th style={{ textAlign: 'left', padding: '10px' }}>Created</th>
@@ -454,21 +427,6 @@ const AdminPanel = () => {
                         >
                           <option value="freelancer">Freelancer</option>
                           <option value="admin">Admin</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <select
-                          value={user.email_verified ? 'verified' : 'unverified'}
-                          onChange={(e) => handleVerificationChange(user.id, e.target.value === 'verified')}
-                          style={{
-                            padding: '5px',
-                            borderColor: user.email_verified ? '#28a745' : '#ffc107',
-                            color: user.email_verified ? '#28a745' : '#856404',
-                            backgroundColor: user.email_verified ? '#e8f5e9' : '#fff3cd'
-                          }}
-                        >
-                          <option value="verified">Verified</option>
-                          <option value="unverified">Unverified</option>
                         </select>
                       </td>
                       <td style={{ padding: '10px', fontSize: '13px' }}>

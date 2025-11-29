@@ -9,25 +9,25 @@ const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isDark } = useTheme();
-  
+
   const [method, setMethod] = useState('code'); // 'code' or 'link'
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [email, setEmail] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState(null); // 'success', 'error', null
   const [message, setMessage] = useState('');
-  
+
   const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
   // Auto-verify if token in URL, or pre-fill email from URL
   useEffect(() => {
     const token = searchParams.get('token');
     const emailParam = searchParams.get('email');
-    
+
     if (token && !isVerifying && verificationStatus === null) {
       verifyByToken(token);
     }
-    
+
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam));
     }
@@ -80,13 +80,13 @@ const VerifyEmail = () => {
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').trim();
-    
+
     // Check if pasted data is 6 digits
     if (/^\d{6}$/.test(pastedData)) {
       const newCode = pastedData.split('');
       setCode(newCode);
       inputRefs[5].current?.focus();
-      
+
       // Auto-submit if email is filled
       if (email) {
         handleVerifyCode(pastedData);
@@ -153,7 +153,7 @@ const VerifyEmail = () => {
           pointerEvents: 'none',
           opacity: isDark ? 0.6 : 1
         }} />
-        
+
         {/* Floating Orbs */}
         <div style={{
           position: 'absolute',
@@ -169,7 +169,7 @@ const VerifyEmail = () => {
           animation: 'float 20s ease-in-out infinite',
           pointerEvents: 'none'
         }} />
-        
+
         <div style={{
           position: 'absolute',
           bottom: '10%',
@@ -189,25 +189,25 @@ const VerifyEmail = () => {
           <div style={{ fontSize: '64px', color: '#10b981', marginBottom: '20px' }}>
             <MdCheckCircle />
           </div>
-          <h2 style={{ 
-            color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f', 
+          <h2 style={{
+            color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
             marginBottom: '10px',
             fontSize: '24px',
             fontWeight: '600'
           }}>
             Email Verified!
           </h2>
-          <p style={{ 
-            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)', 
+          <p style={{
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
             marginBottom: '20px',
             fontSize: '15px',
             lineHeight: '1.5'
           }}>
             {message}
           </p>
-          <p style={{ 
-            fontSize: '14px', 
-            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)' 
+          <p style={{
+            fontSize: '14px',
+            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
           }}>
             Redirecting to login...
           </p>
@@ -223,6 +223,11 @@ const VerifyEmail = () => {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
             33% { transform: translate(30px, -30px) rotate(120deg); }
             66% { transform: translate(-20px, 20px) rotate(240deg); }
+          }
+
+          @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0; }
           }
         `}</style>
       </div>
@@ -255,7 +260,7 @@ const VerifyEmail = () => {
         pointerEvents: 'none',
         opacity: isDark ? 0.6 : 1
       }} />
-      
+
       {/* Large Floating Orb - Blue/Indigo */}
       <div style={{
         position: 'absolute',
@@ -271,7 +276,7 @@ const VerifyEmail = () => {
         animation: 'float 20s ease-in-out infinite',
         pointerEvents: 'none'
       }} />
-      
+
       {/* Large Floating Orb - Purple/Pink */}
       <div style={{
         position: 'absolute',
@@ -287,7 +292,7 @@ const VerifyEmail = () => {
         animation: 'float 25s ease-in-out infinite reverse',
         pointerEvents: 'none'
       }} />
-      
+
       {/* Accent Orb - Cyan */}
       <div style={{
         position: 'absolute',
@@ -304,37 +309,68 @@ const VerifyEmail = () => {
         pointerEvents: 'none'
       }} />
 
-      <div style={{ 
-        width: '100%', 
+      <div style={{
+        width: '100%',
         maxWidth: '450px',
         position: 'relative',
         zIndex: 1
       }}>
         <div style={{ marginBottom: '48px', textAlign: 'center' }}>
-          <img 
-            src="/Asset 7.svg" 
-            alt="Roastify Logo" 
-            style={{ 
-              height: '40px', 
-              marginBottom: '16px',
-              filter: isDark ? 'brightness(0) invert(1)' : 'brightness(0) saturate(100%)'
-            }} 
-          />
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <img
+              src="/Asset 7.svg"
+              alt="Roastify Logo"
+              style={{
+                height: '40px',
+                marginBottom: '16px',
+                filter: isDark ? 'brightness(0) invert(1)' : 'brightness(0) saturate(100%)',
+                transition: 'all 0.3s ease',
+                transform: isVerifying ? 'scale(1.1)' : 'scale(1)',
+                opacity: isVerifying ? 0.8 : 1
+              }}
+            />
+            {isVerifying && (
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                border: `2px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`,
+                borderTopColor: isDark ? '#fff' : '#000',
+                marginTop: '-8px', // Adjust for margin bottom of image
+                animation: 'spin 1s linear infinite'
+              }} />
+            )}
+          </div>
           <h1 style={{
             fontSize: '16px',
             fontWeight: '600',
             color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
             marginBottom: '8px'
           }}>
-            Verify Your Email
+            {isVerifying ? 'Verifying...' : 'Verify Your Email'}
           </h1>
-          <p style={{ 
-            fontSize: '14px', 
+          <p style={{
+            fontSize: '14px',
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
           }}>
-            Check your email for the verification code
+            {isVerifying
+              ? 'Verifying your link... or you can enter the code manually'
+              : 'Check your email for the verification code'
+            }
           </p>
         </div>
+
+        <style>{`
+          @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+          }
+        `}</style>
+
 
         <div style={{ marginBottom: '20px' }}>
           {/* Email Input */}
@@ -378,9 +414,9 @@ const VerifyEmail = () => {
             }}>
               Verification Code
             </label>
-            <div style={{ 
-              display: 'flex', 
-              gap: '8px', 
+            <div style={{
+              display: 'flex',
+              gap: '8px',
               justifyContent: 'center',
               marginBottom: '8px'
             }}>
@@ -417,8 +453,8 @@ const VerifyEmail = () => {
                 />
               ))}
             </div>
-            <p style={{ 
-              fontSize: '12px', 
+            <p style={{
+              fontSize: '12px',
               color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
               textAlign: 'center'
             }}>

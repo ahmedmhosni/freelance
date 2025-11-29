@@ -1,0 +1,160 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    ROASTIFY STATUS PAGE - QUICK START                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+WHAT YOU HAVE:
+✅ Independent status page (works even when app is down)
+✅ Real-time status display
+✅ 90-day uptime history
+✅ Dark mode support
+✅ Responsive design
+✅ Zero dependencies
+
+STEP 1: UPDATE API URL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Edit: status-page/index.html (line 380)
+
+Find:
+    const API_URL = window.location.origin === 'http://localhost:5173' 
+        ? 'http://localhost:3000' 
+        : 'https://api.roastify.com';
+
+Change to your actual API URL:
+    const API_URL = 'https://your-api-domain.com';
+
+Examples:
+    - Local: http://localhost:3000
+    - Azure: https://your-app.azurewebsites.net
+    - Custom: https://api.roastify.com
+
+STEP 2: TEST LOCALLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Option A: Open in browser
+    - Right-click status-page/index.html
+    - Open with browser
+    - Verify status displays
+
+Option B: Serve locally
+    cd status-page
+    python -m http.server 8000
+    Visit: http://localhost:8000
+
+STEP 3: DEPLOY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RECOMMENDED: Azure Static Web Apps
+
+1. Go to Azure Portal
+2. Search "Static Web Apps" → Create
+3. Connect GitHub repo
+4. Set App location: status-page
+5. Deploy!
+
+Your page will be at: https://<your-app-name>.azurestaticapps.net
+
+ALTERNATIVES:
+- GitHub Pages (see DEPLOY.md)
+- Netlify (see DEPLOY.md)
+- Vercel (see DEPLOY.md)
+- Your own server (just copy index.html)
+
+STEP 4: VERIFY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Visit your deployed status page
+2. Verify status displays correctly
+3. Check browser console (F12) for errors
+4. Verify history shows (wait a few hours for data)
+
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Problem: "Loading status..." forever
+Solution: 
+  1. Check browser console (F12 → Console)
+  2. Verify API URL is correct
+  3. Verify API is accessible
+  4. Add CORS headers if needed (see CONFIG.md)
+
+Problem: History not showing
+Solution:
+  1. Wait for data to accumulate (a few hours)
+  2. Verify /api/status/history endpoint works
+  3. Check database has status_history table
+
+Problem: CORS errors
+Solution:
+  Add to backend/src/server.js:
+  
+  app.use(cors({
+    origin: ['https://status.roastify.com', 'http://localhost:5173'],
+    credentials: true
+  }));
+
+DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+README.md      - Overview
+SETUP.md       - Detailed setup
+DEPLOY.md      - Deployment guide
+CONFIG.md      - Configuration & customization
+SUMMARY.md     - What you got
+
+API ENDPOINTS (Already Implemented)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GET /api/status
+  Returns: Current system status and service health
+
+GET /api/status/history
+  Returns: 90-day uptime history
+
+Both endpoints are in: backend/src/routes/status.js
+
+FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Real-time Status
+   - Overall system status
+   - Individual service status
+   - Response times
+
+📈 90-Day History
+   - Uptime percentages
+   - Visual uptime bars
+   - Color-coded status
+
+🌙 Dark Mode
+   - Toggle button
+   - Persistent preference
+
+📱 Responsive
+   - Works on all devices
+   - Mobile-friendly
+
+⚡ Fast
+   - Single HTML file
+   - No build process
+   - No dependencies
+
+NEXT STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ Update API URL in index.html
+2. ✅ Test locally
+3. ✅ Deploy to Azure/GitHub Pages/Netlify
+4. ✅ Verify it works
+5. ✅ Add link to your website
+6. ✅ Set up monitoring (optional)
+
+SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions? See CONFIG.md troubleshooting section
+Contact: support@roastify.com
+
+═══════════════════════════════════════════════════════════════════════════════
+Ready to deploy? Start with Step 1 above!
+═══════════════════════════════════════════════════════════════════════════════
