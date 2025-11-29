@@ -193,47 +193,47 @@ const AdminPanel = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>
-        <div className="card" style={{ padding: '16px' }}>
-          <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+        <div className="card">
+          <div className="stat-label">
             TOTAL USERS
           </div>
-          <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+          <div className="stat-value">
             {stats.users}
           </div>
-          <div className="stat-description" style={{ fontSize: '13px' }}>
+          <div className="stat-description">
             Registered accounts
           </div>
         </div>
-        <div className="card" style={{ padding: '16px' }}>
-          <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+        <div className="card">
+          <div className="stat-label">
             TOTAL PROJECTS
           </div>
-          <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+          <div className="stat-value">
             {stats.projects}
           </div>
-          <div className="stat-description" style={{ fontSize: '13px' }}>
+          <div className="stat-description">
             All projects
           </div>
         </div>
-        <div className="card" style={{ padding: '16px' }}>
-          <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+        <div className="card">
+          <div className="stat-label">
             TOTAL INVOICES
           </div>
-          <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+          <div className="stat-value">
             {stats.invoices}
           </div>
-          <div className="stat-description" style={{ fontSize: '13px' }}>
+          <div className="stat-description">
             All invoices
           </div>
         </div>
-        <div className="card" style={{ padding: '16px' }}>
-          <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+        <div className="card">
+          <div className="stat-label">
             TOTAL REVENUE
           </div>
-          <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+          <div className="stat-value">
             ${stats.revenue}
           </div>
-          <div className="stat-description" style={{ fontSize: '13px' }}>
+          <div className="stat-description">
             System-wide
           </div>
         </div>
@@ -241,7 +241,6 @@ const AdminPanel = () => {
         {/* System Status Card */}
         <Link to="/admin/status" style={{ textDecoration: 'none' }}>
           <div className="card" style={{
-            padding: '16px',
             cursor: 'pointer',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             height: '100%'
@@ -254,7 +253,7 @@ const AdminPanel = () => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '';
             }}>
-            <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+            <div className="stat-label">
               SYSTEM STATUS
             </div>
             <div style={{
@@ -292,19 +291,19 @@ const AdminPanel = () => {
           {/* Activity Stats */}
           {activityStats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card">
                 <div className="stat-label">ACTIVE (7 DAYS)</div>
                 <div className="stat-value">{activityStats.userStats.active_7_days}</div>
               </div>
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card">
                 <div className="stat-label">ACTIVE (30 DAYS)</div>
                 <div className="stat-value">{activityStats.userStats.active_30_days}</div>
               </div>
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card">
                 <div className="stat-label">NEVER LOGGED IN</div>
                 <div className="stat-value">{activityStats.userStats.never_logged_in}</div>
               </div>
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card">
                 <div className="stat-label">INACTIVE (90+ DAYS)</div>
                 <div className="stat-value">{activityStats.userStats.inactive_90_days}</div>
               </div>
@@ -312,7 +311,7 @@ const AdminPanel = () => {
           )}
 
           {/* Inactive Users Toggle */}
-          <div className="card" style={{ padding: '16px', marginBottom: '24px' }}>
+          <div className="card" style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>Inactive Users Management</h3>

@@ -181,7 +181,7 @@ const FeedbackManager = () => {
                     </div>
 
                     {/* Detail View */}
-                    <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--bg-secondary)' }}>
+                    <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '3px', backgroundColor: 'var(--bg-secondary)' }}>
                         {selectedFeedback ? (
                             <div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
