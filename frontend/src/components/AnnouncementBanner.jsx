@@ -55,15 +55,22 @@ const AnnouncementBanner = () => {
           color: 'inherit',
           fontSize: '14px',
           fontWeight: '500',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.3s ease',
+          boxShadow: '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = 'rgba(99, 102, 241, 0.12)';
-          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(99, 102, 241, 0.25), 0 0 50px rgba(99, 102, 241, 0.12)';
+          e.currentTarget.style.transform = 'translateY(-1px)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'rgba(99, 102, 241, 0.08)';
           e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
         <span style={{
@@ -71,10 +78,24 @@ const AnnouncementBanner = () => {
           height: '8px',
           borderRadius: '50%',
           background: '#6366f1',
-          flexShrink: 0
+          flexShrink: 0,
+          boxShadow: '0 0 8px rgba(99, 102, 241, 0.6), 0 0 12px rgba(99, 102, 241, 0.4)',
+          animation: 'pulse 2s ease-in-out infinite'
         }} />
         <span>{currentAnnouncement.title}</span>
       </Link>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.1);
+          }
+        }
+      `}</style>
     </div>
   );
 };
