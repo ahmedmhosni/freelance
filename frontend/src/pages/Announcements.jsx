@@ -55,52 +55,85 @@ const Announcements = () => {
         overflow: 'hidden',
         background: isDark ? '#0a0a0a' : '#ffffff'
       }}>
-        {/* Background Effects */}
+        {/* Subtle Background */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0,
-          opacity: isDark ? 0.4 : 0.6,
+          height: '400px',
+          opacity: isDark ? 0.15 : 0.25,
           pointerEvents: 'none',
           background: isDark 
-            ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%)'
-            : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)'
+            ? 'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 70%)'
+            : 'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 70%)'
         }} />
 
         <PublicHeader isLoggedIn={isLoggedIn} />
+
+        {/* Hero Header */}
+        <div style={{
+          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
+          padding: '100px 40px 60px',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <div style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 16px',
+              background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.08)',
+              border: isDark ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid rgba(99, 102, 241, 0.15)',
+              borderRadius: '50px',
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#6366f1',
+              marginBottom: '24px'
+            }}>
+              <span style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#6366f1'
+              }} />
+              Latest Updates
+            </div>
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: '700',
+              margin: '0 0 16px 0',
+              color: isDark ? '#ffffff' : '#000000',
+              letterSpacing: '-0.02em'
+            }}>
+              Announcements
+            </h1>
+            <p style={{
+              fontSize: '18px',
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+              margin: 0,
+              maxWidth: '600px',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}>
+              Stay updated with our latest news, features, and important updates
+            </p>
+          </div>
+        </div>
 
         {/* Main Content */}
         <div style={{
           maxWidth: '900px',
           margin: '0 auto',
-          padding: '120px 40px 80px',
+          padding: '60px 40px 80px',
           position: 'relative',
           zIndex: 1
         }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h1 style={{
-              fontSize: '48px',
-              fontWeight: '700',
-              margin: '0 0 16px 0',
-              background: isDark 
-                ? 'linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%)'
-                : 'linear-gradient(135deg, #000000 0%, rgba(0, 0, 0, 0.7) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              📢 Announcements
-            </h1>
-            <p style={{
-              fontSize: '18px',
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
-              margin: 0
-            }}>
-              Stay updated with our latest news and updates
-            </p>
-          </div>
 
           {loading ? (
             <div style={{
