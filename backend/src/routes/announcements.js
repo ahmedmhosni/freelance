@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { BlobServiceClient } = require('@azure/storage-blob');
-const { authenticateToken, isAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { query } = require('../db/postgresql');
 
 // Configure multer for memory storage
@@ -67,7 +67,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create announcement (admin only)
-router.post('/', authenticateToken, isAdmin, upload.single('media'), async (req, res) => {
+router.post('/', authenticateToken, requireAdmin, upload.single('media'), async (req, res) => {
   try {
     const { title, content, isFeatured } = req.body;
     
@@ -118,7 +118,7 @@ router.post('/', authenticateToken, isAdmin, upload.single('media'), async (req,
 });
 
 // Update announcement (admin only)
-router.put('/:id', authenticateToken, isAdmin, upload.single('media'), async (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, upload.single('media'), async (req, res) => {
   try {
     const { title, content, isFeatured } = req.body;
     const announcementId = req.params.id;
@@ -189,7 +189,7 @@ router.put('/:id', authenticateToken, isAdmin, upload.single('media'), async (re
 });
 
 // Delete announcement (admin only)
-router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const announcementId = req.params.id;
 
