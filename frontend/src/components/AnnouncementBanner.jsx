@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import './AnnouncementBanner.css';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -35,27 +34,47 @@ const AnnouncementBanner = () => {
   const currentAnnouncement = announcements[currentIndex];
 
   return (
-    <div className="announcement-banner">
-      <div className="announcement-content">
-        <span className="announcement-badge">📢 Announcement</span>
-        <Link to={`/announcements/${currentAnnouncement.id}`} className="announcement-text">
-          {currentAnnouncement.title}
-        </Link>
-        {announcements.length > 1 && (
-          <div className="announcement-dots">
-            {announcements.map((_, index) => (
-              <span
-                key={index}
-                className={`dot ${index === currentIndex ? 'active' : ''}`}
-                onClick={() => setCurrentIndex(index)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      <button className="announcement-close" onClick={() => setIsVisible(false)}>
-        ×
-      </button>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '12px 20px',
+      marginTop: '64px'
+    }}>
+      <Link 
+        to={`/announcements/${currentAnnouncement.id}`}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 24px',
+          background: 'rgba(99, 102, 241, 0.08)',
+          border: '1px solid rgba(99, 102, 241, 0.2)',
+          borderRadius: '50px',
+          textDecoration: 'none',
+          color: 'inherit',
+          fontSize: '14px',
+          fontWeight: '500',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(99, 102, 241, 0.12)';
+          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'rgba(99, 102, 241, 0.08)';
+          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+        }}
+      >
+        <span style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: '#6366f1',
+          flexShrink: 0
+        }} />
+        <span>{currentAnnouncement.title}</span>
+      </Link>
     </div>
   );
 };
