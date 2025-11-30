@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import DashboardCharts from '../components/DashboardCharts';
+import AnnouncementBanner from '../components/AnnouncementBanner';
 import LogoLoader from '../components/LogoLoader';
 import { MdPeople, MdFolder, MdCheckCircle, MdAttachMoney, MdAccessTime } from 'react-icons/md';
 import logger from '../utils/logger';
@@ -79,6 +80,8 @@ const Dashboard = () => {
 
   return (
     <div className="container">
+      <AnnouncementBanner />
+      
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ marginBottom: '4px' }}>Dashboard</h1>
         <p className="page-subtitle">

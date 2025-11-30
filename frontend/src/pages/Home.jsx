@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { MdLightMode, MdDarkMode, MdArrowForward } from 'react-icons/md';
 import FeatureSlider from '../components/home/FeatureSlider';
+import AnnouncementBanner from '../components/AnnouncementBanner';
 import SEO from '../components/SEO';
 import axios from 'axios';
 
@@ -235,6 +236,9 @@ const Home = () => {
           </div>
         </div>
       </header>
+
+      {/* Announcement Banner */}
+      <AnnouncementBanner />
 
       {/* Hero Section */}
       <div style={{
@@ -840,6 +844,19 @@ const Home = () => {
               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               Changelog
+            </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <Link 
+              to="/announcements" 
+              style={{ 
+                color: isDark ? '#ffffff' : '#000000',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Announcements
             </Link>
             <span style={{ opacity: 0.3 }}>•</span>
             <a 

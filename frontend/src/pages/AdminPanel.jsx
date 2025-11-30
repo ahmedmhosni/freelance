@@ -8,6 +8,7 @@ import LegalEditor from '../components/LegalEditor';
 import ChangelogEditor from '../components/ChangelogEditor';
 import VersionNamesManager from '../components/VersionNamesManager';
 import FeedbackManager from '../components/FeedbackManager';
+import AnnouncementsManager from '../components/AnnouncementsManager';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 import { FaUsers, FaFolder, FaFileInvoice, FaDollarSign, FaServer } from 'react-icons/fa';
 import logger from '../utils/logger';
@@ -208,6 +209,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'feedback' ? 'active' : ''}`}
         >
           Feedback
+        </button>
+        <button
+          onClick={() => setActiveTab('announcements')}
+          className={`view-toggle ${activeTab === 'announcements' ? 'active' : ''}`}
+        >
+          Announcements
         </button>
         <Link to="/app/admin/gdpr" style={{ textDecoration: 'none' }}>
           <button className="view-toggle" style={{ width: '100%' }}>
@@ -509,6 +516,8 @@ const AdminPanel = () => {
       {activeTab === 'version-names' && <VersionNamesManager />}
 
       {activeTab === 'feedback' && <FeedbackManager />}
+
+      {activeTab === 'announcements' && <AnnouncementsManager />}
     </div>
   );
 };

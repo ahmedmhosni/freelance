@@ -1,0 +1,119 @@
+.announcement-banner {
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  animation: slideDown 0.3s ease-out;
+  z-index: 100;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.announcement-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.announcement-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.announcement-text {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  flex: 1;
+}
+
+.announcement-text:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.announcement-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.announcement-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.announcement-dots .dot.active {
+  background: white;
+  width: 20px;
+  border-radius: 3px;
+}
+
+.announcement-dots .dot:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.announcement-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.announcement-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .announcement-banner {
+    padding: 10px 15px;
+  }
+
+  .announcement-content {
+    gap: 8px;
+  }
+
+  .announcement-text {
+    font-size: 13px;
+  }
+
+  .announcement-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
