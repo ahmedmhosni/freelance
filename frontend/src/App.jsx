@@ -34,6 +34,8 @@ import PublicProfile from './pages/PublicProfile';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Changelog from './pages/Changelog';
+import Announcements from './pages/Announcements';
+import AnnouncementDetail from './pages/AnnouncementDetail';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
@@ -100,6 +102,8 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/changelog" element={<Changelog />} />
+              <Route path="/announcements" element={<Announcements />} />
+              <Route path="/announcements/:id" element={<AnnouncementDetail />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/profile/:username" element={<PublicProfile />} />
               
