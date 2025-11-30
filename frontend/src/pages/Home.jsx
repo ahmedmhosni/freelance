@@ -244,11 +244,10 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '160px 40px 100px',
+        padding: '80px 40px 80px',
         textAlign: 'center',
         position: 'relative',
         zIndex: 1,
-        minHeight: '85vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center'
