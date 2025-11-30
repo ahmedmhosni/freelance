@@ -2,17 +2,20 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
-import { MdLightMode, MdDarkMode } from 'react-icons/md';
+import PublicHeader from '../components/PublicHeader';
+import PublicFooter from '../components/PublicFooter';
 import SEO from '../components/SEO';
 
 const Announcements = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [version, setVersion] = useState(null);
 
   useEffect(() => {
     fetchAnnouncements();
+    fetchVersion();
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, []);
@@ -25,6 +28,17 @@ const Announcements = () => {
       console.error('Error fetching announcements:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchVersion = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await axios.get(`${apiUrl}/api/changelog/current-version`);
+      setVersion(response.data);
+    } catch (error) {
+      console.error('Failed to fetch version:', error);
+      setVersion({ version: '1.0.0' });
     }
   };
 
@@ -55,135 +69,7 @@ const Announcements = () => {
             : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)'
         }} />
 
-        {/* Header */}
-        <header style={{
-          padding: '16px 40px',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          background: isDark ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <Link to="/" style={{
-              fontSize: '20px',
-              fontWeight: '700',
-              color: isDark ? '#ffffff' : '#000000',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                Roastify
-              </span>
-            </Link>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button
-                onClick={toggleTheme}
-                style={{
-                  padding: '8px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: isDark ? '#ffffff' : '#000000',
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderRadius: '6px',
-                  transition: 'background 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                {isDark ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
-              </button>
-
-              {isLoggedIn ? (
-                <Link
-                  to="/app/dashboard"
-                  style={{
-                    padding: '8px 16px',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
-                    textDecoration: 'none',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    style={{
-                      padding: '8px 16px',
-                      background: 'transparent',
-                      color: isDark ? '#ffffff' : '#000000',
-                      textDecoration: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      transition: 'background 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
-                    style={{
-                      padding: '8px 16px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      color: 'white',
-                      textDecoration: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      transition: 'transform 0.2s, box-shadow 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
+        <PublicHeader isLoggedIn={isLoggedIn} />
 
         {/* Main Content */}
         <div style={{
@@ -364,88 +250,7 @@ const Announcements = () => {
           )}
         </div>
 
-        {/* Footer */}
-        <footer style={{
-          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
-          padding: '40px',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '16px',
-              fontSize: '13px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-              marginBottom: '12px'
-            }}>
-              <Link 
-                to="/" 
-                style={{ 
-                  color: isDark ? '#ffffff' : '#000000',
-                  textDecoration: 'none',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                Home
-              </Link>
-              <span style={{ opacity: 0.3 }}>•</span>
-              <Link 
-                to="/terms" 
-                style={{ 
-                  color: isDark ? '#ffffff' : '#000000',
-                  textDecoration: 'none',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                Terms
-              </Link>
-              <span style={{ opacity: 0.3 }}>•</span>
-              <Link 
-                to="/privacy" 
-                style={{ 
-                  color: isDark ? '#ffffff' : '#000000',
-                  textDecoration: 'none',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                Privacy
-              </Link>
-              <span style={{ opacity: 0.3 }}>•</span>
-              <Link 
-                to="/changelog" 
-                style={{ 
-                  color: isDark ? '#ffffff' : '#000000',
-                  textDecoration: 'none',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                Changelog
-              </Link>
-            </div>
-            <div style={{
-              fontSize: '13px',
-              color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)'
-            }}>
-              © 2024 Roastify. All rights reserved.
-            </div>
-          </div>
-        </footer>
+        <PublicFooter version={version} />
       </div>
     </>
   );

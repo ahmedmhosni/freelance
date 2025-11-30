@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useTheme } from '../context/ThemeContext';
+import PublicHeader from '../components/PublicHeader';
+import PublicFooter from '../components/PublicFooter';
 import SEO from '../components/SEO';
 
 const AnnouncementDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [announcement, setAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [version, setVersion] = useState(null);
 
   useEffect(() => {
     fetchAnnouncement();
+    fetchVersion();
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
   }, [id]);
 
   const fetchAnnouncement = async () => {
@@ -26,200 +34,221 @@ const AnnouncementDetail = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="announcement-detail-page">
-        <div className="loading">Loading...</div>
-      </div>
-    );
-  }
-
-  if (error || !announcement) {
-    return (
-      <div className="announcement-detail-page">
-        <div className="error-message">
-          <h2>Announcement Not Found</h2>
-          <p>The announcement you're looking for doesn't exist.</p>
-          <Link to="/announcements" className="back-link">← Back to Announcements</Link>
-        </div>
-      </div>
-    );
-  }
+  const fetchVersion = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await axios.get(`${apiUrl}/api/changelog/current-version`);
+      setVersion(response.data);
+    } catch (error) {
+      console.error('Failed to fetch version:', error);
+      setVersion({ version: '1.0.0' });
+    }
+  };
 
   return (
     <>
       <SEO 
-        title={announcement.title}
-        description={announcement.content.substring(0, 160)}
-        image={announcement.media_type === 'image' ? announcement.media_url : undefined}
+        title={announcement ? `${announcement.title} - Roastify` : 'Announcement - Roastify'}
+        description={announcement ? announcement.content.substring(0, 160) : 'View announcement details'}
+        image={announcement?.media_type === 'image' ? announcement.media_url : undefined}
       />
-      <div className="announcement-detail-page">
-        <div className="announcement-detail">
-          <Link to="/announcements" className="back-link">← Back to Announcements</Link>
-          
-          {announcement.is_featured && (
-            <span className="featured-badge">⭐ Featured</span>
-          )}
+      <div style={{
+        minHeight: '100vh',
+        fontFamily: '-apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Roboto\', sans-serif',
+        position: 'relative',
+        overflow: 'hidden',
+        background: isDark ? '#0a0a0a' : '#ffffff'
+      }}>
+        {/* Background Effects */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: isDark ? 0.4 : 0.6,
+          pointerEvents: 'none',
+          background: isDark 
+            ? 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)'
+        }} />
 
-          <h1>{announcement.title}</h1>
+        <PublicHeader isLoggedIn={isLoggedIn} />
 
-          <div className="announcement-meta">
-            <span className="date">
-              {new Date(announcement.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </span>
-          </div>
+        {/* Main Content */}
+        <div style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: '120px 40px 80px',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {loading ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '60px 20px',
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
+            }}>
+              Loading...
+            </div>
+          ) : error || !announcement ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '60px 20px'
+            }}>
+              <h2 style={{
+                fontSize: '32px',
+                fontWeight: '700',
+                margin: '0 0 16px 0',
+                color: isDark ? '#ffffff' : '#000000'
+              }}>
+                Announcement Not Found
+              </h2>
+              <p style={{
+                fontSize: '16px',
+                color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+                marginBottom: '24px'
+              }}>
+                The announcement you're looking for doesn't exist.
+              </p>
+              <Link 
+                to="/announcements"
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 20px',
+                  background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                  color: isDark ? '#191919' : '#ffffff',
+                  textDecoration: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ← Back to Announcements
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <Link 
+                to="/announcements"
+                style={{
+                  display: 'inline-block',
+                  marginBottom: '32px',
+                  color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = isDark ? '#ffffff' : '#000000'}
+                onMouseLeave={(e) => e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)'}
+              >
+                ← Back to Announcements
+              </Link>
 
-          {announcement.media_url && (
-            <div className="announcement-media">
-              {announcement.media_type === 'image' ? (
-                <img src={announcement.media_url} alt={announcement.title} />
-              ) : (
-                <video controls>
-                  <source src={announcement.media_url} type="video/mp4" />
-                  <source src={announcement.media_url} type="video/webm" />
-                  Your browser does not support the video tag.
-                </video>
-              )}
+              <div style={{
+                background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.8)',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
+                borderRadius: '12px',
+                padding: '48px',
+                position: 'relative'
+              }}>
+                {announcement.is_featured && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '32px',
+                    right: '32px',
+                    background: 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)',
+                    color: '#000',
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: '600'
+                  }}>
+                    ⭐ Featured
+                  </span>
+                )}
+
+                <h1 style={{
+                  fontSize: '40px',
+                  fontWeight: '700',
+                  margin: '0 0 16px 0',
+                  color: isDark ? '#ffffff' : '#000000',
+                  lineHeight: '1.2'
+                }}>
+                  {announcement.title}
+                </h1>
+
+                <div style={{
+                  marginBottom: '32px',
+                  paddingBottom: '24px',
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)'
+                }}>
+                  <span style={{
+                    fontSize: '14px',
+                    color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
+                  }}>
+                    {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+
+                {announcement.media_url && (
+                  <div style={{
+                    margin: '32px 0',
+                    borderRadius: '8px',
+                    overflow: 'hidden'
+                  }}>
+                    {announcement.media_type === 'image' ? (
+                      <img 
+                        src={announcement.media_url} 
+                        alt={announcement.title}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block'
+                        }}
+                      />
+                    ) : (
+                      <video 
+                        controls
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block'
+                        }}
+                      >
+                        <source src={announcement.media_url} type="video/mp4" />
+                        <source src={announcement.media_url} type="video/webm" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+                )}
+
+                <div style={{
+                  fontSize: '16px',
+                  lineHeight: '1.8',
+                  color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.9)'
+                }}>
+                  {announcement.content.split('\n').map((paragraph, index) => (
+                    <p key={index} style={{ marginBottom: '16px' }}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="announcement-content">
-            {announcement.content.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
         </div>
 
-        <style jsx>{`
-          .announcement-detail-page {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-          }
-
-          .loading, .error-message {
-            text-align: center;
-            padding: 60px 20px;
-          }
-
-          .error-message h2 {
-            color: #dc3545;
-            margin-bottom: 10px;
-          }
-
-          .error-message p {
-            color: #666;
-            margin-bottom: 20px;
-          }
-
-          .back-link {
-            display: inline-block;
-            color: #007bff;
-            text-decoration: none;
-            margin-bottom: 30px;
-            font-size: 14px;
-            transition: color 0.2s;
-          }
-
-          .back-link:hover {
-            color: #0056b3;
-          }
-
-          .announcement-detail {
-            background: var(--card-bg, #fff);
-            border: 1px solid var(--border-color, #e0e0e0);
-            border-radius: 12px;
-            padding: 40px;
-            position: relative;
-          }
-
-          .featured-badge {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            color: #000;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-          }
-
-          .announcement-detail h1 {
-            font-size: 32px;
-            margin: 0 0 20px 0;
-            color: var(--text-primary, #333);
-            line-height: 1.3;
-          }
-
-          .announcement-meta {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color, #e0e0e0);
-          }
-
-          .date {
-            font-size: 14px;
-            color: #999;
-          }
-
-          .announcement-media {
-            margin: 30px 0;
-            border-radius: 8px;
-            overflow: hidden;
-          }
-
-          .announcement-media img,
-          .announcement-media video {
-            width: 100%;
-            height: auto;
-            display: block;
-          }
-
-          .announcement-media video {
-            max-height: 500px;
-          }
-
-          .announcement-content {
-            font-size: 16px;
-            line-height: 1.8;
-            color: var(--text-primary, #333);
-          }
-
-          .announcement-content p {
-            margin-bottom: 16px;
-          }
-
-          .announcement-content p:last-child {
-            margin-bottom: 0;
-          }
-
-          @media (max-width: 768px) {
-            .announcement-detail-page {
-              padding: 20px 15px;
-            }
-
-            .announcement-detail {
-              padding: 25px 20px;
-            }
-
-            .announcement-detail h1 {
-              font-size: 24px;
-            }
-
-            .featured-badge {
-              position: static;
-              display: inline-block;
-              margin-bottom: 15px;
-            }
-          }
-        `}</style>
+        <PublicFooter version={version} />
       </div>
     </>
   );
