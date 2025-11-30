@@ -204,7 +204,7 @@ const Clients = () => {
                               color: 'var(--primary-color)',
                               textDecoration: 'none'
                             }}
-                            onClick={() => window.location.href = `/clients/${client.id}`}
+                            onClick={() => window.location.href = `/app/clients/${client.id}`}
                             onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
                             onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
                           >
