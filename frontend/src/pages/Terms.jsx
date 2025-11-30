@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import logger from '../utils/logger';
+import LogoLoader from '../components/LogoLoader';
 
 const Terms = () => {
   const { isDark } = useTheme();
@@ -33,9 +34,7 @@ const Terms = () => {
         justifyContent: 'center',
         background: isDark ? '#191919' : '#ffffff'
       }}>
-        <p style={{ color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)' }}>
-          Loading...
-        </p>
+        <LogoLoader size={80} text="" />
       </div>
     );
   }
@@ -48,11 +47,11 @@ const Terms = () => {
           <Link to="/" className="back-link">
             ← Back to home
           </Link>
-          
+
           <h1 className="legal-title">
             Terms and Conditions
           </h1>
-          
+
           {content?.lastUpdated && (
             <p className="legal-date">
               Last updated: {new Date(content.lastUpdated).toLocaleDateString('en-US', {
@@ -66,7 +65,7 @@ const Terms = () => {
 
         {/* Content */}
         <div className="legal-content card">
-          <div 
+          <div
             className="terms-content"
             dangerouslySetInnerHTML={{ __html: content?.content || '' }}
           />
