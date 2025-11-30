@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { MdAdd, MdEdit, MdDelete, MdStar, MdImage, MdVideoLibrary } from 'react-icons/md';
 
 const AnnouncementsManager = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -101,24 +102,39 @@ const AnnouncementsManager = () => {
   };
 
   return (
-    <div className="announcements-manager">
-      <div className="manager-header">
-        <h2>📢 Announcements Management</h2>
+    <div style={{ marginTop: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>Announcements Management</h2>
+          <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'rgba(55, 53, 47, 0.6)' }}>
+            Create and manage announcements for your users
+          </p>
+        </div>
         {!isCreating && (
-          <button className="btn-primary" onClick={() => setIsCreating(true)}>
-            + New Announcement
+          <button 
+            className="btn-primary" 
+            onClick={() => setIsCreating(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <MdAdd size={18} />
+            New Announcement
           </button>
         )}
       </div>
 
       {isCreating && (
-        <div className="announcement-form-card">
-          <h3>{editingId ? 'Edit Announcement' : 'Create New Announcement'}</h3>
+        <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
+          <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: '600' }}>
+            {editingId ? 'Edit Announcement' : 'Create New Announcement'}
+          </h3>
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Title *</label>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>
+                Title *
+              </label>
               <input
                 type="text"
+                className="input"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
@@ -126,41 +142,53 @@ const AnnouncementsManager = () => {
               />
             </div>
 
-            <div className="form-group">
-              <label>Content *</label>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>
+                Content *
+              </label>
               <textarea
+                className="input"
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 required
                 rows="6"
                 placeholder="Enter announcement content"
+                style={{ resize: 'vertical', fontFamily: 'inherit' }}
               />
             </div>
 
-            <div className="form-group">
-              <label>Media (Image or Video)</label>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500' }}>
+                Media (Image or Video)
+              </label>
               <input
                 type="file"
+                className="input"
                 accept="image/*,video/*"
                 onChange={(e) => setFormData({ ...formData, media: e.target.files[0] })}
+                style={{ padding: '8px' }}
               />
-              <small>Max 50MB. Supported: JPG, PNG, GIF, WebP, MP4, WebM</small>
+              <small style={{ display: 'block', marginTop: '4px', fontSize: '12px', color: 'rgba(55, 53, 47, 0.6)' }}>
+                Max 50MB. Supported: JPG, PNG, GIF, WebP, MP4, WebM
+              </small>
             </div>
 
-            <div className="form-group checkbox-group">
-              <label>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '13px' }}>
                 <input
                   type="checkbox"
                   checked={formData.isFeatured}
                   onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                  style={{ marginRight: '8px' }}
                 />
-                <span>Featured (Show on home page and dashboard)</span>
+                <MdStar size={16} style={{ marginRight: '4px', color: '#ffc107' }} />
+                Featured (Show on home page and dashboard)
               </label>
             </div>
 
-            <div className="form-actions">
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button type="submit" className="btn-primary" disabled={loading}>
-                {loading ? 'Saving...' : editingId ? 'Update' : 'Create'}
+                {loading ? 'Saving...' : editingId ? 'Update Announcement' : 'Create Announcement'}
               </button>
               <button type="button" className="btn-secondary" onClick={handleCancel}>
                 Cancel
@@ -170,247 +198,112 @@ const AnnouncementsManager = () => {
         </div>
       )}
 
-      <div className="announcements-list">
-        <h3>All Announcements ({announcements.length})</h3>
+      <div>
+        <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+          All Announcements ({announcements.length})
+        </h3>
         {announcements.length === 0 ? (
-          <p className="no-data">No announcements yet. Create your first one!</p>
+          <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
+            <p style={{ margin: 0, color: 'rgba(55, 53, 47, 0.6)' }}>
+              No announcements yet. Create your first one!
+            </p>
+          </div>
         ) : (
-          <div className="announcements-grid">
+          <div style={{ display: 'grid', gap: '12px' }}>
             {announcements.map((announcement) => (
-              <div key={announcement.id} className="announcement-card">
-                {announcement.is_featured && (
-                  <span className="featured-badge">⭐ Featured</span>
-                )}
-                <h4>{announcement.title}</h4>
-                <p className="announcement-preview">
-                  {announcement.content.substring(0, 150)}
-                  {announcement.content.length > 150 && '...'}
-                </p>
-                {announcement.media_url && (
-                  <div className="media-indicator">
-                    {announcement.media_type === 'image' ? '🖼️ Image' : '🎥 Video'}
+              <div key={announcement.id} className="card" style={{ padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '16px' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '600' }}>
+                        {announcement.title}
+                      </h4>
+                      {announcement.is_featured && (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          background: 'rgba(255, 193, 7, 0.1)',
+                          color: '#ffc107',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}>
+                          <MdStar size={12} />
+                          Featured
+                        </span>
+                      )}
+                      {announcement.media_url && (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          color: 'rgba(55, 53, 47, 0.6)',
+                          fontSize: '11px'
+                        }}>
+                          {announcement.media_type === 'image' ? <MdImage size={14} /> : <MdVideoLibrary size={14} />}
+                          {announcement.media_type === 'image' ? 'Image' : 'Video'}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ 
+                      margin: '0 0 8px 0', 
+                      fontSize: '13px', 
+                      color: 'rgba(55, 53, 47, 0.7)',
+                      lineHeight: '1.5'
+                    }}>
+                      {announcement.content.substring(0, 150)}
+                      {announcement.content.length > 150 && '...'}
+                    </p>
+                    <small style={{ fontSize: '12px', color: 'rgba(55, 53, 47, 0.5)' }}>
+                      {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </small>
                   </div>
-                )}
-                <div className="announcement-meta">
-                  <small>{new Date(announcement.created_at).toLocaleDateString()}</small>
-                </div>
-                <div className="announcement-actions">
-                  <button className="btn-edit" onClick={() => handleEdit(announcement)}>
-                    Edit
-                  </button>
-                  <button className="btn-delete" onClick={() => handleDelete(announcement.id)}>
-                    Delete
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    <button 
+                      className="btn-secondary"
+                      onClick={() => handleEdit(announcement)}
+                      style={{ 
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <MdEdit size={14} />
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(announcement.id)}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        background: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <MdDelete size={14} />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .announcements-manager {
-          padding: 20px;
-        }
-
-        .manager-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-        }
-
-        .manager-header h2 {
-          margin: 0;
-          font-size: 24px;
-        }
-
-        .announcement-form-card {
-          background: var(--card-bg, #fff);
-          border: 1px solid var(--border-color, #e0e0e0);
-          border-radius: 8px;
-          padding: 24px;
-          margin-bottom: 30px;
-        }
-
-        .announcement-form-card h3 {
-          margin-top: 0;
-          margin-bottom: 20px;
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: 500;
-        }
-
-        .form-group input[type="text"],
-        .form-group textarea {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid var(--border-color, #ddd);
-          border-radius: 4px;
-          font-size: 14px;
-        }
-
-        .form-group textarea {
-          resize: vertical;
-          font-family: inherit;
-        }
-
-        .form-group small {
-          display: block;
-          margin-top: 4px;
-          color: #666;
-          font-size: 12px;
-        }
-
-        .checkbox-group label {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-          margin-right: 8px;
-        }
-
-        .form-actions {
-          display: flex;
-          gap: 10px;
-          margin-top: 20px;
-        }
-
-        .btn-primary, .btn-secondary {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
-        }
-
-        .btn-primary {
-          background: #007bff;
-          color: white;
-        }
-
-        .btn-primary:hover {
-          background: #0056b3;
-        }
-
-        .btn-primary:disabled {
-          background: #ccc;
-          cursor: not-allowed;
-        }
-
-        .btn-secondary {
-          background: #6c757d;
-          color: white;
-        }
-
-        .btn-secondary:hover {
-          background: #545b62;
-        }
-
-        .announcements-list h3 {
-          margin-bottom: 20px;
-        }
-
-        .no-data {
-          text-align: center;
-          color: #666;
-          padding: 40px;
-        }
-
-        .announcements-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 20px;
-        }
-
-        .announcement-card {
-          background: var(--card-bg, #fff);
-          border: 1px solid var(--border-color, #e0e0e0);
-          border-radius: 8px;
-          padding: 20px;
-          position: relative;
-        }
-
-        .featured-badge {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: #ffc107;
-          color: #000;
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .announcement-card h4 {
-          margin: 0 0 10px 0;
-          font-size: 18px;
-        }
-
-        .announcement-preview {
-          color: #666;
-          font-size: 14px;
-          line-height: 1.5;
-          margin-bottom: 10px;
-        }
-
-        .media-indicator {
-          font-size: 12px;
-          color: #007bff;
-          margin-bottom: 10px;
-        }
-
-        .announcement-meta {
-          margin-bottom: 15px;
-        }
-
-        .announcement-meta small {
-          color: #999;
-          font-size: 12px;
-        }
-
-        .announcement-actions {
-          display: flex;
-          gap: 10px;
-        }
-
-        .btn-edit, .btn-delete {
-          padding: 6px 12px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 13px;
-        }
-
-        .btn-edit {
-          background: #28a745;
-          color: white;
-        }
-
-        .btn-edit:hover {
-          background: #218838;
-        }
-
-        .btn-delete {
-          background: #dc3545;
-          color: white;
-        }
-
-        .btn-delete:hover {
-          background: #c82333;
-        }
-      `}</style>
     </div>
   );
 };
