@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { MdCheckCircle, MdError, MdMail } from 'react-icons/md';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import LogoLoader from '../components/LogoLoader';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -96,7 +97,7 @@ const VerifyEmail = () => {
 
   const handleVerifyCode = async (codeString = code.join('')) => {
     if (!email) {
-      toast.error('Please enter your email');
+      toast.error('Invalid session. Please use the link from your email or sign up again.');
       return;
     }
 
@@ -324,27 +325,15 @@ const VerifyEmail = () => {
                 height: '40px',
                 marginBottom: '16px',
                 filter: isDark ? 'brightness(0) invert(1)' : 'brightness(0) saturate(100%)',
-                transition: 'all 0.3s ease',
-                transform: isVerifying ? 'scale(1.1)' : 'scale(1)',
-                opacity: isVerifying ? 0.8 : 1
+                transition: 'all 0.3s ease'
               }}
             />
-            {isVerifying && (
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '60px',
-                height: '60px',
-                borderRadius: '50%',
-                border: `2px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`,
-                borderTopColor: isDark ? '#fff' : '#000',
-                marginTop: '-8px', // Adjust for margin bottom of image
-                animation: 'spin 1s linear infinite'
-              }} />
-            )}
           </div>
+          {isVerifying && (
+            <div style={{ marginTop: '16px' }}>
+              <LogoLoader size={32} text="" />
+            </div>
+          )}
           <h1 style={{
             fontSize: '16px',
             fontWeight: '600',
@@ -364,45 +353,8 @@ const VerifyEmail = () => {
           </p>
         </div>
 
-        <style>{`
-          @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-        `}</style>
-
 
         <div style={{ marginBottom: '20px' }}>
-          {/* Email Input */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '500',
-              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
-              marginBottom: '6px'
-            }}>
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="name@work-email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 10px',
-                fontSize: '14px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                borderRadius: '3px',
-                outline: 'none',
-                transition: 'all 0.15s ease',
-                background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-              }}
-            />
-          </div>
-
           {/* Code Input */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{

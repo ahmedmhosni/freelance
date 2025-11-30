@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import logger from '../utils/logger';
+import LogoLoader from '../components/LogoLoader';
 
 const Privacy = () => {
   const { isDark } = useTheme();
@@ -26,10 +27,14 @@ const Privacy = () => {
 
   if (loading) {
     return (
-      <div className="legal-page">
-        <div className="legal-container">
-          <p style={{ textAlign: 'center', padding: '48px' }}>Loading...</p>
-        </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        backgroundColor: isDark ? '#191919' : '#ffffff'
+      }}>
+        <LogoLoader size={80} text="" />
       </div>
     );
   }
@@ -42,11 +47,11 @@ const Privacy = () => {
           <Link to="/" className="back-link">
             ← Back to home
           </Link>
-          
+
           <h1 className="legal-title">
             Privacy Policy
           </h1>
-          
+
           {content?.lastUpdated && (
             <p className="legal-date">
               Last updated: {new Date(content.lastUpdated).toLocaleDateString('en-US', {
@@ -60,7 +65,7 @@ const Privacy = () => {
 
         {/* Content */}
         <div className="legal-content card">
-          <div 
+          <div
             className="terms-content"
             dangerouslySetInnerHTML={{ __html: content?.content || '' }}
           />

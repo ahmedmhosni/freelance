@@ -373,6 +373,11 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
         }
       }
     } else {
+      // Check if we are in production - if so, we MUST use Azure Blob Storage
+      if (isProduction) {
+        throw new AppError('Azure Storage configuration missing in production environment', 500);
+      }
+
       // DEVELOPMENT: Save to local uploads directory
       const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
       

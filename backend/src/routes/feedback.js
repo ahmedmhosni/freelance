@@ -99,6 +99,8 @@ router.post('/', authenticateToken, upload.single('screenshot'), asyncHandler(as
         });
 
         screenshotUrl = blockBlobClient.url;
+      } else if (process.env.NODE_ENV === 'production') {
+        throw new AppError('Azure Storage configuration missing in production environment', 500);
       }
     } catch (error) {
       console.error('Error uploading screenshot:', error);
@@ -126,7 +128,7 @@ router.post('/', authenticateToken, upload.single('screenshot'), asyncHandler(as
   // Send email notification
   try {
     const typeLabel = type === 'bug' ? '🐛 Bug Report' : type === 'feature' ? '✨ Feature Request' : '💬 Feedback';
-    
+
     await emailService.sendEmail(
       process.env.SUPPORT_EMAIL || 'support@roastify.com',
       `${typeLabel}: ${title}`,
@@ -361,7 +363,7 @@ router.delete('/:id', authenticateToken, asyncHandler(async (req, res) => {
         const containerClient = blobServiceClient.getContainerClient(containerName);
         const blobName = feedback.screenshot_url.split('/').pop();
         const blobClient = containerClient.getBlockBlobClient(blobName);
-        
+
         await blobClient.deleteIfExists();
       }
     } catch (error) {
