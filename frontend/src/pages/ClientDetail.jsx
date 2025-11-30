@@ -122,7 +122,7 @@ const ClientDetail = () => {
       <div className="container">
         <div className="card">
           <p>Client not found</p>
-          <button onClick={() => navigate('/clients')} className="btn-primary">
+          <button onClick={() => navigate('/app/clients')} className="btn-primary">
             Back to Clients
           </button>
         </div>
@@ -134,7 +134,7 @@ const ClientDetail = () => {
     <div className="container">
       <div style={{ marginBottom: '24px' }}>
         <button 
-          onClick={() => navigate('/clients')} 
+          onClick={() => navigate('/app/clients')} 
           className="btn-edit"
           style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}
         >
@@ -174,7 +174,7 @@ const ClientDetail = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn-edit" onClick={() => navigate(`/clients/edit/${client.id}`)}>
+              <button className="btn-edit" onClick={() => navigate(`/app/clients/edit/${client.id}`)}>
                 <MdEdit size={16} /> Edit
               </button>
             </div>
@@ -305,7 +305,7 @@ const ClientDetail = () => {
                             color: 'var(--primary-color)',
                             cursor: 'pointer'
                           }}
-                          onClick={() => navigate(`/projects`)}
+                          onClick={() => navigate(`/app/projects`)}
                         >
                           {project.name}
                         </h4>
@@ -323,7 +323,7 @@ const ClientDetail = () => {
                           className="btn-edit"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/projects`);
+                            navigate(`/app/projects`);
                           }}
                           style={{ fontSize: '12px', padding: '6px 12px' }}
                         >
