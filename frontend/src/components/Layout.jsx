@@ -7,6 +7,7 @@ import NotificationBell from './NotificationBell';
 import TimerWidget from './TimerWidget';
 import MaintenanceBanner from './MaintenanceBanner';
 import FeedbackWidget from './FeedbackWidget';
+import MobileBlocker from './MobileBlocker';
 import AppFooter from './AppFooter';
 import axios from 'axios';
 import { 
@@ -64,9 +65,11 @@ const Layout = () => {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Show maintenance banner for admins */}
-      {isMaintenanceMode && user?.role === 'admin' && <MaintenanceBanner />}
+    <>
+      <MobileBlocker />
+      <div style={{ display: 'flex', minHeight: '100vh' }}>
+        {/* Show maintenance banner for admins */}
+        {isMaintenanceMode && user?.role === 'admin' && <MaintenanceBanner />}
       
       <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{
         marginTop: isMaintenanceMode && user?.role === 'admin' ? '48px' : '0'
@@ -472,9 +475,10 @@ const Layout = () => {
         <Outlet />
       </main>
       
-      {/* Feedback Widget - appears on all pages */}
-      <FeedbackWidget />
-    </div>
+        {/* Feedback Widget - appears on all pages */}
+        <FeedbackWidget />
+      </div>
+    </>
   );
 };
 
