@@ -39,28 +39,6 @@ const MobileBlocker = () => {
         maxWidth: '400px',
         textAlign: 'center'
       }}>
-        {/* Icon */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          marginBottom: '32px'
-        }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.08)',
-            border: isDark ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid rgba(99, 102, 241, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#6366f1'
-          }}>
-            <MdDesktopWindows size={40} />
-          </div>
-        </div>
-
         {/* Logo */}
         <img 
           src="/Asset 7.svg" 
