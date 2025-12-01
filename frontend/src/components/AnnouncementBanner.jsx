@@ -23,15 +23,21 @@ const AnnouncementBanner = () => {
   const fetchFeaturedAnnouncements = async () => {
     try {
       const response = await axios.get('/api/announcements/featured');
-      setAnnouncements(response.data);
+      // Ensure we always set an array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setAnnouncements(data);
     } catch (error) {
       console.error('Error fetching featured announcements:', error);
+      setAnnouncements([]); // Set empty array on error
     }
   };
 
-  if (!isVisible || announcements.length === 0) return null;
+  if (!isVisible || !announcements || announcements.length === 0) return null;
 
   const currentAnnouncement = announcements[currentIndex];
+  
+  // Safety check - if no current announcement, don't render
+  if (!currentAnnouncement) return null;
 
   return (
     <div style={{
