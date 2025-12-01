@@ -22,11 +22,11 @@
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
-    "backend/**/*.{js,jsx}": [
+    "backend/**/*.{js,jsx,ts,tsx}": [
       "npm run lint --prefix backend -- --fix",
       "npm run format --prefix backend"
     ],
-    "frontend/**/*.{js,jsx}": [
+    "frontend/**/*.{js,jsx,ts,tsx}": [
       "npm run lint --prefix frontend -- --fix",
       "npm run format --prefix frontend"
     ]

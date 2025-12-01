@@ -2,13 +2,18 @@
   "name": "freelancer-backend",
   "version": "1.0.1",
   "description": "Backend API for freelancer management with PostgreSQL",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "seed": "node src/db/seed.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev:js": "nodemon src/server.js",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start:js": "node src/server.js",
+    "seed": "ts-node src/db/seed.ts",
+    "seed:js": "node src/db/seed.js",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
@@ -40,10 +45,23 @@
     "winston": "^3.18.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/helmet": "^0.0.48",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.1",
+    "@types/pg": "^8.15.6",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-node": "^11.1.0",
     "nodemon": "^3.1.11",
-    "prettier": "^3.7.3"
+    "prettier": "^3.7.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
   }
 }
