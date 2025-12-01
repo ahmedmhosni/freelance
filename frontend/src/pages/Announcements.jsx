@@ -23,9 +23,12 @@ const Announcements = () => {
   const fetchAnnouncements = async () => {
     try {
       const response = await axios.get('/api/announcements');
-      setAnnouncements(response.data);
+      // Ensure we always set an array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setAnnouncements(data);
     } catch (error) {
       console.error('Error fetching announcements:', error);
+      setAnnouncements([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
