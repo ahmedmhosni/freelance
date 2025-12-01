@@ -4,58 +4,58 @@
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-tertiary: rgba(55, 53, 47, 0.03);
-  
+
   --text-primary: #37352f;
   --text-secondary: rgba(55, 53, 47, 0.65);
   --text-tertiary: rgba(55, 53, 47, 0.5);
   --text-quaternary: rgba(55, 53, 47, 0.4);
-  
+
   --border-primary: rgba(55, 53, 47, 0.16);
   --border-secondary: rgba(55, 53, 47, 0.09);
-  
+
   --hover-bg: rgba(55, 53, 47, 0.08);
   --active-bg: rgba(55, 53, 47, 0.08);
-  
+
   --button-bg: transparent;
   --button-text: rgba(55, 53, 47, 0.65);
   --button-border: rgba(55, 53, 47, 0.16);
   --button-hover-bg: rgba(55, 53, 47, 0.04);
-  
+
   --primary-bg: #37352f;
   --primary-text: #ffffff;
-  
+
   --danger-bg: rgba(235, 87, 87, 0.1);
   --danger-text: #eb5757;
   --danger-border: rgba(235, 87, 87, 0.3);
-  
+
   --success-bg: rgba(46, 170, 220, 0.1);
   --success-text: #2eaadc;
   --success-border: rgba(46, 170, 220, 0.3);
-  
+
   --icon-color: rgba(55, 53, 47, 0.4);
   --icon-active: rgba(55, 53, 47, 0.8);
-  
+
   /* Semantic Colors - Accent Colors */
   --accent-blue: #2eaadc;
   --accent-blue-bg: rgba(46, 170, 220, 0.1);
   --accent-blue-border: rgba(46, 170, 220, 0.3);
-  
+
   --accent-red: #eb5757;
   --accent-red-bg: rgba(235, 87, 87, 0.1);
   --accent-red-border: rgba(235, 87, 87, 0.3);
-  
+
   --accent-yellow: #ffd426;
   --accent-yellow-bg: rgba(255, 212, 38, 0.1);
   --accent-yellow-border: rgba(255, 212, 38, 0.3);
-  
+
   --accent-orange: #ffa344;
   --accent-orange-bg: rgba(255, 163, 68, 0.1);
   --accent-orange-border: rgba(255, 163, 68, 0.3);
-  
+
   --accent-green: #28a745;
   --accent-green-bg: rgba(40, 167, 69, 0.1);
   --accent-green-border: rgba(40, 167, 69, 0.3);
-  
+
   /* Chart Colors */
   --chart-color-1: #667eea;
   --chart-color-2: #f093fb;
@@ -68,58 +68,58 @@ body.dark-mode {
   --bg-primary: #191919;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: rgba(255, 255, 255, 0.05);
-  
+
   --text-primary: rgba(255, 255, 255, 0.9);
   --text-secondary: rgba(255, 255, 255, 0.65);
   --text-tertiary: rgba(255, 255, 255, 0.5);
   --text-quaternary: rgba(255, 255, 255, 0.4);
-  
+
   --border-primary: rgba(255, 255, 255, 0.15);
   --border-secondary: rgba(255, 255, 255, 0.1);
-  
+
   --hover-bg: rgba(255, 255, 255, 0.08);
   --active-bg: rgba(255, 255, 255, 0.1);
-  
+
   --button-bg: transparent;
   --button-text: rgba(255, 255, 255, 0.6);
   --button-border: rgba(255, 255, 255, 0.15);
   --button-hover-bg: rgba(255, 255, 255, 0.05);
-  
+
   --primary-bg: rgba(255, 255, 255, 0.9);
   --primary-text: #191919;
-  
+
   --danger-bg: rgba(235, 87, 87, 0.1);
   --danger-text: #eb5757;
   --danger-border: rgba(235, 87, 87, 0.3);
-  
+
   --success-bg: rgba(46, 170, 220, 0.2);
   --success-text: #2eaadc;
   --success-border: rgba(46, 170, 220, 0.3);
-  
+
   --icon-color: rgba(255, 255, 255, 0.3);
   --icon-active: rgba(255, 255, 255, 0.8);
-  
+
   /* Semantic Colors - Same in Dark Mode */
   --accent-blue: #2eaadc;
   --accent-blue-bg: rgba(46, 170, 220, 0.2);
   --accent-blue-border: rgba(46, 170, 220, 0.3);
-  
+
   --accent-red: #eb5757;
   --accent-red-bg: rgba(235, 87, 87, 0.2);
   --accent-red-border: rgba(235, 87, 87, 0.3);
-  
+
   --accent-yellow: #ffd426;
   --accent-yellow-bg: rgba(255, 212, 38, 0.2);
   --accent-yellow-border: rgba(255, 212, 38, 0.3);
-  
+
   --accent-orange: #ffa344;
   --accent-orange-bg: rgba(255, 163, 68, 0.2);
   --accent-orange-border: rgba(255, 163, 68, 0.3);
-  
+
   --accent-green: #28a745;
   --accent-green-bg: rgba(40, 167, 69, 0.2);
   --accent-green-border: rgba(40, 167, 69, 0.3);
-  
+
   /* Chart Colors - Same in Dark Mode */
   --chart-color-1: #667eea;
   --chart-color-2: #f093fb;
@@ -156,19 +156,29 @@ button:hover {
 
 .btn-primary:hover {
   opacity: 0.9;
+  background: var(--primary-bg);
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   background: var(--bg-primary);
   color: var(--text-primary);
   border-color: var(--border-primary);
 }
 
-input:hover, textarea:hover, select:hover {
+input:hover,
+textarea:hover,
+select:hover {
   background: var(--bg-tertiary);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text-primary);
 }
 
