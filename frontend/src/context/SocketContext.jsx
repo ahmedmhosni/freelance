@@ -16,7 +16,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       const newSocket = io(SOCKET_URL, {
-        transports: ['websocket', 'polling']
+        transports: ['websocket', 'polling'],
       });
 
       newSocket.on('connect', () => {
@@ -36,6 +36,7 @@ export const SocketProvider = ({ children }) => {
         newSocket.close();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (

@@ -19,13 +19,13 @@ const DataPrivacy = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('token');
-      
+
       const response = await axios.post(
         `${apiUrl}/api/gdpr/export`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success(response.data.message);
     } catch (error) {
       if (error.response?.status === 429) {
@@ -48,13 +48,13 @@ const DataPrivacy = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('token');
-      
+
       await axios.post(
         `${apiUrl}/api/gdpr/delete-account`,
         { password: deletePassword, reason: deleteReason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success('Account deleted successfully');
       setTimeout(() => {
         logout();
@@ -74,7 +74,9 @@ const DataPrivacy = () => {
   return (
     <>
       <div className="card" style={{ padding: '24px' }}>
-        <h3 style={{ fontSize: '16px', marginBottom: '8px', fontWeight: '600' }}>
+        <h3
+          style={{ fontSize: '16px', marginBottom: '8px', fontWeight: '600' }}
+        >
           Data & Privacy
         </h3>
         <p className="page-subtitle" style={{ marginBottom: '24px' }}>
@@ -83,15 +85,23 @@ const DataPrivacy = () => {
 
         {/* Export Data */}
         <div className="privacy-section">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <MdDownload style={{ fontSize: '24px', color: 'var(--primary-color)', marginTop: '2px', flexShrink: 0 }} />
+          <div
+            style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}
+          >
+            <MdDownload
+              style={{
+                fontSize: '24px',
+                color: 'var(--primary-color)',
+                marginTop: '2px',
+                flexShrink: 0,
+              }}
+            />
             <div style={{ flex: 1 }}>
-              <h4 className="privacy-section-title">
-                Export Your Data
-              </h4>
+              <h4 className="privacy-section-title">Export Your Data</h4>
               <p className="privacy-section-description">
-                Download a copy of all your data including clients, projects, tasks, invoices, and time entries. 
-                You'll receive an email with a download link within 15-30 minutes.
+                Download a copy of all your data including clients, projects,
+                tasks, invoices, and time entries. You'll receive an email with
+                a download link within 15-30 minutes.
               </p>
               <button
                 onClick={handleExportData}
@@ -107,15 +117,27 @@ const DataPrivacy = () => {
 
         {/* Delete Account */}
         <div className="privacy-section danger">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <MdWarning style={{ fontSize: '24px', color: '#ef4444', marginTop: '2px', flexShrink: 0 }} />
+          <div
+            style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}
+          >
+            <MdWarning
+              style={{
+                fontSize: '24px',
+                color: '#ef4444',
+                marginTop: '2px',
+                flexShrink: 0,
+              }}
+            />
             <div style={{ flex: 1 }}>
-              <h4 className="privacy-section-title" style={{ color: '#ef4444' }}>
+              <h4
+                className="privacy-section-title"
+                style={{ color: '#ef4444' }}
+              >
                 Delete Account
               </h4>
               <p className="privacy-section-description">
-                Permanently delete your account and all associated data. This action cannot be undone. 
-                We recommend exporting your data first.
+                Permanently delete your account and all associated data. This
+                action cannot be undone. We recommend exporting your data first.
               </p>
               <button
                 onClick={() => setShowDeleteModal(true)}
@@ -133,7 +155,14 @@ const DataPrivacy = () => {
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginBottom: '16px',
+              }}
+            >
               <MdDelete style={{ fontSize: '32px', color: '#ef4444' }} />
               <h3 style={{ fontSize: '20px', fontWeight: '600' }}>
                 Delete Account
@@ -141,13 +170,12 @@ const DataPrivacy = () => {
             </div>
 
             <p style={{ marginBottom: '24px', lineHeight: '1.6' }}>
-              This will permanently delete your account and all associated data. This action cannot be undone.
+              This will permanently delete your account and all associated data.
+              This action cannot be undone.
             </p>
 
             <div style={{ marginBottom: '16px' }}>
-              <label className="form-label">
-                Confirm your password
-              </label>
+              <label className="form-label">Confirm your password</label>
               <input
                 type="password"
                 value={deletePassword}
@@ -171,7 +199,13 @@ const DataPrivacy = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+              }}
+            >
               <button
                 onClick={() => {
                   setShowDeleteModal(false);

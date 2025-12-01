@@ -11,9 +11,12 @@ const config = {
   database: process.env.PG_DATABASE || 'roastify',
   user: process.env.PG_USER || 'postgres',
   password: process.env.PG_PASSWORD || 'postgres',
-  ssl: process.env.PG_SSL === 'true' ? {
-    rejectUnauthorized: false
-  } : false,
+  ssl:
+    process.env.PG_SSL === 'true'
+      ? {
+          rejectUnauthorized: false,
+        }
+      : false,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
@@ -24,7 +27,7 @@ console.log('🐘 Connecting to PostgreSQL:', {
   port: config.port,
   database: config.database,
   user: config.user,
-  ssl: !!config.ssl
+  ssl: !!config.ssl,
 });
 
 // Create connection pool
@@ -74,5 +77,5 @@ module.exports = {
   query,
   getOne,
   getAll,
-  closePool
+  closePool,
 };

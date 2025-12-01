@@ -14,24 +14,40 @@ const Clients = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
-  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, clientId: null });
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 1 });
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    clientId: null,
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 1,
+  });
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', company: '', notes: '', tags: ''
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    notes: '',
+    tags: '',
   });
 
   useEffect(() => {
     fetchClients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, searchTerm]);
 
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/api/clients?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`);
+      const response = await api.get(
+        `/api/clients?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`
+      );
       const data = response.data.data || response.data;
       setClients(Array.isArray(data) ? data : []);
       if (response.data.pagination) {
-        setPagination(prev => ({ ...prev, ...response.data.pagination }));
+        setPagination((prev) => ({ ...prev, ...response.data.pagination }));
       }
     } catch (error) {
       logger.error('Error fetching clients:', error);
@@ -53,7 +69,14 @@ const Clients = () => {
       }
       setShowForm(false);
       setEditingClient(null);
-      setFormData({ name: '', email: '', phone: '', company: '', notes: '', tags: '' });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        notes: '',
+        tags: '',
+      });
       fetchClients();
     } catch (error) {
       logger.error('Error saving client:', error);
@@ -94,44 +117,48 @@ const Clients = () => {
 
   return (
     <div className="container">
-      <div className="page-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        marginBottom: '24px',
-        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-        gap: window.innerWidth <= 768 ? '16px' : '0'
-      }}>
+      <div
+        className="page-header"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '24px',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          gap: window.innerWidth <= 768 ? '16px' : '0',
+        }}
+      >
         <div>
           <h1 style={{ marginBottom: '4px' }}>Clients</h1>
-          <p className="page-subtitle">
-            Manage your client relationships
-          </p>
+          <p className="page-subtitle">Manage your client relationships</p>
         </div>
-        <div className="page-actions" style={{ 
-          display: 'flex', 
-          gap: '8px',
-          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-          width: window.innerWidth <= 768 ? '100%' : 'auto'
-        }}>
+        <div
+          className="page-actions"
+          style={{
+            display: 'flex',
+            gap: '8px',
+            flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+            width: window.innerWidth <= 768 ? '100%' : 'auto',
+          }}
+        >
           {clients.length > 0 && (
-            <button 
-              className="btn-edit" 
+            <button
+              className="btn-edit"
               onClick={handleExportCSV}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                width: window.innerWidth <= 768 ? '100%' : 'auto'
+                width: window.innerWidth <= 768 ? '100%' : 'auto',
               }}
             >
               <MdFileDownload size={18} />
               Export CSV
             </button>
           )}
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             onClick={() => setShowForm(true)}
             style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
           >
@@ -151,20 +178,85 @@ const Clients = () => {
       </div>
 
       {showForm && (
-        <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
+        <div
+          className="card"
+          style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}
+        >
           <h3>{editingClient ? 'Edit Client' : 'New Client'}</h3>
           <form onSubmit={handleSubmit}>
-            <input placeholder="Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required style={{ marginBottom: '10px' }} />
-            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} style={{ marginBottom: '10px' }} />
-            <input placeholder="Phone" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} style={{ marginBottom: '10px' }} />
-            <input placeholder="Company" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} style={{ marginBottom: '10px' }} />
-            <textarea placeholder="Notes" value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} style={{ marginBottom: '10px', minHeight: '80px' }} />
-            <input placeholder="Tags (comma separated)" value={formData.tags} onChange={(e) => setFormData({...formData, tags: e.target.value})} style={{ marginBottom: '10px' }} />
+            <input
+              placeholder="Name *"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+              style={{ marginBottom: '10px' }}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              style={{ marginBottom: '10px' }}
+            />
+            <input
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              style={{ marginBottom: '10px' }}
+            />
+            <input
+              placeholder="Company"
+              value={formData.company}
+              onChange={(e) =>
+                setFormData({ ...formData, company: e.target.value })
+              }
+              style={{ marginBottom: '10px' }}
+            />
+            <textarea
+              placeholder="Notes"
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
+              style={{ marginBottom: '10px', minHeight: '80px' }}
+            />
+            <input
+              placeholder="Tags (comma separated)"
+              value={formData.tags}
+              onChange={(e) =>
+                setFormData({ ...formData, tags: e.target.value })
+              }
+              style={{ marginBottom: '10px' }}
+            />
             <div>
-              <button type="submit" className="btn-primary" style={{ marginRight: '10px' }}>
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ marginRight: '10px' }}
+              >
                 {editingClient ? 'Update' : 'Create'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingClient(null); setFormData({ name: '', email: '', phone: '', company: '', notes: '', tags: '' }); }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingClient(null);
+                  setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    company: '',
+                    notes: '',
+                    tags: '',
+                  });
+                }}
+              >
                 Cancel
               </button>
             </div>
@@ -179,54 +271,113 @@ const Clients = () => {
           <div className="card">
             {clients.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon"><MdPeople /></div>
-                <p>{searchTerm ? 'No clients found matching your search.' : 'No clients yet. Add your first client to get started!'}</p>
+                <div className="empty-state-icon">
+                  <MdPeople />
+                </div>
+                <p>
+                  {searchTerm
+                    ? 'No clients found matching your search.'
+                    : 'No clients yet. Add your first client to get started!'}
+                </p>
               </div>
             ) : (
               <div className="table-container" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '600px' : 'auto' }}>
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    minWidth: window.innerWidth <= 768 ? '600px' : 'auto',
+                  }}
+                >
                   <thead>
                     <tr style={{ borderBottom: '2px solid #ddd' }}>
-                      <th style={{ textAlign: 'left', padding: '12px' }}>Name</th>
-                      <th style={{ textAlign: 'left', padding: '12px' }}>Email</th>
-                      <th style={{ textAlign: 'left', padding: '12px' }}>Company</th>
-                      <th style={{ textAlign: 'left', padding: '12px' }}>Phone</th>
-                      <th style={{ textAlign: 'right', padding: '12px' }}>Actions</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>
+                        Name
+                      </th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>
+                        Email
+                      </th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>
+                        Company
+                      </th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>
+                        Phone
+                      </th>
+                      <th style={{ textAlign: 'right', padding: '12px' }}>
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {clients.map(client => (
-                      <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
+                    {clients.map((client) => (
+                      <tr
+                        key={client.id}
+                        style={{ borderBottom: '1px solid #eee' }}
+                      >
                         <td style={{ padding: '12px' }}>
-                          <strong 
-                            style={{ 
-                              cursor: 'pointer', 
+                          <strong
+                            style={{
+                              cursor: 'pointer',
                               color: 'var(--primary-color)',
-                              textDecoration: 'none'
+                              textDecoration: 'none',
                             }}
-                            onClick={() => window.location.href = `/app/clients/${client.id}`}
-                            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                            onClick={() =>
+                              (window.location.href = `/app/clients/${client.id}`)
+                            }
+                            onMouseEnter={(e) =>
+                              (e.target.style.textDecoration = 'underline')
+                            }
+                            onMouseLeave={(e) =>
+                              (e.target.style.textDecoration = 'none')
+                            }
                           >
                             {client.name}
                           </strong>
                         </td>
-                        <td style={{ padding: '12px' }}>{client.email || '-'}</td>
-                        <td style={{ padding: '12px' }}>{client.company || '-'}</td>
-                        <td style={{ padding: '12px' }}>{client.phone || '-'}</td>
+                        <td style={{ padding: '12px' }}>
+                          {client.email || '-'}
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          {client.company || '-'}
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          {client.phone || '-'}
+                        </td>
                         <td style={{ padding: '12px', textAlign: 'right' }}>
-                          <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                            <button 
-                              onClick={() => handleEdit(client)} 
+                          <div
+                            className="table-actions"
+                            style={{
+                              display: 'flex',
+                              gap: '8px',
+                              justifyContent: 'flex-end',
+                              flexWrap: 'nowrap',
+                            }}
+                          >
+                            <button
+                              onClick={() => handleEdit(client)}
                               className="btn-edit"
-                              style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                              style={{
+                                fontSize:
+                                  window.innerWidth <= 768 ? '11px' : '13px',
+                                padding:
+                                  window.innerWidth <= 768
+                                    ? '6px 8px'
+                                    : '6px 12px',
+                              }}
                             >
                               Edit
                             </button>
-                            <button 
-                              onClick={() => confirmDelete(client.id)} 
+                            <button
+                              onClick={() => confirmDelete(client.id)}
                               className="btn-delete"
-                              style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                              style={{
+                                fontSize:
+                                  window.innerWidth <= 768 ? '11px' : '13px',
+                                padding:
+                                  window.innerWidth <= 768
+                                    ? '6px 8px'
+                                    : '6px 12px',
+                              }}
                             >
                               Delete
                             </button>
@@ -246,7 +397,9 @@ const Clients = () => {
               totalPages={pagination.pages}
               totalItems={pagination.total}
               itemsPerPage={pagination.limit}
-              onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+              onPageChange={(page) =>
+                setPagination((prev) => ({ ...prev, page }))
+              }
             />
           )}
         </>

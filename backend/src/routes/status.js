@@ -16,15 +16,15 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   const startTime = Date.now();
-  
+
   // Internal detailed status (not exposed to public)
   const internalStatus = {
     uptime: process.uptime(),
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
-    errors: []
+    errors: [],
   };
-  
+
   // Public status (sanitized)
   const status = {
     status: 'operational',
@@ -32,20 +32,20 @@ router.get('/', async (req, res) => {
     services: {
       api: {
         status: 'operational',
-        responseTime: 0
+        responseTime: 0,
       },
       database: {
         status: 'unknown',
-        responseTime: 0
+        responseTime: 0,
       },
       email: {
         status: 'unknown',
-        responseTime: 0
+        responseTime: 0,
       },
       websocket: {
-        status: 'operational'
-      }
-    }
+        status: 'operational',
+      },
+    },
   };
 
   // Check database
@@ -77,15 +77,15 @@ router.get('/', async (req, res) => {
 
   // Overall status
   const allOperational = Object.values(status.services).every(
-    service => service.status === 'operational'
+    (service) => service.status === 'operational'
   );
-  
+
   if (!allOperational) {
     status.status = 'degraded';
   }
 
   // Save status to history (async, don't wait)
-  saveStatusHistory(status.services).catch(err => 
+  saveStatusHistory(status.services).catch((err) =>
     console.error('Failed to save status history:', err)
   );
 
@@ -111,7 +111,7 @@ async function saveStatusHistory(services) {
         WHERE table_name = 'status_history'
       )
     `);
-    
+
     if (!tableCheck.rows[0].exists) {
       return; // Table doesn't exist yet, skip saving
     }
@@ -148,9 +148,12 @@ router.get('/history', async (req, res) => {
         WHERE table_name = 'status_history'
       )
     `);
-    
+
     if (!tableCheck.rows[0].exists) {
-      return res.json({ history: {}, message: 'History tracking not yet enabled' });
+      return res.json({
+        history: {},
+        message: 'History tracking not yet enabled',
+      });
     }
 
     // Get history for last 90 days, grouped by day
@@ -170,15 +173,17 @@ router.get('/history', async (req, res) => {
 
     // Format data by service
     const formattedHistory = {};
-    history.rows.forEach(row => {
+    history.rows.forEach((row) => {
       if (!formattedHistory[row.service_name]) {
         formattedHistory[row.service_name] = [];
       }
       formattedHistory[row.service_name].push({
         hour: row.day, // Keep 'hour' key for frontend compatibility
         uptime: ((row.successful_checks / row.total_checks) * 100).toFixed(2),
-        avgResponseTime: row.avg_response_time ? Math.round(row.avg_response_time) : null,
-        checks: row.total_checks
+        avgResponseTime: row.avg_response_time
+          ? Math.round(row.avg_response_time)
+          : null,
+        checks: row.total_checks,
       });
     });
 
@@ -206,11 +211,11 @@ router.get('/history', async (req, res) => {
 router.get('/detailed', async (req, res) => {
   // Check for admin authentication (optional - can be made required)
   const isAdmin = req.headers.authorization && req.user?.role === 'admin';
-  
+
   if (!isAdmin) {
-    return res.status(401).json({ 
+    return res.status(401).json({
       error: 'Unauthorized',
-      message: 'Admin access required for detailed metrics' 
+      message: 'Admin access required for detailed metrics',
     });
   }
   const status = {
@@ -220,16 +225,16 @@ router.get('/detailed', async (req, res) => {
       memory: {
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
         used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        external: Math.round(process.memoryUsage().external / 1024 / 1024)
+        external: Math.round(process.memoryUsage().external / 1024 / 1024),
       },
       cpu: process.cpuUsage(),
       platform: process.platform,
-      nodeVersion: process.version
+      nodeVersion: process.version,
     },
     database: {
       status: 'checking...',
-      tables: []
-    }
+      tables: [],
+    },
   };
 
   // Check database tables (PostgreSQL)
@@ -242,7 +247,7 @@ router.get('/detailed', async (req, res) => {
       FROM pg_stat_user_tables
       ORDER BY tablename
     `);
-    
+
     status.database.status = 'operational';
     status.database.tables = result.rows;
   } catch (error) {

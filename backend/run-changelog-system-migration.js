@@ -11,25 +11,28 @@ async function runMigration() {
     database: process.env.PG_DATABASE || 'roastify_local',
     user: process.env.PG_USER || 'postgres',
     password: process.env.PG_PASSWORD || 'postgres',
-    ssl: false
+    ssl: false,
   });
 
   try {
     console.log('🚀 Running Changelog System Migration');
     console.log('📍 Database:', process.env.PG_DATABASE || 'roastify_local\n');
-    
+
     // Drop old tables if exist
     await pool.query('DROP TABLE IF EXISTS changelog CASCADE');
     await pool.query('DROP TABLE IF EXISTS changelog_entries CASCADE');
     console.log('✅ Cleaned up old tables');
-    
+
     const sql = fs.readFileSync(
-      path.join(__dirname, '../database/migrations/CREATE_CHANGELOG_SYSTEM.sql'),
+      path.join(
+        __dirname,
+        '../database/migrations/CREATE_CHANGELOG_SYSTEM.sql'
+      ),
       'utf8'
     );
-    
+
     await pool.query(sql);
-    
+
     console.log('\n✅ SUCCESS! Changelog system created!');
     console.log('📊 Tables:');
     console.log('   1. versions - Store version releases (1.0.0, 1.1.0, etc.)');
@@ -42,7 +45,7 @@ async function runMigration() {
     console.log('     • Improvement: Faster loading');
     console.log('   - Publish when ready!');
     console.log('\n🎉 Ready to use!');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {

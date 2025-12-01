@@ -14,13 +14,13 @@ router.get('/terms', async (req, res) => {
     if (result.rows.length === 0) {
       return res.json({
         content: getDefaultTerms(),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       });
     }
 
     res.json({
       content: result.rows[0].content,
-      lastUpdated: result.rows[0].updated_at
+      lastUpdated: result.rows[0].updated_at,
     });
   } catch (error) {
     console.error('Error fetching terms:', error);
@@ -39,13 +39,13 @@ router.get('/privacy', async (req, res) => {
     if (result.rows.length === 0) {
       return res.json({
         content: getDefaultPrivacy(),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       });
     }
 
     res.json({
       content: result.rows[0].content,
-      lastUpdated: result.rows[0].updated_at
+      lastUpdated: result.rows[0].updated_at,
     });
   } catch (error) {
     console.error('Error fetching privacy policy:', error);
@@ -79,7 +79,7 @@ router.put('/:type', authenticateToken, requireAdmin, async (req, res) => {
 
     res.json({
       message: 'Legal content updated successfully',
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (error) {
     console.error('Error updating legal content:', error);
@@ -88,25 +88,30 @@ router.put('/:type', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // Admin: Get all versions
-router.get('/:type/versions', authenticateToken, requireAdmin, async (req, res) => {
-  const { type } = req.params;
+router.get(
+  '/:type/versions',
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    const { type } = req.params;
 
-  try {
-    const result = await pool.query(
-      `SELECT lc.*, u.username as updated_by_name
+    try {
+      const result = await pool.query(
+        `SELECT lc.*, u.username as updated_by_name
        FROM legal_content lc
        LEFT JOIN users u ON lc.updated_by = u.id
        WHERE lc.type = $1
        ORDER BY lc.updated_at DESC`,
-      [type]
-    );
+        [type]
+      );
 
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching versions:', error);
-    res.status(500).json({ error: 'Failed to fetch versions' });
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error fetching versions:', error);
+      res.status(500).json({ error: 'Failed to fetch versions' });
+    }
   }
-});
+);
 
 // Default terms content
 function getDefaultTerms() {

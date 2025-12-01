@@ -6,7 +6,7 @@ const EmailPreferences = () => {
   const [preferences, setPreferences] = useState({
     marketing: true,
     notifications: true,
-    updates: true
+    updates: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -19,11 +19,11 @@ const EmailPreferences = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('token');
-      
+
       const response = await axios.get(`${apiUrl}/api/preferences/email`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       setPreferences(response.data.preferences);
     } catch (error) {
       console.error('Failed to fetch preferences:', error);
@@ -36,20 +36,18 @@ const EmailPreferences = () => {
   const handleToggle = async (key) => {
     const newPreferences = {
       ...preferences,
-      [key]: !preferences[key]
+      [key]: !preferences[key],
     };
 
     setSaving(true);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('token');
-      
-      await axios.put(
-        `${apiUrl}/api/preferences/email`,
-        newPreferences,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
+
+      await axios.put(`${apiUrl}/api/preferences/email`, newPreferences, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setPreferences(newPreferences);
       toast.success('Preferences updated');
     } catch (error) {
@@ -69,7 +67,10 @@ const EmailPreferences = () => {
   }
 
   const Toggle = ({ checked, onChange, disabled }) => (
-    <label className="toggle-switch" style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
+    <label
+      className="toggle-switch"
+      style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+    >
       <input
         type="checkbox"
         checked={checked}
@@ -94,9 +95,7 @@ const EmailPreferences = () => {
         {/* Marketing Emails */}
         <div className="preference-item">
           <div style={{ flex: 1 }}>
-            <div className="preference-title">
-              Marketing Emails
-            </div>
+            <div className="preference-title">Marketing Emails</div>
             <div className="preference-description">
               Product updates, tips, and special offers
             </div>
@@ -111,9 +110,7 @@ const EmailPreferences = () => {
         {/* Notification Emails */}
         <div className="preference-item">
           <div style={{ flex: 1 }}>
-            <div className="preference-title">
-              Notification Emails
-            </div>
+            <div className="preference-title">Notification Emails</div>
             <div className="preference-description">
               Task reminders, invoice updates, and activity alerts
             </div>
@@ -128,9 +125,7 @@ const EmailPreferences = () => {
         {/* Update Emails */}
         <div className="preference-item">
           <div style={{ flex: 1 }}>
-            <div className="preference-title">
-              Platform Updates
-            </div>
+            <div className="preference-title">Platform Updates</div>
             <div className="preference-description">
               New features, improvements, and important announcements
             </div>
@@ -144,7 +139,8 @@ const EmailPreferences = () => {
       </div>
 
       <div className="info-box" style={{ marginTop: '20px' }}>
-        💡 You can unsubscribe from any email type at any time. Important security and account-related emails will still be sent.
+        💡 You can unsubscribe from any email type at any time. Important
+        security and account-related emails will still be sent.
       </div>
     </div>
   );

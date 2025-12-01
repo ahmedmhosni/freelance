@@ -9,7 +9,7 @@ export const logger = {
       console.log(...args);
     }
   },
-  
+
   error: (...args) => {
     if (isDevelopment) {
       console.error(...args);
@@ -17,24 +17,24 @@ export const logger = {
     // In production, you might want to send errors to a monitoring service
     // Example: sendToSentry(args);
   },
-  
+
   warn: (...args) => {
     if (isDevelopment) {
       console.warn(...args);
     }
   },
-  
+
   debug: (...args) => {
     if (isDevelopment) {
       console.debug(...args);
     }
   },
-  
+
   info: (...args) => {
     if (isDevelopment) {
       console.info(...args);
     }
-  }
+  },
 };
 
 export default logger;

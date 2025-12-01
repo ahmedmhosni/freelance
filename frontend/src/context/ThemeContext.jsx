@@ -11,6 +11,31 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
   const [loading, setLoading] = useState(true);
 
+  const syncThemeWithServer = async () => {
+    try {
+      const response = await api.get('/api/user/preferences');
+      if (response.data.theme && response.data.theme !== theme) {
+        setTheme(response.data.theme);
+        document.documentElement.setAttribute(
+          'data-theme',
+          response.data.theme
+        );
+        localStorage.setItem('theme', response.data.theme);
+        // Apply dark-mode class to body for CSS
+        if (response.data.theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+        // Update favicon
+        updateFavicon(response.data.theme === 'dark');
+      }
+    } catch (error) {
+      // Silently fail - user might not be logged in or endpoint doesn't exist yet
+      logger.debug('Could not sync theme with server');
+    }
+  };
+
   useEffect(() => {
     // Load theme from localStorage first (instant)
     const savedTheme = localStorage.getItem('theme');
@@ -33,43 +58,22 @@ export const ThemeProvider = ({ children }) => {
     if (token) {
       syncThemeWithServer();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const syncThemeWithServer = async () => {
-    try {
-      const response = await api.get('/api/user/preferences');
-      if (response.data.theme && response.data.theme !== theme) {
-        setTheme(response.data.theme);
-        document.documentElement.setAttribute('data-theme', response.data.theme);
-        localStorage.setItem('theme', response.data.theme);
-        // Apply dark-mode class to body for CSS
-        if (response.data.theme === 'dark') {
-          document.body.classList.add('dark-mode');
-        } else {
-          document.body.classList.remove('dark-mode');
-        }
-        // Update favicon
-        updateFavicon(response.data.theme === 'dark');
-      }
-    } catch (error) {
-      // Silently fail - user might not be logged in or endpoint doesn't exist yet
-      logger.debug('Could not sync theme with server');
-    }
-  };
 
   const toggleTheme = async () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
-    
+
     // Apply dark-mode class to body for CSS
     if (newTheme === 'dark') {
       document.body.classList.add('dark-mode');
     } else {
       document.body.classList.remove('dark-mode');
     }
-    
+
     // Update favicon
     updateFavicon(newTheme === 'dark');
 

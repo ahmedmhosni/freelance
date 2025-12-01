@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { MdClose, MdBugReport, MdLightbulb, MdFeedback, MdCamera } from 'react-icons/md';
+import {
+  MdClose,
+  MdBugReport,
+  MdLightbulb,
+  MdFeedback,
+  MdCamera,
+} from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
@@ -75,17 +81,6 @@ const FeedbackWidget = () => {
     }
   };
 
-  const getTypeIcon = (feedbackType) => {
-    switch (feedbackType) {
-      case 'bug':
-        return <MdBugReport size={20} />;
-      case 'feature':
-        return <MdLightbulb size={20} />;
-      default:
-        return <MdFeedback size={20} />;
-    }
-  };
-
   return (
     <>
       {/* Floating Button */}
@@ -109,7 +104,7 @@ const FeedbackWidget = () => {
             alignItems: 'center',
             gap: '8px',
             zIndex: 999,
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';
@@ -127,42 +122,52 @@ const FeedbackWidget = () => {
 
       {/* Modal */}
       {isOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div style={{
-            background: isDark ? '#1a1a1a' : '#ffffff',
-            borderRadius: '8px',
-            maxWidth: '500px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflow: 'auto',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
-          }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+        >
+          <div
+            style={{
+              background: isDark ? '#1a1a1a' : '#ffffff',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            }}
+          >
             {/* Header */}
-            <div style={{
-              padding: '20px',
-              borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <h2 style={{
-                margin: 0,
-                fontSize: '18px',
-                fontWeight: '600',
-                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-              }}>
+            <div
+              style={{
+                padding: '20px',
+                borderBottom: isDark
+                  ? '1px solid rgba(255, 255, 255, 0.1)'
+                  : '1px solid rgba(55, 53, 47, 0.09)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                }}
+              >
                 Send Feedback
               </h2>
               <button
@@ -172,7 +177,9 @@ const FeedbackWidget = () => {
                   border: 'none',
                   cursor: 'pointer',
                   padding: '4px',
-                  color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.6)'
+                    : 'rgba(55, 53, 47, 0.6)',
                 }}
               >
                 <MdClose size={24} />
@@ -183,20 +190,30 @@ const FeedbackWidget = () => {
             <form onSubmit={handleSubmit} style={{ padding: '20px' }}>
               {/* Type Selection */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  marginBottom: '8px',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    marginBottom: '8px',
+                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                  }}
+                >
                   Type
                 </label>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {[
-                    { value: 'bug', label: 'Bug Report', icon: <MdBugReport /> },
-                    { value: 'feature', label: 'Feature Request', icon: <MdLightbulb /> },
-                    { value: 'other', label: 'Other', icon: <MdFeedback /> }
+                    {
+                      value: 'bug',
+                      label: 'Bug Report',
+                      icon: <MdBugReport />,
+                    },
+                    {
+                      value: 'feature',
+                      label: 'Feature Request',
+                      icon: <MdLightbulb />,
+                    },
+                    { value: 'other', label: 'Other', icon: <MdFeedback /> },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -205,12 +222,20 @@ const FeedbackWidget = () => {
                       style={{
                         flex: 1,
                         padding: '10px',
-                        background: type === option.value
-                          ? (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)')
-                          : 'transparent',
-                        border: type === option.value
-                          ? (isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(55, 53, 47, 0.2)')
-                          : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.1)'),
+                        background:
+                          type === option.value
+                            ? isDark
+                              ? 'rgba(255, 255, 255, 0.1)'
+                              : 'rgba(55, 53, 47, 0.08)'
+                            : 'transparent',
+                        border:
+                          type === option.value
+                            ? isDark
+                              ? '1px solid rgba(255, 255, 255, 0.2)'
+                              : '1px solid rgba(55, 53, 47, 0.2)'
+                            : isDark
+                              ? '1px solid rgba(255, 255, 255, 0.1)'
+                              : '1px solid rgba(55, 53, 47, 0.1)',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '13px',
@@ -219,7 +244,7 @@ const FeedbackWidget = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '6px',
-                        transition: 'all 0.15s ease'
+                        transition: 'all 0.15s ease',
                       }}
                     >
                       {option.icon}
@@ -231,13 +256,15 @@ const FeedbackWidget = () => {
 
               {/* Title */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  marginBottom: '8px',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    marginBottom: '8px',
+                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                  }}
+                >
                   Title
                 </label>
                 <input
@@ -249,25 +276,31 @@ const FeedbackWidget = () => {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.16)',
+                    background: isDark
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.1)'
+                      : '1px solid rgba(55, 53, 47, 0.16)',
                     borderRadius: '4px',
                     fontSize: '14px',
                     color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-                    outline: 'none'
+                    outline: 'none',
                   }}
                 />
               </div>
 
               {/* Description */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  marginBottom: '8px',
-                  color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    marginBottom: '8px',
+                    color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                  }}
+                >
                   Description
                 </label>
                 <textarea
@@ -279,14 +312,18 @@ const FeedbackWidget = () => {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.16)',
+                    background: isDark
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.1)'
+                      : '1px solid rgba(55, 53, 47, 0.16)',
                     borderRadius: '4px',
                     fontSize: '14px',
                     color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
                     outline: 'none',
                     resize: 'vertical',
-                    fontFamily: 'inherit'
+                    fontFamily: 'inherit',
                   }}
                 />
               </div>
@@ -299,36 +336,52 @@ const FeedbackWidget = () => {
                   style={{
                     padding: '10px 16px',
                     background: 'transparent',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(55, 53, 47, 0.2)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.2)'
+                      : '1px solid rgba(55, 53, 47, 0.2)',
                     borderRadius: '4px',
                     cursor: 'pointer',
                     fontSize: '13px',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.7)'
+                      : 'rgba(55, 53, 47, 0.7)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    transition: 'all 0.15s ease'
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   <MdCamera size={18} />
-                  {screenshot ? 'Screenshot added ✓' : 'Add screenshot (optional)'}
+                  {screenshot
+                    ? 'Screenshot added ✓'
+                    : 'Add screenshot (optional)'}
                 </button>
               </div>
 
               {/* Buttons */}
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'flex-end',
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
                   style={{
                     padding: '10px 20px',
                     background: 'transparent',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(55, 53, 47, 0.2)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.2)'
+                      : '1px solid rgba(55, 53, 47, 0.2)',
                     borderRadius: '3px',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)'
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.7)'
+                      : 'rgba(55, 53, 47, 0.7)',
                   }}
                 >
                   Cancel
@@ -345,7 +398,7 @@ const FeedbackWidget = () => {
                     cursor: isSubmitting ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
                     fontWeight: '600',
-                    opacity: isSubmitting ? 0.6 : 1
+                    opacity: isSubmitting ? 0.6 : 1,
                   }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

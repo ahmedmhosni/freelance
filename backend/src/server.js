@@ -1,9 +1,13 @@
 require('dotenv').config();
 
 // Application Insights - Must be first!
-if (process.env.NODE_ENV === 'production' && process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
+if (
+  process.env.NODE_ENV === 'production' &&
+  process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
+) {
   const appInsights = require('applicationinsights');
-  appInsights.setup(process.env.APPLICATIONINSIGHTS_CONNECTION_STRING)
+  appInsights
+    .setup(process.env.APPLICATIONINSIGHTS_CONNECTION_STRING)
     .setAutoDependencyCorrelation(true)
     .setAutoCollectRequests(true)
     .setAutoCollectPerformance(true, true)
@@ -72,14 +76,14 @@ const server = http.createServer(app);
 app.set('trust proxy', true);
 
 // Allowed origins for CORS - use environment variable or defaults
-const allowedOrigins = process.env.FRONTEND_URL 
+const allowedOrigins = process.env.FRONTEND_URL
   ? [
       'http://localhost:3000',
       'http://localhost:5173',
       process.env.FRONTEND_URL,
       'https://roastify.online',
       'https://www.roastify.online',
-      'https://status.roastify.online'
+      'https://status.roastify.online',
     ]
   : [
       'http://localhost:3000',
@@ -87,15 +91,15 @@ const allowedOrigins = process.env.FRONTEND_URL
       'https://white-sky-0a7e9f003.3.azurestaticapps.net',
       'https://roastify.online',
       'https://www.roastify.online',
-      'https://status.roastify.online'
+      'https://status.roastify.online',
     ];
 
 const io = socketIo(server, {
   cors: {
     origin: allowedOrigins,
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
 const PORT = process.env.PORT || 5000;
@@ -113,27 +117,31 @@ if (process.env.NODE_ENV === 'production') {
 
 // Middleware
 app.use(helmet());
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      logger.warn(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        logger.warn(`CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Request logging
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
-  }
-}));
+app.use(
+  morgan('combined', {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -159,10 +167,14 @@ io.on('connection', (socket) => {
 });
 
 // API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Roastify API Documentation'
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Roastify API Documentation',
+  })
+);
 
 // CSRF token endpoint
 const { getCsrfToken } = require('./middleware/csrfProtection');
@@ -206,9 +218,9 @@ app.use('/api', healthRoutes);
 if (process.env.NODE_ENV === 'production') {
   const path = require('path');
   const frontendPath = path.join(__dirname, '../../frontend/dist');
-  
+
   app.use(express.static(frontendPath));
-  
+
   // Serve index.html for all non-API routes (SPA support)
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
@@ -216,11 +228,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res, _next) => {
   res.status(404).json({
     success: false,
     error: 'Route not found',
-    code: 'NOT_FOUND'
+    code: 'NOT_FOUND',
   });
 });
 

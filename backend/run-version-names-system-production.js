@@ -11,25 +11,28 @@ async function runMigration() {
     user: 'adminuser',
     password: 'AHmed#123456',
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   });
 
   try {
     console.log('🚀 Creating version names system in PRODUCTION');
-    
+
     const sql = fs.readFileSync(
-      path.join(__dirname, '../database/migrations/CREATE_VERSION_NAMES_SYSTEM.sql'),
+      path.join(
+        __dirname,
+        '../database/migrations/CREATE_VERSION_NAMES_SYSTEM.sql'
+      ),
       'utf8'
     );
-    
+
     await pool.query(sql);
-    
+
     console.log('✅ Production version names system created!');
     console.log('📊 46 coffee-themed names added');
     console.log('   - 17 minor names (roasting levels)');
     console.log('   - 29 major names (specialty drinks)');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {

@@ -22,5 +22,5 @@ const isValidCodeFormat = (code) => {
 
 module.exports = {
   generateVerificationCode,
-  isValidCodeFormat
+  isValidCodeFormat,
 };

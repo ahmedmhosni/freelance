@@ -11,21 +11,21 @@ async function runMigration() {
     database: process.env.PG_DATABASE || 'roastify_local',
     user: process.env.PG_USER || 'postgres',
     password: process.env.PG_PASSWORD || 'postgres',
-    ssl: false
+    ssl: false,
   });
 
   try {
     console.log('🚀 Running GDPR Features Migration (Local)');
     console.log('📍 Database:', process.env.PG_DATABASE || 'roastify_local');
     console.log('📍 Host:', process.env.PG_HOST || 'localhost\n');
-    
+
     const sql = fs.readFileSync(
       path.join(__dirname, '../database/migrations/ADD_GDPR_FEATURES.sql'),
       'utf8'
     );
-    
+
     await pool.query(sql);
-    
+
     console.log('\n✅ SUCCESS! GDPR features added to local database!');
     console.log('📊 Added:');
     console.log('   - email_preferences column to users table');
@@ -38,12 +38,12 @@ async function runMigration() {
     console.log('✅ Email preferences management');
     console.log('✅ Data export (resource-friendly)');
     console.log('✅ Account deletion (soft delete)');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {
     console.error('\n❌ Error running migration:', error.message);
-    
+
     if (error.message.includes('already exists')) {
       console.log('\n✅ Features already exist! Migration not needed.');
       console.log('🎉 GDPR features are already available locally!');

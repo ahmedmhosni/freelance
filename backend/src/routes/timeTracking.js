@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
-const { query, getAll } = require('../db/postgresql');
+const { query, getAll: _getAll } = require('../db/postgresql');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -9,7 +9,7 @@ router.use(authenticateToken);
 router.get('/', async (req, res) => {
   try {
     const { task_id, project_id, start_date, end_date } = req.query;
-    
+
     let queryText = `
       SELECT 
         te.*,
@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
     }
 
     queryText += ' ORDER BY te.start_time DESC';
-    
+
     const result = await query(queryText, params);
     res.json({ data: result.rows });
   } catch (error) {
@@ -61,18 +61,25 @@ router.post('/start', async (req, res) => {
       'SELECT id FROM time_entries WHERE user_id = $1 AND end_time IS NULL',
       [req.user.id]
     );
-    
+
     if (runningCheck.rows.length > 0) {
-      return res.status(400).json({ error: 'You already have a running timer. Please stop it first.' });
+      return res.status(400).json({
+        error: 'You already have a running timer. Please stop it first.',
+      });
     }
 
-    const result = await query(`
+    const result = await query(
+      `
       INSERT INTO time_entries (user_id, task_id, project_id, description, start_time) 
       VALUES ($1, $2, $3, $4, NOW())
       RETURNING id
-    `, [req.user.id, task_id || null, project_id || null, description || null]);
-    
-    res.status(201).json({ id: result.rows[0].id, message: 'Time tracking started' });
+    `,
+      [req.user.id, task_id || null, project_id || null, description || null]
+    );
+
+    res
+      .status(201)
+      .json({ id: result.rows[0].id, message: 'Time tracking started' });
   } catch (error) {
     console.error('Time tracking START error:', error);
     res.status(500).json({ error: error.message });
@@ -87,20 +94,23 @@ router.post('/stop/:id', async (req, res) => {
       'SELECT * FROM time_entries WHERE id = $1 AND user_id = $2 AND end_time IS NULL',
       [req.params.id, req.user.id]
     );
-    
+
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: 'Active time entry not found' });
     }
 
     // Stop tracking and calculate duration (in minutes)
-    const updateResult = await query(`
+    const updateResult = await query(
+      `
       UPDATE time_entries 
       SET 
         end_time = NOW(),
         duration = EXTRACT(EPOCH FROM (NOW() - start_time)) / 60
       WHERE id = $1
       RETURNING duration
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     const duration = Math.round(updateResult.rows[0].duration);
     res.json({ message: 'Time tracking stopped', duration });
@@ -118,11 +128,11 @@ router.delete('/:id', async (req, res) => {
       'DELETE FROM time_entries WHERE id = $1 AND user_id = $2 RETURNING id',
       [req.params.id, req.user.id]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Time entry not found' });
     }
-    
+
     res.json({ message: 'Time entry deleted' });
   } catch (error) {
     console.error('Time tracking DELETE error:', error);
@@ -134,7 +144,7 @@ router.delete('/:id', async (req, res) => {
 router.get('/summary', async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    
+
     let queryText = `
       SELECT 
         COALESCE(SUM(duration), 0) as total_hours, 
@@ -161,10 +171,10 @@ router.get('/summary', async (req, res) => {
 router.get('/grouped', async (req, res) => {
   try {
     const { start_date, end_date, group_by } = req.query;
-    
+
     let selectFields = '';
     let groupFields = '';
-    
+
     if (group_by === 'task') {
       selectFields = `
         te.task_id,
@@ -187,9 +197,11 @@ router.get('/grouped', async (req, res) => {
       `;
       groupFields = 'c.id, c.name';
     } else {
-      return res.status(400).json({ error: 'group_by must be task, project, or client' });
+      return res
+        .status(400)
+        .json({ error: 'group_by must be task, project, or client' });
     }
-    
+
     let queryText = `
       SELECT 
         ${selectFields}
@@ -210,7 +222,7 @@ router.get('/grouped', async (req, res) => {
     }
 
     queryText += ` GROUP BY ${groupFields} ORDER BY total_minutes DESC`;
-    
+
     const result = await query(queryText, params);
     res.json({ data: result.rows });
   } catch (error) {

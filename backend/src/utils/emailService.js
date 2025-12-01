@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const createTransporter = () => {
   // For development, use ethereal email (fake SMTP)
   // For production, use SendGrid, AWS SES, or other service
-  
+
   if (process.env.NODE_ENV === 'production') {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -12,8 +12,8 @@ const createTransporter = () => {
       secure: true,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+        pass: process.env.SMTP_PASS,
+      },
     });
   } else {
     // Development: Log emails to console
@@ -22,8 +22,8 @@ const createTransporter = () => {
       port: 587,
       auth: {
         user: 'ethereal.user@ethereal.email',
-        pass: 'ethereal.password'
-      }
+        pass: 'ethereal.password',
+      },
     });
   }
 };
@@ -31,12 +31,13 @@ const createTransporter = () => {
 const sendEmail = async (to, subject, html) => {
   try {
     const transporter = createTransporter();
-    
+
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || 'Freelancer App <noreply@freelancerapp.com>',
+      from:
+        process.env.EMAIL_FROM || 'Freelancer App <noreply@freelancerapp.com>',
       to,
       subject,
-      html
+      html,
     });
 
     console.log('Email sent:', info.messageId);
@@ -106,7 +107,7 @@ const emailTemplates = {
       <p>If you have any questions, feel free to reach out to our support team.</p>
       <p>Happy freelancing!</p>
     </div>
-  `
+  `,
 };
 
 module.exports = { sendEmail, emailTemplates };

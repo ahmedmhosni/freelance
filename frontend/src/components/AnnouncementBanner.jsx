@@ -5,20 +5,7 @@ import axios from 'axios';
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    fetchFeaturedAnnouncements();
-  }, []);
-
-  useEffect(() => {
-    if (announcements.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % announcements.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [announcements.length]);
+  const [isVisible] = useState(true);
 
   const fetchFeaturedAnnouncements = async () => {
     try {
@@ -32,22 +19,38 @@ const AnnouncementBanner = () => {
     }
   };
 
+  useEffect(() => {
+    fetchFeaturedAnnouncements();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (announcements.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % announcements.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [announcements.length]);
+
   if (!isVisible || !announcements || announcements.length === 0) return null;
 
   const currentAnnouncement = announcements[currentIndex];
-  
+
   // Safety check - if no current announcement, don't render
   if (!currentAnnouncement) return null;
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '12px 20px',
-      marginTop: '64px'
-    }}>
-      <Link 
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '12px 20px',
+        marginTop: '64px',
+      }}
+    >
+      <Link
         to={`/announcements/${currentAnnouncement.id}`}
         style={{
           display: 'inline-flex',
@@ -62,32 +65,38 @@ const AnnouncementBanner = () => {
           fontSize: '14px',
           fontWeight: '500',
           transition: 'all 0.3s ease',
-          boxShadow: '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)',
+          boxShadow:
+            '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = 'rgba(99, 102, 241, 0.12)';
           e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-          e.currentTarget.style.boxShadow = '0 0 25px rgba(99, 102, 241, 0.25), 0 0 50px rgba(99, 102, 241, 0.12)';
+          e.currentTarget.style.boxShadow =
+            '0 0 25px rgba(99, 102, 241, 0.25), 0 0 50px rgba(99, 102, 241, 0.12)';
           e.currentTarget.style.transform = 'translateY(-1px)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'rgba(99, 102, 241, 0.08)';
           e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.2)';
-          e.currentTarget.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)';
+          e.currentTarget.style.boxShadow =
+            '0 0 20px rgba(99, 102, 241, 0.15), 0 0 40px rgba(99, 102, 241, 0.08)';
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <span style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: '#6366f1',
-          flexShrink: 0,
-          boxShadow: '0 0 8px rgba(99, 102, 241, 0.6), 0 0 12px rgba(99, 102, 241, 0.4)',
-          animation: 'pulse 2s ease-in-out infinite'
-        }} />
+        <span
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#6366f1',
+            flexShrink: 0,
+            boxShadow:
+              '0 0 8px rgba(99, 102, 241, 0.6), 0 0 12px rgba(99, 102, 241, 0.4)',
+            animation: 'pulse 2s ease-in-out infinite',
+          }}
+        />
         <span>{currentAnnouncement.title}</span>
       </Link>
       <style>{`

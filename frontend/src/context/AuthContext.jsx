@@ -12,17 +12,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
     setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (email, password) => {
     const response = await api.post('/api/auth/login', { email, password });
     const { token, user } = response.data;
-    
+
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);

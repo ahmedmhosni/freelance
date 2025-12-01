@@ -35,20 +35,23 @@ router.get('/users/:id', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Get stats
-    const statsResult = await query(`
+    const statsResult = await query(
+      `
       SELECT 
         (SELECT COUNT(*) FROM clients WHERE user_id = $1) as clients_count,
         (SELECT COUNT(*) FROM projects WHERE user_id = $1) as projects_count,
         (SELECT COUNT(*) FROM tasks WHERE user_id = $1) as tasks_count,
         (SELECT COUNT(*) FROM invoices WHERE user_id = $1) as invoices_count
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     const statsData = statsResult.rows[0];
     const stats = {
       clients: { count: parseInt(statsData.clients_count) },
       projects: { count: parseInt(statsData.projects_count) },
       tasks: { count: parseInt(statsData.tasks_count) },
-      invoices: { count: parseInt(statsData.invoices_count) }
+      invoices: { count: parseInt(statsData.invoices_count) },
     };
 
     res.json({ user, stats });
@@ -61,7 +64,10 @@ router.get('/users/:id', async (req, res) => {
 router.put('/users/:id/role', async (req, res) => {
   const { role } = req.body;
   try {
-    await query('UPDATE users SET role = $1 WHERE id = $2', [role, req.params.id]);
+    await query('UPDATE users SET role = $1 WHERE id = $2', [
+      role,
+      req.params.id,
+    ]);
     res.json({ message: 'User role updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -72,7 +78,10 @@ router.put('/users/:id/role', async (req, res) => {
 router.put('/users/:id/verification', async (req, res) => {
   const { email_verified } = req.body;
   try {
-    await query('UPDATE users SET email_verified = $1 WHERE id = $2', [email_verified, req.params.id]);
+    await query('UPDATE users SET email_verified = $1 WHERE id = $2', [
+      email_verified,
+      req.params.id,
+    ]);
     res.json({ message: 'User verification status updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -92,13 +101,16 @@ router.delete('/users/:id', async (req, res) => {
 // System reports
 router.get('/reports', async (req, res) => {
   try {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT 
         (SELECT COUNT(*) FROM users) as users_count,
         (SELECT COUNT(*) FROM projects) as projects_count,
         (SELECT COUNT(*) FROM invoices) as invoices_count,
         (SELECT COALESCE(SUM(total), 0) FROM invoices WHERE status = $1) as total_revenue
-    `, ['paid']);
+    `,
+      ['paid']
+    );
 
     const data = result.rows[0];
 
@@ -106,7 +118,7 @@ router.get('/reports', async (req, res) => {
       users: parseInt(data.users_count),
       projects: parseInt(data.projects_count),
       invoices: parseInt(data.invoices_count),
-      revenue: parseFloat(data.total_revenue)
+      revenue: parseFloat(data.total_revenue),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

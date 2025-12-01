@@ -13,13 +13,23 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.'));
+      cb(
+        new Error(
+          'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.'
+        )
+      );
     }
-  }
+  },
 });
 
 /**
@@ -30,9 +40,13 @@ const upload = multer({
  */
 
 // Root route - redirect to /me
-router.get('/', authenticateToken, asyncHandler(async (req, res) => {
-  res.redirect('/api/profile/me');
-}));
+router.get(
+  '/',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    res.redirect('/api/profile/me');
+  })
+);
 
 /**
  * @swagger
@@ -48,8 +62,11 @@ router.get('/', authenticateToken, asyncHandler(async (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
-  const queryText = `
+router.get(
+  '/me',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const queryText = `
     SELECT 
       id, name, email, username, role,
       job_title, bio, profile_picture, location, website,
@@ -59,15 +76,16 @@ router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
     FROM users 
     WHERE id = $1
   `;
-  
-  const result = await query(queryText, [req.user.id]);
-  
-  if (!result.rows || result.rows.length === 0) {
-    throw new AppError('User not found', 404);
-  }
-  
-  res.json(result.rows[0]);
-}));
+
+    const result = await query(queryText, [req.user.id]);
+
+    if (!result.rows || result.rows.length === 0) {
+      throw new AppError('User not found', 404);
+    }
+
+    res.json(result.rows[0]);
+  })
+);
 
 /**
  * @swagger
@@ -125,43 +143,68 @@ router.get('/me', authenticateToken, asyncHandler(async (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
-  const {
-    name, username, job_title, bio, profile_picture, location, website,
-    linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
-    profile_visibility
-  } = req.body;
+router.put(
+  '/me',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const {
+      name,
+      username,
+      job_title,
+      bio,
+      profile_picture,
+      location,
+      website,
+      linkedin,
+      behance,
+      instagram,
+      facebook,
+      twitter,
+      github,
+      dribbble,
+      portfolio,
+      profile_visibility,
+    } = req.body;
 
-  // Validate username if provided
-  if (username) {
-    // Check if username is already taken by another user
-    const checkQuery = `
+    // Validate username if provided
+    if (username) {
+      // Check if username is already taken by another user
+      const checkQuery = `
       SELECT id FROM users 
       WHERE username = $1 AND id != $2
     `;
-    const existing = await query(checkQuery, [username, req.user.id]);
-    
-    if (existing.rows && existing.rows.length > 0) {
-      throw new AppError('Username already taken', 400);
+      const existing = await query(checkQuery, [username, req.user.id]);
+
+      if (existing.rows && existing.rows.length > 0) {
+        throw new AppError('Username already taken', 400);
+      }
+
+      // Validate username format (alphanumeric, underscore, hyphen only)
+      if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+        throw new AppError(
+          'Username can only contain letters, numbers, underscores, and hyphens',
+          400
+        );
+      }
+
+      // Validate username length
+      if (username.length < 3 || username.length > 30) {
+        throw new AppError('Username must be between 3 and 30 characters', 400);
+      }
     }
 
-    // Validate username format (alphanumeric, underscore, hyphen only)
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      throw new AppError('Username can only contain letters, numbers, underscores, and hyphens', 400);
+    // Validate profile visibility
+    if (
+      profile_visibility &&
+      !['public', 'private'].includes(profile_visibility)
+    ) {
+      throw new AppError(
+        'Profile visibility must be either public or private',
+        400
+      );
     }
 
-    // Validate username length
-    if (username.length < 3 || username.length > 30) {
-      throw new AppError('Username must be between 3 and 30 characters', 400);
-    }
-  }
-
-  // Validate profile visibility
-  if (profile_visibility && !['public', 'private'].includes(profile_visibility)) {
-    throw new AppError('Profile visibility must be either public or private', 400);
-  }
-
-  const updateQuery = `
+    const updateQuery = `
     UPDATE users 
     SET 
       name = COALESCE($1, name),
@@ -183,14 +226,28 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
     WHERE id = $17
   `;
 
-  await query(updateQuery, [
-    name, username, job_title, bio, profile_picture, location, website,
-    linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
-    profile_visibility, req.user.id
-  ]);
+    await query(updateQuery, [
+      name,
+      username,
+      job_title,
+      bio,
+      profile_picture,
+      location,
+      website,
+      linkedin,
+      behance,
+      instagram,
+      facebook,
+      twitter,
+      github,
+      dribbble,
+      portfolio,
+      profile_visibility,
+      req.user.id,
+    ]);
 
-  // Get updated profile
-  const getQuery = `
+    // Get updated profile
+    const getQuery = `
     SELECT 
       id, name, email, username, role,
       job_title, bio, profile_picture, location, website,
@@ -200,14 +257,15 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
     FROM users 
     WHERE id = $1
   `;
-  
-  const result = await query(getQuery, [req.user.id]);
-  
-  res.json({
-    message: 'Profile updated successfully',
-    profile: result.rows[0]
-  });
-}));
+
+    const result = await query(getQuery, [req.user.id]);
+
+    res.json({
+      message: 'Profile updated successfully',
+      profile: result.rows[0],
+    });
+  })
+);
 
 /**
  * @swagger
@@ -228,10 +286,12 @@ router.put('/me', authenticateToken, asyncHandler(async (req, res) => {
  *       404:
  *         description: Profile not found or private
  */
-router.get('/:username', asyncHandler(async (req, res) => {
-  const { username } = req.params;
+router.get(
+  '/:username',
+  asyncHandler(async (req, res) => {
+    const { username } = req.params;
 
-  const queryText = `
+    const queryText = `
     SELECT 
       id, name, username, role,
       job_title, bio, profile_picture, location, website,
@@ -240,15 +300,16 @@ router.get('/:username', asyncHandler(async (req, res) => {
     FROM users 
     WHERE username = $1 AND profile_visibility = 'public'
   `;
-  
-  const result = await query(queryText, [username]);
-  
-  if (!result.rows || result.rows.length === 0) {
-    throw new AppError('Profile not found or is private', 404);
-  }
-  
-  res.json(result.rows[0]);
-}));
+
+    const result = await query(queryText, [username]);
+
+    if (!result.rows || result.rows.length === 0) {
+      throw new AppError('Profile not found or is private', 404);
+    }
+
+    res.json(result.rows[0]);
+  })
+);
 
 /**
  * @swagger
@@ -266,26 +327,35 @@ router.get('/:username', asyncHandler(async (req, res) => {
  *       200:
  *         description: Username availability status
  */
-router.get('/check-username/:username', asyncHandler(async (req, res) => {
-  const { username } = req.params;
+router.get(
+  '/check-username/:username',
+  asyncHandler(async (req, res) => {
+    const { username } = req.params;
 
-  // Validate username format
-  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-    return res.json({ available: false, message: 'Invalid username format' });
-  }
+    // Validate username format
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return res.json({ available: false, message: 'Invalid username format' });
+    }
 
-  if (username.length < 3 || username.length > 30) {
-    return res.json({ available: false, message: 'Username must be between 3 and 30 characters' });
-  }
+    if (username.length < 3 || username.length > 30) {
+      return res.json({
+        available: false,
+        message: 'Username must be between 3 and 30 characters',
+      });
+    }
 
-  const queryText = `SELECT id FROM users WHERE username = $1`;
-  const result = await query(queryText, [username]);
-  
-  res.json({
-    available: !result.rows || result.rows.length === 0,
-    message: result.rows && result.rows.length > 0 ? 'Username already taken' : 'Username available'
-  });
-}));
+    const queryText = `SELECT id FROM users WHERE username = $1`;
+    const result = await query(queryText, [username]);
+
+    res.json({
+      available: !result.rows || result.rows.length === 0,
+      message:
+        result.rows && result.rows.length > 0
+          ? 'Username already taken'
+          : 'Username available',
+    });
+  })
+);
 
 /**
  * @swagger
@@ -313,138 +383,158 @@ router.get('/check-username/:username', asyncHandler(async (req, res) => {
  *       401:
  *         description: Unauthorized
  */
-router.post('/upload-picture', authenticateToken, upload.single('profilePicture'), asyncHandler(async (req, res) => {
-  if (!req.file) {
-    throw new AppError('No file uploaded', 400);
-  }
+router.post(
+  '/upload-picture',
+  authenticateToken,
+  upload.single('profilePicture'),
+  asyncHandler(async (req, res) => {
+    if (!req.file) {
+      throw new AppError('No file uploaded', 400);
+    }
 
-  const userId = req.user.id;
-  const file = req.file;
-  const path = require('path');
-  const fs = require('fs');
+    const userId = req.user.id;
+    const file = req.file;
+    const path = require('path');
+    const fs = require('fs');
 
-  try {
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
-    const isProduction = process.env.NODE_ENV === 'production';
-    
-    let fileUrl;
+    try {
+      const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+      const containerName =
+        process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+      const isProduction = process.env.NODE_ENV === 'production';
 
-    // Use Azure Blob Storage if connection string is available
-    if (connectionString) {
-      // PRODUCTION: Upload to Azure Blob Storage
-      const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-      const containerClient = blobServiceClient.getContainerClient(containerName);
+      let fileUrl;
 
-      // Generate unique blob name
-      const timestamp = Date.now();
-      const extension = file.originalname.split('.').pop();
-      const blobName = `user-${userId}-${timestamp}.${extension}`;
+      // Use Azure Blob Storage if connection string is available
+      if (connectionString) {
+        // PRODUCTION: Upload to Azure Blob Storage
+        const blobServiceClient =
+          BlobServiceClient.fromConnectionString(connectionString);
+        const containerClient =
+          blobServiceClient.getContainerClient(containerName);
 
-      // Get blob client
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        // Generate unique blob name
+        const timestamp = Date.now();
+        const extension = file.originalname.split('.').pop();
+        const blobName = `user-${userId}-${timestamp}.${extension}`;
 
-      // Upload file buffer to blob
-      await blockBlobClient.uploadData(file.buffer, {
-        blobHTTPHeaders: {
-          blobContentType: file.mimetype
-        }
-      });
+        // Get blob client
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-      fileUrl = blockBlobClient.url;
+        // Upload file buffer to blob
+        await blockBlobClient.uploadData(file.buffer, {
+          blobHTTPHeaders: {
+            blobContentType: file.mimetype,
+          },
+        });
 
-      // Delete old profile picture from blob storage if it exists
-      const oldPictureResult = await query(
-        'SELECT profile_picture FROM users WHERE id = $1',
-        [userId]
-      );
+        fileUrl = blockBlobClient.url;
 
-      if (oldPictureResult.rows[0]?.profile_picture) {
-        const oldPicture = oldPictureResult.rows[0].profile_picture;
-        
-        if (oldPicture.includes('blob.core.windows.net') && !oldPicture.includes('dicebear.com')) {
-          try {
-            const oldBlobName = oldPicture.split('/').pop();
-            const oldBlobClient = containerClient.getBlockBlobClient(oldBlobName);
-            await oldBlobClient.deleteIfExists();
-          } catch (error) {
-            console.error('Error deleting old picture:', error);
-          }
-        }
-      }
-    } else {
-      // Check if we are in production - if so, we MUST use Azure Blob Storage
-      if (isProduction) {
-        throw new AppError('Azure Storage configuration missing in production environment', 500);
-      }
+        // Delete old profile picture from blob storage if it exists
+        const oldPictureResult = await query(
+          'SELECT profile_picture FROM users WHERE id = $1',
+          [userId]
+        );
 
-      // DEVELOPMENT: Save to local uploads directory
-      const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
-      
-      // Create directory if it doesn't exist
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
+        if (oldPictureResult.rows[0]?.profile_picture) {
+          const oldPicture = oldPictureResult.rows[0].profile_picture;
 
-      // Generate unique filename
-      const timestamp = Date.now();
-      const extension = file.originalname.split('.').pop();
-      const filename = `user-${userId}-${timestamp}.${extension}`;
-      const filepath = path.join(uploadsDir, filename);
-
-      // Save file
-      fs.writeFileSync(filepath, file.buffer);
-
-      // Generate local URL
-      fileUrl = `/uploads/profile-pictures/${filename}`;
-
-      // Delete old local file if it exists
-      const oldPictureResult = await query(
-        'SELECT profile_picture FROM users WHERE id = $1',
-        [userId]
-      );
-
-      if (oldPictureResult.rows[0]?.profile_picture) {
-        const oldPicture = oldPictureResult.rows[0].profile_picture;
-        
-        if (oldPicture.startsWith('/uploads/') && !oldPicture.includes('dicebear.com')) {
-          try {
-            const oldFilename = path.basename(oldPicture);
-            const oldFilepath = path.join(uploadsDir, oldFilename);
-            if (fs.existsSync(oldFilepath)) {
-              fs.unlinkSync(oldFilepath);
+          if (
+            oldPicture.includes('blob.core.windows.net') &&
+            !oldPicture.includes('dicebear.com')
+          ) {
+            try {
+              const oldBlobName = oldPicture.split('/').pop();
+              const oldBlobClient =
+                containerClient.getBlockBlobClient(oldBlobName);
+              await oldBlobClient.deleteIfExists();
+            } catch (error) {
+              console.error('Error deleting old picture:', error);
             }
-          } catch (error) {
-            console.error('Error deleting old file:', error);
+          }
+        }
+      } else {
+        // Check if we are in production - if so, we MUST use Azure Blob Storage
+        if (isProduction) {
+          throw new AppError(
+            'Azure Storage configuration missing in production environment',
+            500
+          );
+        }
+
+        // DEVELOPMENT: Save to local uploads directory
+        const uploadsDir = path.join(
+          __dirname,
+          '../../uploads/profile-pictures'
+        );
+
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const extension = file.originalname.split('.').pop();
+        const filename = `user-${userId}-${timestamp}.${extension}`;
+        const filepath = path.join(uploadsDir, filename);
+
+        // Save file
+        fs.writeFileSync(filepath, file.buffer);
+
+        // Generate local URL
+        fileUrl = `/uploads/profile-pictures/${filename}`;
+
+        // Delete old local file if it exists
+        const oldPictureResult = await query(
+          'SELECT profile_picture FROM users WHERE id = $1',
+          [userId]
+        );
+
+        if (oldPictureResult.rows[0]?.profile_picture) {
+          const oldPicture = oldPictureResult.rows[0].profile_picture;
+
+          if (
+            oldPicture.startsWith('/uploads/') &&
+            !oldPicture.includes('dicebear.com')
+          ) {
+            try {
+              const oldFilename = path.basename(oldPicture);
+              const oldFilepath = path.join(uploadsDir, oldFilename);
+              if (fs.existsSync(oldFilepath)) {
+                fs.unlinkSync(oldFilepath);
+              }
+            } catch (error) {
+              console.error('Error deleting old file:', error);
+            }
           }
         }
       }
+
+      // Update user's profile picture in database
+      await query('UPDATE users SET profile_picture = $1 WHERE id = $2', [
+        fileUrl,
+        userId,
+      ]);
+
+      res.json({
+        success: true,
+        url: fileUrl,
+        message: 'Profile picture uploaded successfully',
+      });
+    } catch (error) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        throw new AppError('File too large. Maximum size is 5MB.', 400);
+      }
+
+      if (error.message?.includes('Invalid file type')) {
+        throw new AppError(error.message, 400);
+      }
+
+      throw error;
     }
-
-    // Update user's profile picture in database
-    await query(
-      'UPDATE users SET profile_picture = $1 WHERE id = $2',
-      [fileUrl, userId]
-    );
-
-    res.json({
-      success: true,
-      url: fileUrl,
-      message: 'Profile picture uploaded successfully'
-    });
-
-  } catch (error) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
-      throw new AppError('File too large. Maximum size is 5MB.', 400);
-    }
-    
-    if (error.message?.includes('Invalid file type')) {
-      throw new AppError(error.message, 400);
-    }
-
-    throw error;
-  }
-}));
+  })
+);
 
 /**
  * @swagger
@@ -460,62 +550,75 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
  *       401:
  *         description: Unauthorized
  */
-router.delete('/delete-picture', authenticateToken, asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const path = require('path');
-  const fs = require('fs');
+router.delete(
+  '/delete-picture',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const path = require('path');
+    const fs = require('fs');
 
-  // Get current profile picture
-  const result = await query(
-    'SELECT profile_picture FROM users WHERE id = $1',
-    [userId]
-  );
+    // Get current profile picture
+    const result = await query(
+      'SELECT profile_picture FROM users WHERE id = $1',
+      [userId]
+    );
 
-  const user = result.rows[0];
-  
-  if (user?.profile_picture && !user.profile_picture.includes('dicebear.com')) {
-    // Delete from blob storage if it's a blob URL
-    if (user.profile_picture.includes('blob.core.windows.net')) {
-      try {
-        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+    const user = result.rows[0];
 
-        if (connectionString) {
-          const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-          const containerClient = blobServiceClient.getContainerClient(containerName);
-          const blobName = user.profile_picture.split('/').pop();
-          const blobClient = containerClient.getBlockBlobClient(blobName);
-          
-          await blobClient.deleteIfExists();
+    if (
+      user?.profile_picture &&
+      !user.profile_picture.includes('dicebear.com')
+    ) {
+      // Delete from blob storage if it's a blob URL
+      if (user.profile_picture.includes('blob.core.windows.net')) {
+        try {
+          const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+          const containerName =
+            process.env.AZURE_STORAGE_CONTAINER_NAME || 'profile-pictures';
+
+          if (connectionString) {
+            const blobServiceClient =
+              BlobServiceClient.fromConnectionString(connectionString);
+            const containerClient =
+              blobServiceClient.getContainerClient(containerName);
+            const blobName = user.profile_picture.split('/').pop();
+            const blobClient = containerClient.getBlockBlobClient(blobName);
+
+            await blobClient.deleteIfExists();
+          }
+        } catch (error) {
+          console.error('Error deleting blob:', error);
         }
-      } catch (error) {
-        console.error('Error deleting blob:', error);
+      }
+      // Delete from local storage if it's a local file
+      else if (user.profile_picture.startsWith('/uploads/')) {
+        try {
+          const filename = path.basename(user.profile_picture);
+          const filepath = path.join(
+            __dirname,
+            '../../uploads/profile-pictures',
+            filename
+          );
+          if (fs.existsSync(filepath)) {
+            fs.unlinkSync(filepath);
+          }
+        } catch (error) {
+          console.error('Error deleting local file:', error);
+        }
       }
     }
-    // Delete from local storage if it's a local file
-    else if (user.profile_picture.startsWith('/uploads/')) {
-      try {
-        const filename = path.basename(user.profile_picture);
-        const filepath = path.join(__dirname, '../../uploads/profile-pictures', filename);
-        if (fs.existsSync(filepath)) {
-          fs.unlinkSync(filepath);
-        }
-      } catch (error) {
-        console.error('Error deleting local file:', error);
-      }
-    }
-  }
 
-  // Clear profile picture from database
-  await query(
-    'UPDATE users SET profile_picture = NULL WHERE id = $1',
-    [userId]
-  );
+    // Clear profile picture from database
+    await query('UPDATE users SET profile_picture = NULL WHERE id = $1', [
+      userId,
+    ]);
 
-  res.json({
-    success: true,
-    message: 'Profile picture deleted successfully'
-  });
-}));
+    res.json({
+      success: true,
+      message: 'Profile picture deleted successfully',
+    });
+  })
+);
 
 module.exports = router;

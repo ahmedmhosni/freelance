@@ -27,13 +27,15 @@ const Privacy = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: isDark ? '#191919' : '#ffffff'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          backgroundColor: isDark ? '#191919' : '#ffffff',
+        }}
+      >
         <LogoLoader size={80} text="" />
       </div>
     );
@@ -48,16 +50,15 @@ const Privacy = () => {
             ← Back to home
           </Link>
 
-          <h1 className="legal-title">
-            Privacy Policy
-          </h1>
+          <h1 className="legal-title">Privacy Policy</h1>
 
           {content?.lastUpdated && (
             <p className="legal-date">
-              Last updated: {new Date(content.lastUpdated).toLocaleDateString('en-US', {
+              Last updated:{' '}
+              {new Date(content.lastUpdated).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
               })}
             </p>
           )}
@@ -75,11 +76,16 @@ const Privacy = () => {
         <div className="legal-footer">
           <p>
             Questions about privacy?{' '}
-            <a href="mailto:support@roastify.com">
-              Contact us
-            </a>
+            <a href="mailto:support@roastify.com">Contact us</a>
           </p>
-          <div style={{ marginTop: '16px', display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <div
+            style={{
+              marginTop: '16px',
+              display: 'flex',
+              gap: '20px',
+              justifyContent: 'center',
+            }}
+          >
             <Link to="/terms">Terms & Conditions</Link>
             <Link to="/public-status">System Status</Link>
           </div>

@@ -15,6 +15,7 @@ const LegalEditor = () => {
 
   useEffect(() => {
     fetchContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeType]);
 
   const fetchContent = async () => {
@@ -39,7 +40,9 @@ const LegalEditor = () => {
     setIsSaving(true);
     try {
       await api.put(`/api/legal/${activeType}`, { content });
-      toast.success(`${activeType === 'terms' ? 'Terms' : 'Privacy Policy'} updated successfully!`);
+      toast.success(
+        `${activeType === 'terms' ? 'Terms' : 'Privacy Policy'} updated successfully!`
+      );
     } catch (error) {
       logger.error('Error saving legal content:', error);
       toast.error('Failed to save content');
@@ -50,14 +53,16 @@ const LegalEditor = () => {
 
   return (
     <div className="card">
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '20px',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
         <h2 style={{ margin: 0 }}>Legal Content Editor</h2>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button
@@ -76,15 +81,20 @@ const LegalEditor = () => {
       </div>
 
       <div style={{ marginBottom: '16px' }}>
-        <p style={{ 
-          fontSize: '13px', 
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-          marginBottom: '12px'
-        }}>
-          Edit the {activeType === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'} content. 
-          You can use HTML for formatting.
+        <p
+          style={{
+            fontSize: '13px',
+            color: isDark
+              ? 'rgba(255, 255, 255, 0.6)'
+              : 'rgba(55, 53, 47, 0.65)',
+            marginBottom: '12px',
+          }}
+        >
+          Edit the{' '}
+          {activeType === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'}{' '}
+          content. You can use HTML for formatting.
         </p>
-        
+
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <button
             onClick={() => setIsPreview(false)}
@@ -106,11 +116,15 @@ const LegalEditor = () => {
       </div>
 
       {isLoading ? (
-        <div style={{ 
-          padding: '40px', 
-          textAlign: 'center',
-          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
-        }}>
+        <div
+          style={{
+            padding: '40px',
+            textAlign: 'center',
+            color: isDark
+              ? 'rgba(255, 255, 255, 0.6)'
+              : 'rgba(55, 53, 47, 0.65)',
+          }}
+        >
           Loading content...
         </div>
       ) : (
@@ -126,34 +140,40 @@ const LegalEditor = () => {
                 padding: '12px',
                 fontSize: '14px',
                 fontFamily: 'monospace',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                border: isDark
+                  ? '1px solid rgba(255, 255, 255, 0.15)'
+                  : '1px solid rgba(55, 53, 47, 0.16)',
                 borderRadius: '4px',
                 background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
                 color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
                 resize: 'vertical',
-                outline: 'none'
+                outline: 'none',
               }}
             />
           ) : (
-            <div 
+            <div
               className="terms-content"
               style={{
                 minHeight: '400px',
                 padding: '20px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                border: isDark
+                  ? '1px solid rgba(255, 255, 255, 0.15)'
+                  : '1px solid rgba(55, 53, 47, 0.16)',
                 borderRadius: '4px',
-                background: isDark ? 'rgba(255, 255, 255, 0.02)' : '#fafafa'
+                background: isDark ? 'rgba(255, 255, 255, 0.02)' : '#fafafa',
               }}
               dangerouslySetInnerHTML={{ __html: content }}
             />
           )}
 
-          <div style={{ 
-            display: 'flex', 
-            gap: '8px', 
-            marginTop: '16px',
-            justifyContent: 'flex-end'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '8px',
+              marginTop: '16px',
+              justifyContent: 'flex-end',
+            }}
+          >
             <button
               onClick={handleSave}
               disabled={isSaving || !content.trim()}
@@ -162,8 +182,8 @@ const LegalEditor = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                opacity: (isSaving || !content.trim()) ? 0.6 : 1,
-                cursor: (isSaving || !content.trim()) ? 'not-allowed' : 'pointer'
+                opacity: isSaving || !content.trim() ? 0.6 : 1,
+                cursor: isSaving || !content.trim() ? 'not-allowed' : 'pointer',
               }}
             >
               <MdSave />
@@ -173,21 +193,35 @@ const LegalEditor = () => {
         </>
       )}
 
-      <div style={{ 
-        marginTop: '20px',
-        padding: '12px',
-        background: isDark ? 'rgba(46, 170, 220, 0.1)' : 'rgba(46, 170, 220, 0.05)',
-        border: isDark ? '1px solid rgba(46, 170, 220, 0.2)' : '1px solid rgba(46, 170, 220, 0.15)',
-        borderRadius: '4px',
-        fontSize: '13px',
-        color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)'
-      }}>
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '12px',
+          background: isDark
+            ? 'rgba(46, 170, 220, 0.1)'
+            : 'rgba(46, 170, 220, 0.05)',
+          border: isDark
+            ? '1px solid rgba(46, 170, 220, 0.2)'
+            : '1px solid rgba(46, 170, 220, 0.15)',
+          borderRadius: '4px',
+          fontSize: '13px',
+          color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
+        }}
+      >
         <strong>💡 Tip:</strong> Use HTML tags for formatting:
         <ul style={{ marginTop: '8px', marginBottom: 0, paddingLeft: '20px' }}>
-          <li><code>&lt;h2&gt;</code> for headings</li>
-          <li><code>&lt;p&gt;</code> for paragraphs</li>
-          <li><code>&lt;ul&gt;</code> and <code>&lt;li&gt;</code> for lists</li>
-          <li><code>&lt;strong&gt;</code> for bold text</li>
+          <li>
+            <code>&lt;h2&gt;</code> for headings
+          </li>
+          <li>
+            <code>&lt;p&gt;</code> for paragraphs
+          </li>
+          <li>
+            <code>&lt;ul&gt;</code> and <code>&lt;li&gt;</code> for lists
+          </li>
+          <li>
+            <code>&lt;strong&gt;</code> for bold text
+          </li>
         </ul>
       </div>
     </div>

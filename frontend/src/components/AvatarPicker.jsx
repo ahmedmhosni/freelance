@@ -16,10 +16,38 @@ const AVATAR_STYLES = [
 ];
 
 const AVATAR_SEEDS = [
-  'Felix', 'Aneka', 'Jasmine', 'Max', 'Luna', 'Oliver', 'Emma', 'Leo',
-  'Sophia', 'Jack', 'Mia', 'Charlie', 'Ava', 'George', 'Isabella', 'Oscar',
-  'Amelia', 'Harry', 'Lily', 'Noah', 'Grace', 'Lucas', 'Ella', 'Mason',
-  'Chloe', 'Ethan', 'Zoe', 'Logan', 'Aria', 'James', 'Riley', 'Benjamin'
+  'Felix',
+  'Aneka',
+  'Jasmine',
+  'Max',
+  'Luna',
+  'Oliver',
+  'Emma',
+  'Leo',
+  'Sophia',
+  'Jack',
+  'Mia',
+  'Charlie',
+  'Ava',
+  'George',
+  'Isabella',
+  'Oscar',
+  'Amelia',
+  'Harry',
+  'Lily',
+  'Noah',
+  'Grace',
+  'Lucas',
+  'Ella',
+  'Mason',
+  'Chloe',
+  'Ethan',
+  'Zoe',
+  'Logan',
+  'Aria',
+  'James',
+  'Riley',
+  'Benjamin',
 ];
 
 const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
@@ -43,9 +71,17 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
     const file = event.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Please select a valid image file (JPG, PNG, GIF, or WebP)');
+        toast.error(
+          'Please select a valid image file (JPG, PNG, GIF, or WebP)'
+        );
         return;
       }
 
@@ -70,7 +106,7 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
 
   const handleFileUpload = async (file) => {
     setUploading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append('profilePicture', file);
@@ -83,7 +119,7 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
 
       const uploadedUrl = response.data.url;
       toast.success('Picture uploaded successfully!');
-      
+
       // Update profile with new picture
       onSelect(uploadedUrl);
       onClose();
@@ -101,46 +137,60 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        maxWidth: '800px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
-      }}>
-        {/* Header */}
-        <div style={{
-          padding: '20px',
-          borderBottom: '1px solid rgba(55, 53, 47, 0.09)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'sticky',
-          top: 0,
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px',
+      }}
+    >
+      <div
+        style={{
           backgroundColor: 'white',
-          zIndex: 1
-        }}>
+          borderRadius: '8px',
+          maxWidth: '800px',
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            padding: '20px',
+            borderBottom: '1px solid rgba(55, 53, 47, 0.09)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: 'white',
+            zIndex: 1,
+          }}
+        >
           <div>
             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>
               Profile Picture
             </h2>
-            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>
-              {uploadMode === 'avatar' ? 'Select a style and pick your favorite character' : 'Upload your own profile picture'}
+            <p
+              style={{
+                margin: '4px 0 0 0',
+                fontSize: '13px',
+                color: 'rgba(55, 53, 47, 0.65)',
+              }}
+            >
+              {uploadMode === 'avatar'
+                ? 'Select a style and pick your favorite character'
+                : 'Upload your own profile picture'}
             </p>
           </div>
           <button
@@ -154,37 +204,47 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '4px',
-              color: 'rgba(55, 53, 47, 0.65)'
+              color: 'rgba(55, 53, 47, 0.65)',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(55, 53, 47, 0.08)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = 'rgba(55, 53, 47, 0.08)')
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = 'transparent')
+            }
           >
             <MdClose size={24} />
           </button>
         </div>
 
         {/* Mode Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          padding: '0 20px',
-          borderBottom: '1px solid rgba(55, 53, 47, 0.09)'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            padding: '0 20px',
+            borderBottom: '1px solid rgba(55, 53, 47, 0.09)',
+          }}
+        >
           <button
             onClick={() => setUploadMode('avatar')}
             style={{
               padding: '12px 16px',
               background: 'none',
               border: 'none',
-              borderBottom: uploadMode === 'avatar' ? '2px solid #2eaadc' : '2px solid transparent',
-              color: uploadMode === 'avatar' ? '#2eaadc' : 'rgba(55, 53, 47, 0.6)',
+              borderBottom:
+                uploadMode === 'avatar'
+                  ? '2px solid #2eaadc'
+                  : '2px solid transparent',
+              color:
+                uploadMode === 'avatar' ? '#2eaadc' : 'rgba(55, 53, 47, 0.6)',
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              transition: 'all 0.15s ease'
+              transition: 'all 0.15s ease',
             }}
           >
             <MdImage /> Choose Avatar
@@ -195,15 +255,19 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
               padding: '12px 16px',
               background: 'none',
               border: 'none',
-              borderBottom: uploadMode === 'upload' ? '2px solid #2eaadc' : '2px solid transparent',
-              color: uploadMode === 'upload' ? '#2eaadc' : 'rgba(55, 53, 47, 0.6)',
+              borderBottom:
+                uploadMode === 'upload'
+                  ? '2px solid #2eaadc'
+                  : '2px solid transparent',
+              color:
+                uploadMode === 'upload' ? '#2eaadc' : 'rgba(55, 53, 47, 0.6)',
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              transition: 'all 0.15s ease'
+              transition: 'all 0.15s ease',
             }}
           >
             <MdCloudUpload /> Upload Picture
@@ -220,14 +284,16 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
               onChange={handleFileSelect}
               style={{ display: 'none' }}
             />
-            
-            <div style={{
-              textAlign: 'center',
-              padding: '40px 20px',
-              border: '2px dashed rgba(55, 53, 47, 0.2)',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(55, 53, 47, 0.02)'
-            }}>
+
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                border: '2px dashed rgba(55, 53, 47, 0.2)',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(55, 53, 47, 0.02)',
+              }}
+            >
               {uploadPreview ? (
                 <div>
                   <img
@@ -238,38 +304,49 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
                       height: '150px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      marginBottom: '16px'
+                      marginBottom: '16px',
                     }}
                   />
-                  <p style={{ fontSize: '14px', color: 'rgba(55, 53, 47, 0.65)' }}>
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: 'rgba(55, 53, 47, 0.65)',
+                    }}
+                  >
                     {uploading ? 'Uploading...' : 'Upload complete!'}
                   </p>
                 </div>
               ) : (
                 <>
-                  <MdCloudUpload style={{
-                    fontSize: '48px',
-                    color: 'rgba(55, 53, 47, 0.4)',
-                    marginBottom: '16px'
-                  }} />
-                  
-                  <h3 style={{
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    color: 'rgba(55, 53, 47, 0.9)',
-                    marginBottom: '8px'
-                  }}>
+                  <MdCloudUpload
+                    style={{
+                      fontSize: '48px',
+                      color: 'rgba(55, 53, 47, 0.4)',
+                      marginBottom: '16px',
+                    }}
+                  />
+
+                  <h3
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: 'rgba(55, 53, 47, 0.9)',
+                      marginBottom: '8px',
+                    }}
+                  >
                     Upload Your Picture
                   </h3>
-                  
-                  <p style={{
-                    fontSize: '14px',
-                    color: 'rgba(55, 53, 47, 0.6)',
-                    marginBottom: '20px'
-                  }}>
+
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: 'rgba(55, 53, 47, 0.6)',
+                      marginBottom: '20px',
+                    }}
+                  >
                     JPG, PNG, GIF or WebP • Max 5MB
                   </p>
-                  
+
                   <button
                     onClick={triggerFileInput}
                     disabled={uploading}
@@ -279,7 +356,7 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
                       alignItems: 'center',
                       gap: '8px',
                       opacity: uploading ? 0.6 : 1,
-                      cursor: uploading ? 'not-allowed' : 'pointer'
+                      cursor: uploading ? 'not-allowed' : 'pointer',
                     }}
                   >
                     <MdCloudUpload />
@@ -294,156 +371,190 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
         {/* Avatar Mode */}
         {uploadMode === 'avatar' && (
           <>
-        {/* Style Selector */}
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(55, 53, 47, 0.09)' }}>
-          <label style={{
-            display: 'block',
-            fontSize: '13px',
-            fontWeight: '500',
-            marginBottom: '12px',
-            color: 'rgba(55, 53, 47, 0.9)'
-          }}>
-            Avatar Style
-          </label>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-            gap: '8px'
-          }}>
-            {AVATAR_STYLES.map(style => (
-              <button
-                key={style.id}
-                onClick={() => setSelectedStyle(style.id)}
+            {/* Style Selector */}
+            <div
+              style={{
+                padding: '20px',
+                borderBottom: '1px solid rgba(55, 53, 47, 0.09)',
+              }}
+            >
+              <label
                 style={{
-                  padding: '12px',
-                  border: selectedStyle === style.id 
-                    ? '2px solid #2eaadc' 
-                    : '1px solid rgba(55, 53, 47, 0.16)',
-                  borderRadius: '6px',
-                  backgroundColor: selectedStyle === style.id 
-                    ? 'rgba(46, 170, 220, 0.08)' 
-                    : 'white',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedStyle !== style.id) {
-                    e.currentTarget.style.borderColor = 'rgba(55, 53, 47, 0.3)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedStyle !== style.id) {
-                    e.currentTarget.style.borderColor = 'rgba(55, 53, 47, 0.16)';
-                  }
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  marginBottom: '12px',
+                  color: 'rgba(55, 53, 47, 0.9)',
                 }}
               >
-                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '2px' }}>
-                  {style.name}
-                </div>
-                <div style={{ fontSize: '11px', color: 'rgba(55, 53, 47, 0.65)' }}>
-                  {style.description}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Avatar Grid */}
-        <div style={{ padding: '20px' }}>
-          <label style={{
-            display: 'block',
-            fontSize: '13px',
-            fontWeight: '500',
-            marginBottom: '12px',
-            color: 'rgba(55, 53, 47, 0.9)'
-          }}>
-            Choose Character
-          </label>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
-            gap: '12px'
-          }}>
-            {AVATAR_SEEDS.map(seed => {
-              const avatarUrl = generateAvatarUrl(selectedStyle, seed);
-              const isHovered = hoveredAvatar === seed;
-              const isCurrent = currentAvatar === avatarUrl;
-
-              return (
-                <button
-                  key={seed}
-                  onClick={() => handleSelect(avatarUrl)}
-                  onMouseEnter={() => setHoveredAvatar(seed)}
-                  onMouseLeave={() => setHoveredAvatar(null)}
-                  style={{
-                    padding: '8px',
-                    border: isCurrent 
-                      ? '3px solid #2eaadc' 
-                      : isHovered 
-                        ? '2px solid #2eaadc' 
-                        : '1px solid rgba(55, 53, 47, 0.16)',
-                    borderRadius: '8px',
-                    backgroundColor: isCurrent 
-                      ? 'rgba(46, 170, 220, 0.08)' 
-                      : 'white',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                    position: 'relative'
-                  }}
-                >
-                  <img
-                    src={avatarUrl}
-                    alt={seed}
+                Avatar Style
+              </label>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+                  gap: '8px',
+                }}
+              >
+                {AVATAR_STYLES.map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => setSelectedStyle(style.id)}
                     style={{
-                      width: '100%',
-                      height: 'auto',
-                      display: 'block',
-                      borderRadius: '4px'
+                      padding: '12px',
+                      border:
+                        selectedStyle === style.id
+                          ? '2px solid #2eaadc'
+                          : '1px solid rgba(55, 53, 47, 0.16)',
+                      borderRadius: '6px',
+                      backgroundColor:
+                        selectedStyle === style.id
+                          ? 'rgba(46, 170, 220, 0.08)'
+                          : 'white',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
                     }}
-                  />
-                  {isCurrent && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      backgroundColor: '#2eaadc',
-                      color: 'white',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      fontWeight: 'bold'
-                    }}>
-                      ✓
+                    onMouseEnter={(e) => {
+                      if (selectedStyle !== style.id) {
+                        e.currentTarget.style.borderColor =
+                          'rgba(55, 53, 47, 0.3)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedStyle !== style.id) {
+                        e.currentTarget.style.borderColor =
+                          'rgba(55, 53, 47, 0.16)';
+                      }
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        marginBottom: '2px',
+                      }}
+                    >
+                      {style.name}
                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'rgba(55, 53, 47, 0.65)',
+                      }}
+                    >
+                      {style.description}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Avatar Grid */}
+            <div style={{ padding: '20px' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  marginBottom: '12px',
+                  color: 'rgba(55, 53, 47, 0.9)',
+                }}
+              >
+                Choose Character
+              </label>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                  gap: '12px',
+                }}
+              >
+                {AVATAR_SEEDS.map((seed) => {
+                  const avatarUrl = generateAvatarUrl(selectedStyle, seed);
+                  const isHovered = hoveredAvatar === seed;
+                  const isCurrent = currentAvatar === avatarUrl;
+
+                  return (
+                    <button
+                      key={seed}
+                      onClick={() => handleSelect(avatarUrl)}
+                      onMouseEnter={() => setHoveredAvatar(seed)}
+                      onMouseLeave={() => setHoveredAvatar(null)}
+                      style={{
+                        padding: '8px',
+                        border: isCurrent
+                          ? '3px solid #2eaadc'
+                          : isHovered
+                            ? '2px solid #2eaadc'
+                            : '1px solid rgba(55, 53, 47, 0.16)',
+                        borderRadius: '8px',
+                        backgroundColor: isCurrent
+                          ? 'rgba(46, 170, 220, 0.08)'
+                          : 'white',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                        position: 'relative',
+                      }}
+                    >
+                      <img
+                        src={avatarUrl}
+                        alt={seed}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block',
+                          borderRadius: '4px',
+                        }}
+                      />
+                      {isCurrent && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '4px',
+                            backgroundColor: '#2eaadc',
+                            color: 'white',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          ✓
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </>
         )}
 
         {/* Footer */}
-        <div style={{
-          padding: '16px 20px',
-          borderTop: '1px solid rgba(55, 53, 47, 0.09)',
-          backgroundColor: 'rgba(55, 53, 47, 0.03)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <p style={{
-            margin: 0,
-            fontSize: '11px',
-            color: 'rgba(55, 53, 47, 0.5)'
-          }}>
+        <div
+          style={{
+            padding: '16px 20px',
+            borderTop: '1px solid rgba(55, 53, 47, 0.09)',
+            backgroundColor: 'rgba(55, 53, 47, 0.03)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: '11px',
+              color: 'rgba(55, 53, 47, 0.5)',
+            }}
+          >
             Avatars powered by DiceBear
           </p>
           <button

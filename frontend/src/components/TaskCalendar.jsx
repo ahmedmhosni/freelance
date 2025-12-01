@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import logger from '../utils/logger';
 
 const locales = {
-  'en-US': enUS
+  'en-US': enUS,
 };
 
 const localizer = dateFnsLocalizer({
@@ -43,8 +43,8 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
 
   const events = useMemo(() => {
     return tasks
-      .filter(task => task.due_date)
-      .map(task => ({
+      .filter((task) => task.due_date)
+      .map((task) => ({
         id: task.id,
         title: task.title,
         start: new Date(task.due_date),
@@ -57,7 +57,7 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
   const eventStyleGetter = (event) => {
     const task = event.resource;
     let backgroundColor = '#2eaadc';
-    
+
     switch (task.priority) {
       case 'urgent':
         backgroundColor = '#eb5757';
@@ -89,7 +89,7 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
         display: 'block',
         fontSize: '12px',
         padding: '2px 5px',
-      }
+      },
     };
   };
 
@@ -107,15 +107,17 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
 
   if (loading) {
     return (
-      <div style={{ 
-        height: '600px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'var(--bg-primary)',
-        borderRadius: '3px',
-        border: '1px solid var(--border-secondary)'
-      }}>
+      <div
+        style={{
+          height: '600px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--bg-primary)',
+          borderRadius: '3px',
+          border: '1px solid var(--border-secondary)',
+        }}
+      >
         <p style={{ color: 'var(--text-secondary)' }}>Loading calendar...</p>
       </div>
     );

@@ -6,12 +6,29 @@
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "prepare": "husky"
   },
-  "keywords": ["freelancer", "management", "admin"],
+  "keywords": [
+    "freelancer",
+    "management",
+    "admin"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "backend/**/*.{js,jsx}": [
+      "npm run lint --prefix backend -- --fix",
+      "npm run format --prefix backend"
+    ],
+    "frontend/**/*.{js,jsx}": [
+      "npm run lint --prefix frontend -- --fix",
+      "npm run format --prefix frontend"
+    ]
   }
 }

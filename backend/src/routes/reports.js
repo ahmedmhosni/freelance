@@ -9,7 +9,7 @@ router.use(authenticateToken);
 router.get('/financial', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     let queryText = 'SELECT * FROM invoices WHERE user_id = $1';
     const params = [req.user.id];
 
@@ -22,17 +22,32 @@ router.get('/financial', async (req, res) => {
 
     const report = {
       totalInvoices: invoices.length,
-      totalRevenue: invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
-      pendingAmount: invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
-      overdueAmount: invoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0),
+      totalRevenue: invoices
+        .filter((inv) => inv.status === 'paid')
+        .reduce(
+          (sum, inv) => sum + parseFloat(inv.total || inv.amount || 0),
+          0
+        ),
+      pendingAmount: invoices
+        .filter((inv) => inv.status === 'sent')
+        .reduce(
+          (sum, inv) => sum + parseFloat(inv.total || inv.amount || 0),
+          0
+        ),
+      overdueAmount: invoices
+        .filter((inv) => inv.status === 'overdue')
+        .reduce(
+          (sum, inv) => sum + parseFloat(inv.total || inv.amount || 0),
+          0
+        ),
       byStatus: {
-        draft: invoices.filter(inv => inv.status === 'draft').length,
-        sent: invoices.filter(inv => inv.status === 'sent').length,
-        paid: invoices.filter(inv => inv.status === 'paid').length,
-        overdue: invoices.filter(inv => inv.status === 'overdue').length,
-        cancelled: invoices.filter(inv => inv.status === 'cancelled').length
+        draft: invoices.filter((inv) => inv.status === 'draft').length,
+        sent: invoices.filter((inv) => inv.status === 'sent').length,
+        paid: invoices.filter((inv) => inv.status === 'paid').length,
+        overdue: invoices.filter((inv) => inv.status === 'overdue').length,
+        cancelled: invoices.filter((inv) => inv.status === 'cancelled').length,
       },
-      invoices: invoices
+      invoices: invoices,
     };
 
     res.json(report);
@@ -44,25 +59,32 @@ router.get('/financial', async (req, res) => {
 // Project report
 router.get('/projects', async (req, res) => {
   try {
-    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [req.user.id]);
-    const tasks = await getAll('SELECT * FROM tasks WHERE user_id = $1', [req.user.id]);
+    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [
+      req.user.id,
+    ]);
+    const tasks = await getAll('SELECT * FROM tasks WHERE user_id = $1', [
+      req.user.id,
+    ]);
 
     const report = {
       totalProjects: projects.length,
       byStatus: {
-        active: projects.filter(p => p.status === 'active').length,
-        completed: projects.filter(p => p.status === 'completed').length,
-        'on-hold': projects.filter(p => p.status === 'on-hold').length,
-        cancelled: projects.filter(p => p.status === 'cancelled').length
+        active: projects.filter((p) => p.status === 'active').length,
+        completed: projects.filter((p) => p.status === 'completed').length,
+        'on-hold': projects.filter((p) => p.status === 'on-hold').length,
+        cancelled: projects.filter((p) => p.status === 'cancelled').length,
       },
       totalTasks: tasks.length,
       tasksByStatus: {
-        todo: tasks.filter(t => t.status === 'todo' || t.status === 'pending').length,
-        'in-progress': tasks.filter(t => t.status === 'in-progress').length,
-        review: tasks.filter(t => t.status === 'review').length,
-        done: tasks.filter(t => t.status === 'done' || t.status === 'completed').length
+        todo: tasks.filter((t) => t.status === 'todo' || t.status === 'pending')
+          .length,
+        'in-progress': tasks.filter((t) => t.status === 'in-progress').length,
+        review: tasks.filter((t) => t.status === 'review').length,
+        done: tasks.filter(
+          (t) => t.status === 'done' || t.status === 'completed'
+        ).length,
       },
-      projects: projects
+      projects: projects,
     };
 
     res.json(report);
@@ -74,22 +96,33 @@ router.get('/projects', async (req, res) => {
 // Client report
 router.get('/clients', async (req, res) => {
   try {
-    const clients = await getAll('SELECT * FROM clients WHERE user_id = $1', [req.user.id]);
-    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [req.user.id]);
-    const invoices = await getAll('SELECT * FROM invoices WHERE user_id = $1', [req.user.id]);
+    const clients = await getAll('SELECT * FROM clients WHERE user_id = $1', [
+      req.user.id,
+    ]);
+    const projects = await getAll('SELECT * FROM projects WHERE user_id = $1', [
+      req.user.id,
+    ]);
+    const invoices = await getAll('SELECT * FROM invoices WHERE user_id = $1', [
+      req.user.id,
+    ]);
 
-    const clientReport = clients.map(client => {
-      const clientProjects = projects.filter(p => p.client_id === client.id);
-      const clientInvoices = invoices.filter(inv => inv.client_id === client.id);
+    const clientReport = clients.map((client) => {
+      const clientProjects = projects.filter((p) => p.client_id === client.id);
+      const clientInvoices = invoices.filter(
+        (inv) => inv.client_id === client.id
+      );
       const totalRevenue = clientInvoices
-        .filter(inv => inv.status === 'paid')
-        .reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
+        .filter((inv) => inv.status === 'paid')
+        .reduce(
+          (sum, inv) => sum + parseFloat(inv.total || inv.amount || 0),
+          0
+        );
 
       return {
         ...client,
         projectCount: clientProjects.length,
         invoiceCount: clientInvoices.length,
-        totalRevenue: totalRevenue
+        totalRevenue: totalRevenue,
       };
     });
 
@@ -103,7 +136,7 @@ router.get('/clients', async (req, res) => {
 router.get('/time-tracking/tasks', async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    
+
     let queryText = `
       SELECT 
         t.id as task_id,
@@ -128,8 +161,9 @@ router.get('/time-tracking/tasks', async (req, res) => {
       params.push(start_date, end_date);
     }
 
-    queryText += ' GROUP BY t.id, t.title, p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
-    
+    queryText +=
+      ' GROUP BY t.id, t.title, p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
+
     const result = await getAll(queryText, params);
     res.json(result);
   } catch (error) {
@@ -141,7 +175,7 @@ router.get('/time-tracking/tasks', async (req, res) => {
 router.get('/time-tracking/projects', async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    
+
     let queryText = `
       SELECT 
         p.id as project_id,
@@ -164,8 +198,9 @@ router.get('/time-tracking/projects', async (req, res) => {
       params.push(start_date, end_date);
     }
 
-    queryText += ' GROUP BY p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
-    
+    queryText +=
+      ' GROUP BY p.id, p.name, c.id, c.name ORDER BY total_minutes DESC';
+
     const result = await getAll(queryText, params);
     res.json(result);
   } catch (error) {
@@ -177,7 +212,7 @@ router.get('/time-tracking/projects', async (req, res) => {
 router.get('/time-tracking/clients', async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    
+
     let queryText = `
       SELECT 
         c.id as client_id,
@@ -200,7 +235,7 @@ router.get('/time-tracking/clients', async (req, res) => {
     }
 
     queryText += ' GROUP BY c.id, c.name ORDER BY total_minutes DESC';
-    
+
     const result = await getAll(queryText, params);
     res.json(result);
   } catch (error) {

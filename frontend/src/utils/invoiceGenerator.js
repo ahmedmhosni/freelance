@@ -5,28 +5,32 @@
  * @param {Number} padding - Number of digits to pad (default: 4)
  * @returns {String} Next invoice number (e.g., 'INV-0001')
  */
-export const generateInvoiceNumber = (existingInvoices = [], prefix = 'INV', padding = 4) => {
+export const generateInvoiceNumber = (
+  existingInvoices = [],
+  prefix = 'INV',
+  padding = 4
+) => {
   if (!existingInvoices || existingInvoices.length === 0) {
     return `${prefix}-${'1'.padStart(padding, '0')}`;
   }
 
   // Extract numbers from existing invoice numbers
   const numbers = existingInvoices
-    .map(inv => {
+    .map((inv) => {
       if (!inv.invoice_number) return 0;
-      
+
       // Extract number from format like "INV-0001" or "INV-001" or just "001"
       const match = inv.invoice_number.match(/(\d+)$/);
       return match ? parseInt(match[1], 10) : 0;
     })
-    .filter(num => !isNaN(num));
+    .filter((num) => !isNaN(num));
 
   // Get the highest number
   const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-  
+
   // Generate next number
   const nextNumber = maxNumber + 1;
-  
+
   return `${prefix}-${String(nextNumber).padStart(padding, '0')}`;
 };
 
@@ -39,7 +43,7 @@ export const validateInvoiceNumber = (invoiceNumber) => {
   if (!invoiceNumber || typeof invoiceNumber !== 'string') {
     return false;
   }
-  
+
   // Allow formats like: INV-0001, INV-001, 0001, etc.
   const pattern = /^[A-Z]{0,10}-?\d{1,10}$/;
   return pattern.test(invoiceNumber);
@@ -52,9 +56,13 @@ export const validateInvoiceNumber = (invoiceNumber) => {
  * @param {Number} excludeId - ID to exclude from check (for editing)
  * @returns {Boolean} True if exists
  */
-export const invoiceNumberExists = (invoiceNumber, existingInvoices, excludeId = null) => {
-  return existingInvoices.some(inv => 
-    inv.invoice_number === invoiceNumber && inv.id !== excludeId
+export const invoiceNumberExists = (
+  invoiceNumber,
+  existingInvoices,
+  excludeId = null
+) => {
+  return existingInvoices.some(
+    (inv) => inv.invoice_number === invoiceNumber && inv.id !== excludeId
   );
 };
 
@@ -65,14 +73,14 @@ export const invoiceNumberExists = (invoiceNumber, existingInvoices, excludeId =
  */
 export const getInvoiceNumberSuggestions = (existingInvoices = []) => {
   const suggestions = [];
-  
+
   // Current year format
   const year = new Date().getFullYear();
   const yearShort = year.toString().slice(-2);
-  
+
   suggestions.push(generateInvoiceNumber(existingInvoices, 'INV', 4));
   suggestions.push(generateInvoiceNumber(existingInvoices, `INV-${year}`, 3));
   suggestions.push(generateInvoiceNumber(existingInvoices, `${yearShort}`, 4));
-  
+
   return suggestions;
 };

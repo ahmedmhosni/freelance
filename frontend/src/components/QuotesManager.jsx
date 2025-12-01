@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { MdAdd, MdEdit, MdDelete, MdCheck, MdClose, MdVisibility } from 'react-icons/md';
+import {
+  MdAdd,
+  MdEdit,
+  MdDelete,
+  MdCheck,
+  MdClose,
+  MdVisibility,
+} from 'react-icons/md';
 import Pagination from './Pagination';
 import QuoteViewModal from './QuoteViewModal';
 import logger from '../utils/logger';
@@ -10,19 +17,21 @@ const QuotesManager = () => {
   const [quotes, setQuotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingQuote, setEditingQuote] = useState(null);
-  const [formData, setFormData] = useState({ text: '', author: '', is_active: 1 });
+  const [formData, setFormData] = useState({
+    text: '',
+    author: '',
+    is_active: 1,
+  });
   const [viewingQuote, setViewingQuote] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
 
-  useEffect(() => {
-    fetchQuotes();
-  }, [currentPage]);
-
   const fetchQuotes = async () => {
     try {
-      const response = await api.get(`/api/quotes?page=${currentPage}&limit=${itemsPerPage}`);
+      const response = await api.get(
+        `/api/quotes?page=${currentPage}&limit=${itemsPerPage}`
+      );
       setQuotes(response.data.data || []);
       setPagination(response.data.pagination || { total: 0, totalPages: 0 });
     } catch (error) {
@@ -30,6 +39,11 @@ const QuotesManager = () => {
       toast.error('Failed to load quotes');
     }
   };
+
+  useEffect(() => {
+    fetchQuotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,7 +71,7 @@ const QuotesManager = () => {
     setFormData({
       text: quote.text,
       author: quote.author || '',
-      is_active: quote.is_active
+      is_active: quote.is_active,
     });
     setShowForm(true);
   };
@@ -67,7 +81,7 @@ const QuotesManager = () => {
       try {
         await api.delete(`/api/quotes/${id}`);
         toast.success('Quote deleted successfully!');
-        
+
         // If we're on a page that will be empty after deletion, go to previous page
         if (quotes.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1);
@@ -85,7 +99,7 @@ const QuotesManager = () => {
     try {
       await api.put(`/api/quotes/${quote.id}`, {
         ...quote,
-        is_active: quote.is_active ? 0 : 1
+        is_active: quote.is_active ? 0 : 1,
       });
       toast.success('Quote status updated!');
       fetchQuotes();
@@ -111,7 +125,10 @@ const QuotesManager = () => {
 
   const handleViewToggleActive = async () => {
     await toggleActive(viewingQuote);
-    setViewingQuote({ ...viewingQuote, is_active: viewingQuote.is_active ? 0 : 1 });
+    setViewingQuote({
+      ...viewingQuote,
+      is_active: viewingQuote.is_active ? 0 : 1,
+    });
   };
 
   const handlePageChange = (pageNumber) => {
@@ -121,14 +138,21 @@ const QuotesManager = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+        }}
+      >
         <div>
           <h2 style={{ marginBottom: '4px' }}>Daily Quotes</h2>
           <p style={{ fontSize: '14px', color: 'rgba(55, 53, 47, 0.65)' }}>
             Manage motivational quotes shown on the login page
           </p>
         </div>
-        <button 
+        <button
           onClick={() => {
             setShowForm(true);
             setEditingQuote(null);
@@ -143,30 +167,51 @@ const QuotesManager = () => {
       </div>
 
       {showForm && (
-        <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
+        <div
+          className="card"
+          style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}
+        >
           <h3>{editingQuote ? 'Edit Quote' : 'New Quote'}</h3>
           <form onSubmit={handleSubmit}>
             <textarea
               placeholder="Quote text *"
               value={formData.text}
-              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, text: e.target.value })
+              }
               required
               style={{ marginBottom: '10px', minHeight: '80px' }}
             />
             <input
               placeholder="Author (optional)"
               value={formData.author}
-              onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, author: e.target.value })
+              }
               style={{ marginBottom: '10px' }}
             />
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={formData.is_active === 1}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked ? 1 : 0 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      is_active: e.target.checked ? 1 : 0,
+                    })
+                  }
                 />
-                <span style={{ fontSize: '14px' }}>Active (show in rotation)</span>
+                <span style={{ fontSize: '14px' }}>
+                  Active (show in rotation)
+                </span>
               </label>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -202,20 +247,27 @@ const QuotesManager = () => {
             {quotes.map((quote) => (
               <tr key={quote.id}>
                 <td style={{ padding: '12px', maxWidth: '400px' }}>
-                  <div style={{ 
-                    fontSize: '14px', 
-                    fontStyle: 'italic',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontStyle: 'italic',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                    }}
+                  >
                     "{quote.text}"
                   </div>
                 </td>
                 <td style={{ padding: '12px' }}>
-                  <div style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>
+                  <div
+                    style={{
+                      fontSize: '13px',
+                      color: 'rgba(55, 53, 47, 0.65)',
+                    }}
+                  >
                     {quote.author || '—'}
                   </div>
                 </td>
@@ -228,15 +280,23 @@ const QuotesManager = () => {
                       borderRadius: '12px',
                       border: 'none',
                       cursor: 'pointer',
-                      background: quote.is_active ? 'rgba(46, 170, 220, 0.1)' : 'rgba(55, 53, 47, 0.1)',
-                      color: quote.is_active ? '#2eaadc' : 'rgba(55, 53, 47, 0.5)',
+                      background: quote.is_active
+                        ? 'rgba(46, 170, 220, 0.1)'
+                        : 'rgba(55, 53, 47, 0.1)',
+                      color: quote.is_active
+                        ? '#2eaadc'
+                        : 'rgba(55, 53, 47, 0.5)',
                       fontWeight: '500',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '4px',
                     }}
                   >
-                    {quote.is_active ? <MdCheck size={14} /> : <MdClose size={14} />}
+                    {quote.is_active ? (
+                      <MdCheck size={14} />
+                    ) : (
+                      <MdClose size={14} />
+                    )}
                     {quote.is_active ? 'Active' : 'Inactive'}
                   </button>
                 </td>
@@ -269,11 +329,13 @@ const QuotesManager = () => {
         </table>
 
         {quotes.length === 0 && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '40px', 
-            color: 'rgba(55, 53, 47, 0.4)' 
-          }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px',
+              color: 'rgba(55, 53, 47, 0.4)',
+            }}
+          >
             No quotes yet. Add your first motivational quote!
           </div>
         )}

@@ -30,10 +30,14 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   background: #ffffff;
   color: #37352f;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -333,7 +337,7 @@ body.dark-mode a:hover {
 }
 
 /* Dark mode for gradient cards */
-body.dark-mode .card[style*="linear-gradient"] {
+body.dark-mode .card[style*='linear-gradient'] {
   opacity: 0.95;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -375,7 +379,9 @@ button {
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   transition: all 0.15s ease;
   font-weight: 400;
   background: transparent;
@@ -396,7 +402,9 @@ button:active {
   color: var(--primary-text);
   border: none;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   padding: 6px 12px;
   border-radius: 3px;
   cursor: pointer;
@@ -414,7 +422,9 @@ button:active {
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -432,7 +442,9 @@ button:active {
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -450,7 +462,9 @@ select {
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
   font-size: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   transition: all 0.15s ease;
   background: #ffffff;
   color: #37352f;
@@ -477,7 +491,9 @@ select:focus {
   font-size: 13px;
   font-weight: 500;
   color: #37352f;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
 }
 
 .form-input {
@@ -486,7 +502,9 @@ select:focus {
   border: 1px solid rgba(55, 53, 47, 0.16);
   border-radius: 3px;
   font-size: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   transition: all 0.15s ease;
   background: #ffffff;
   color: #37352f;
@@ -651,26 +669,26 @@ body.dark-mode .register-container input::placeholder {
   color: rgba(255, 255, 255, 0.4) !important;
 }
 
-body.dark-mode .login-container button[type="submit"],
-body.dark-mode .register-container button[type="submit"] {
+body.dark-mode .login-container button[type='submit'],
+body.dark-mode .register-container button[type='submit'] {
   background: rgba(255, 255, 255, 0.9) !important;
   color: #191919 !important;
 }
 
-body.dark-mode .login-container button[type="submit"]:hover,
-body.dark-mode .register-container button[type="submit"]:hover {
+body.dark-mode .login-container button[type='submit']:hover,
+body.dark-mode .register-container button[type='submit']:hover {
   background: #ffffff !important;
 }
 
-body.dark-mode .login-container button[type="button"],
-body.dark-mode .register-container button[type="button"] {
+body.dark-mode .login-container button[type='button'],
+body.dark-mode .register-container button[type='button'] {
   background: transparent !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
-body.dark-mode .login-container button[type="button"]:hover,
-body.dark-mode .register-container button[type="button"]:hover {
+body.dark-mode .login-container button[type='button']:hover,
+body.dark-mode .register-container button[type='button']:hover {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
@@ -687,7 +705,9 @@ body.dark-mode .register-container a {
   border: 1px solid rgba(55, 53, 47, 0.16);
   padding: 6px 12px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -704,7 +724,9 @@ body.dark-mode .register-container a {
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
 }
 
 .btn-view:hover {
@@ -718,7 +740,8 @@ body.dark-mode .register-container a {
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 600;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -817,7 +840,9 @@ body.dark-mode .status-badge {
   border: 1px solid var(--border-primary);
   padding: 6px 12px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1035,7 +1060,9 @@ body.dark-mode .notification-header h3 {
   padding: 24px 12px;
   display: flex;
   flex-direction: column;
-  transition: width 0.2s ease, background 0.2s ease;
+  transition:
+    width 0.2s ease,
+    background 0.2s ease;
   position: relative;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02);
 }
@@ -1132,7 +1159,9 @@ body.dark-mode .sidebar-toggle:hover {
   border: 1px solid var(--button-border);
   cursor: pointer;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1209,21 +1238,24 @@ body.dark-mode .register-container img {
 }
 
 /* Dark mode for nested stat boxes in Reports */
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] {
+body.dark-mode .card div[style*='background: rgba(55, 53, 47, 0.03)'] {
   background: rgba(255, 255, 255, 0.05) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p {
+body.dark-mode .card div[style*='background: rgba(55, 53, 47, 0.03)'] p {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="color: rgba(55, 53, 47, 0.65)"] {
+body.dark-mode
+  .card
+  div[style*='background: rgba(55, 53, 47, 0.03)']
+  p[style*='color: rgba(55, 53, 47, 0.65)'] {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Dark mode for stat card icons */
-body.dark-mode .card div[style*="color: rgba(55, 53, 47, 0.4)"] {
+body.dark-mode .card div[style*='color: rgba(55, 53, 47, 0.4)'] {
   color: rgba(255, 255, 255, 0.3) !important;
 }
 
@@ -1233,7 +1265,7 @@ body.dark-mode .empty-state-icon {
 }
 
 /* Dark mode for inline icons in task details */
-body.dark-mode span[style*="display: flex"] svg {
+body.dark-mode span[style*='display: flex'] svg {
   opacity: 0.8;
 }
 
@@ -1279,35 +1311,44 @@ body.dark-mode textarea {
 }
 
 /* Dark mode for task description text */
-body.dark-mode .card p[style*="color: rgba(55, 53, 47, 0.65)"] {
+body.dark-mode .card p[style*='color: rgba(55, 53, 47, 0.65)'] {
   color: rgba(255, 255, 255, 0.65) !important;
 }
 
 /* Dark mode for task title text */
-body.dark-mode span[style*="color: #37352f"] {
+body.dark-mode span[style*='color: #37352f'] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Dark mode for date/time text */
-body.dark-mode span[style*="color: rgba(55, 53, 47, 0.5)"] {
+body.dark-mode span[style*='color: rgba(55, 53, 47, 0.5)'] {
   color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Dark mode for overdue text */
-body.dark-mode span[style*="color: #eb5757"] {
+body.dark-mode span[style*='color: #eb5757'] {
   color: #eb5757 !important;
 }
 
 /* Dark mode for Reports page nested stat boxes */
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="color: #37352f"] {
+body.dark-mode
+  .card
+  div[style*='background: rgba(55, 53, 47, 0.03)']
+  p[style*='color: #37352f'] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="fontSize: '20px'"] {
+body.dark-mode
+  .card
+  div[style*='background: rgba(55, 53, 47, 0.03)']
+  p[style*="fontSize: '20px'"] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-body.dark-mode .card div[style*="background: rgba(55, 53, 47, 0.03)"] p[style*="fontSize: '24px'"] {
+body.dark-mode
+  .card
+  div[style*='background: rgba(55, 53, 47, 0.03)']
+  p[style*="fontSize: '24px'"] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -1361,13 +1402,13 @@ body.dark-mode table td[style*="fontWeight: '600'"] {
   text-align: right;
 }
 
-.rbc-date-cell>a {
+.rbc-date-cell > a {
   color: var(--text-primary);
   text-decoration: none;
   font-size: 13px;
 }
 
-.rbc-date-cell.rbc-now>a {
+.rbc-date-cell.rbc-now > a {
   color: #2eaadc;
   font-weight: 600;
 }
@@ -1410,7 +1451,9 @@ body.dark-mode table td[style*="fontWeight: '600'"] {
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1450,7 +1493,7 @@ body.dark-mode table td[style*="fontWeight: '600'"] {
   border-left: none;
 }
 
-.rbc-header+.rbc-header {
+.rbc-header + .rbc-header {
   border-left: 1px solid var(--border-secondary);
 }
 
@@ -1521,10 +1564,8 @@ body.dark-mode .rbc-current-time-indicator {
   background-color: #2eaadc;
 }
 
-
 /* Login Background Animations */
 @keyframes float {
-
   0%,
   100% {
     transform: translate(0, 0) scale(1);
@@ -1540,7 +1581,6 @@ body.dark-mode .rbc-current-time-indicator {
 }
 
 @keyframes wave {
-
   0%,
   100% {
     transform: translateX(0) translateY(0);
@@ -1646,7 +1686,7 @@ body.dark-mode .preference-description {
 
 .toggle-slider::before {
   position: absolute;
-  content: "";
+  content: '';
   height: 18px;
   width: 18px;
   left: 3px;

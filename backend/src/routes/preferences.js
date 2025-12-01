@@ -16,20 +16,24 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *       200:
  *         description: Email preferences
  */
-router.get('/email', authenticateToken, asyncHandler(async (req, res) => {
-  const result = await query(
-    'SELECT email_preferences FROM users WHERE id = $1',
-    [req.user.id]
-  );
+router.get(
+  '/email',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const result = await query(
+      'SELECT email_preferences FROM users WHERE id = $1',
+      [req.user.id]
+    );
 
-  const preferences = result.rows[0]?.email_preferences || {
-    marketing: true,
-    notifications: true,
-    updates: true
-  };
+    const preferences = result.rows[0]?.email_preferences || {
+      marketing: true,
+      notifications: true,
+      updates: true,
+    };
 
-  res.json({ preferences });
-}));
+    res.json({ preferences });
+  })
+);
 
 /**
  * @swagger
@@ -56,25 +60,29 @@ router.get('/email', authenticateToken, asyncHandler(async (req, res) => {
  *       200:
  *         description: Preferences updated
  */
-router.put('/email', authenticateToken, asyncHandler(async (req, res) => {
-  const { marketing, notifications, updates } = req.body;
+router.put(
+  '/email',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { marketing, notifications, updates } = req.body;
 
-  const preferences = {
-    marketing: marketing !== undefined ? marketing : true,
-    notifications: notifications !== undefined ? notifications : true,
-    updates: updates !== undefined ? updates : true
-  };
+    const preferences = {
+      marketing: marketing !== undefined ? marketing : true,
+      notifications: notifications !== undefined ? notifications : true,
+      updates: updates !== undefined ? updates : true,
+    };
 
-  await query(
-    'UPDATE users SET email_preferences = $1 WHERE id = $2',
-    [JSON.stringify(preferences), req.user.id]
-  );
+    await query('UPDATE users SET email_preferences = $1 WHERE id = $2', [
+      JSON.stringify(preferences),
+      req.user.id,
+    ]);
 
-  res.json({ 
-    message: 'Email preferences updated successfully',
-    preferences 
-  });
-}));
+    res.json({
+      message: 'Email preferences updated successfully',
+      preferences,
+    });
+  })
+);
 
 /**
  * @swagger
@@ -97,29 +105,32 @@ router.put('/email', authenticateToken, asyncHandler(async (req, res) => {
  *       200:
  *         description: Unsubscribed successfully
  */
-router.post('/unsubscribe', asyncHandler(async (req, res) => {
-  const { email } = req.body;
+router.post(
+  '/unsubscribe',
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
-  }
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
 
-  // Unsubscribe from all marketing emails
-  await query(
-    `UPDATE users 
+    // Unsubscribe from all marketing emails
+    await query(
+      `UPDATE users 
      SET email_preferences = jsonb_set(
        COALESCE(email_preferences, '{}'::jsonb),
        '{marketing}',
        'false'
      )
      WHERE email = $1`,
-    [email]
-  );
+      [email]
+    );
 
-  res.json({ 
-    message: 'You have been unsubscribed from marketing emails',
-    success: true 
-  });
-}));
+    res.json({
+      message: 'You have been unsubscribed from marketing emails',
+      success: true,
+    });
+  })
+);
 
 module.exports = router;

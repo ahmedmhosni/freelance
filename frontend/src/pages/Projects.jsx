@@ -12,9 +12,16 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, projectId: null });
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    projectId: null,
+  });
   const [formData, setFormData] = useState({
-    title: '', description: '', client_id: '', status: 'active', deadline: ''
+    title: '',
+    description: '',
+    client_id: '',
+    status: 'active',
+    deadline: '',
   });
 
   useEffect(() => {
@@ -56,9 +63,9 @@ const Projects = () => {
         client_id: formData.client_id || null,
         status: formData.status,
         end_date: formData.deadline || null,
-        start_date: formData.start_date || null
+        start_date: formData.start_date || null,
       };
-      
+
       if (editingProject) {
         await api.put(`/api/projects/${editingProject.id}`, projectData);
         toast.success('Project updated successfully!');
@@ -68,7 +75,13 @@ const Projects = () => {
       }
       setShowForm(false);
       setEditingProject(null);
-      setFormData({ title: '', description: '', client_id: '', status: 'active', deadline: '' });
+      setFormData({
+        title: '',
+        description: '',
+        client_id: '',
+        status: 'active',
+        deadline: '',
+      });
       fetchProjects();
     } catch (error) {
       logger.error('Error saving project:', error);
@@ -85,7 +98,7 @@ const Projects = () => {
       client_id: project.client_id,
       status: project.status,
       deadline: project.end_date,
-      start_date: project.start_date
+      start_date: project.start_date,
     });
     setShowForm(true);
   };
@@ -106,28 +119,25 @@ const Projects = () => {
     }
   };
 
-  const statusColors = {
-    active: '#007bff', completed: '#28a745', 'on-hold': '#ffc107', cancelled: '#dc3545'
-  };
-
   return (
     <div className="container">
-      <div className="page-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        marginBottom: '24px',
-        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-        gap: window.innerWidth <= 768 ? '16px' : '0'
-      }}>
+      <div
+        className="page-header"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '24px',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          gap: window.innerWidth <= 768 ? '16px' : '0',
+        }}
+      >
         <div>
           <h1 style={{ marginBottom: '4px' }}>Projects</h1>
-          <p className="page-subtitle">
-            Track and manage your projects
-          </p>
+          <p className="page-subtitle">Track and manage your projects</p>
         </div>
-        <button 
-          className="btn-primary" 
+        <button
+          className="btn-primary"
           onClick={() => setShowForm(true)}
           style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
         >
@@ -136,35 +146,48 @@ const Projects = () => {
       </div>
 
       {showForm && (
-        <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
+        <div
+          className="card"
+          style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}
+        >
           <h3>{editingProject ? 'Edit Project' : 'New Project'}</h3>
           <form onSubmit={handleSubmit}>
-            <input 
-              placeholder="Project Title *" 
-              value={formData.title} 
-              onChange={(e) => setFormData({...formData, title: e.target.value})} 
-              required 
-              style={{ marginBottom: '10px' }} 
+            <input
+              placeholder="Project Title *"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              required
+              style={{ marginBottom: '10px' }}
             />
-            <textarea 
-              placeholder="Description" 
-              value={formData.description || ''} 
-              onChange={(e) => setFormData({...formData, description: e.target.value})} 
-              style={{ marginBottom: '10px', minHeight: '80px' }} 
+            <textarea
+              placeholder="Description"
+              value={formData.description || ''}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              style={{ marginBottom: '10px', minHeight: '80px' }}
             />
-            <select 
-              value={formData.client_id} 
-              onChange={(e) => setFormData({...formData, client_id: e.target.value})} 
+            <select
+              value={formData.client_id}
+              onChange={(e) =>
+                setFormData({ ...formData, client_id: e.target.value })
+              }
               style={{ marginBottom: '10px' }}
             >
               <option value="">Select Client (Optional)</option>
-              {clients.map(client => (
-                <option key={client.id} value={client.id}>{client.name}</option>
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name}
+                </option>
               ))}
             </select>
-            <select 
-              value={formData.status} 
-              onChange={(e) => setFormData({...formData, status: e.target.value})} 
+            <select
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
               style={{ marginBottom: '10px' }}
             >
               <option value="active">Active</option>
@@ -172,18 +195,37 @@ const Projects = () => {
               <option value="on-hold">On Hold</option>
               <option value="cancelled">Cancelled</option>
             </select>
-            <input 
-              type="date" 
-              placeholder="Deadline" 
-              value={formData.deadline} 
-              onChange={(e) => setFormData({...formData, deadline: e.target.value})} 
-              style={{ marginBottom: '10px' }} 
+            <input
+              type="date"
+              placeholder="Deadline"
+              value={formData.deadline}
+              onChange={(e) =>
+                setFormData({ ...formData, deadline: e.target.value })
+              }
+              style={{ marginBottom: '10px' }}
             />
             <div>
-              <button type="submit" className="btn-primary" style={{ marginRight: '10px' }}>
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ marginRight: '10px' }}
+              >
                 {editingProject ? 'Update' : 'Create'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingProject(null); setFormData({ title: '', description: '', client_id: '', status: 'active', deadline: '' }); }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingProject(null);
+                  setFormData({
+                    title: '',
+                    description: '',
+                    client_id: '',
+                    status: 'active',
+                    deadline: '',
+                  });
+                }}
+              >
                 Cancel
               </button>
             </div>
@@ -195,40 +237,76 @@ const Projects = () => {
         <LoadingSkeleton type="card" count={4} />
       ) : projects.length === 0 ? (
         <div className="card empty-state">
-          <div className="empty-state-icon"><MdFolder /></div>
+          <div className="empty-state-icon">
+            <MdFolder />
+          </div>
           <p>No projects yet. Create your first project to get started!</p>
         </div>
       ) : (
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: window.innerWidth <= 768 
-            ? '1fr' 
-            : 'repeat(auto-fill, minmax(300px, 1fr))', 
-          gap: '20px' 
-        }}>
-          {projects.map(project => (
-            <div key={project.id} className="card" style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
-                <h3 style={{ margin: 0, flex: 1, fontSize: '16px' }}>{project.name}</h3>
-                <span className={`status-badge status-${project.status}`} style={{ marginLeft: '10px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              window.innerWidth <= 768
+                ? '1fr'
+                : 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="card"
+              style={{ position: 'relative' }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'start',
+                  marginBottom: '10px',
+                }}
+              >
+                <h3 style={{ margin: 0, flex: 1, fontSize: '16px' }}>
+                  {project.name}
+                </h3>
+                <span
+                  className={`status-badge status-${project.status}`}
+                  style={{ marginLeft: '10px' }}
+                >
                   {project.status}
                 </span>
               </div>
-              <p style={{ color: 'rgba(55, 53, 47, 0.65)', marginBottom: '15px', minHeight: '40px', fontSize: '14px' }}>{project.description || 'No description'}</p>
+              <p
+                style={{
+                  color: 'rgba(55, 53, 47, 0.65)',
+                  marginBottom: '15px',
+                  minHeight: '40px',
+                  fontSize: '14px',
+                }}
+              >
+                {project.description || 'No description'}
+              </p>
               {project.end_date && (
-                <p style={{ fontSize: '12px', color: 'rgba(55, 53, 47, 0.5)', marginBottom: '15px' }}>
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'rgba(55, 53, 47, 0.5)',
+                    marginBottom: '15px',
+                  }}
+                >
                   {new Date(project.end_date).toLocaleDateString()}
                 </p>
               )}
               <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                <button 
+                <button
                   onClick={() => handleEdit(project)}
                   className="btn-edit"
                   style={{ flex: 1 }}
                 >
                   Edit
                 </button>
-                <button 
+                <button
                   onClick={() => confirmDelete(project.id)}
                   className="btn-delete"
                   style={{ flex: 1 }}

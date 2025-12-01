@@ -12,8 +12,8 @@ async function runMigrations() {
     user: 'adminuser',
     password: 'AHmed#123456',
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   });
 
   try {
@@ -21,25 +21,31 @@ async function runMigrations() {
     console.log('📍 Database:', process.env.PG_DATABASE);
     console.log('📍 Host:', process.env.PG_HOST);
     console.log('\n⚠️  WARNING: Running on PRODUCTION database!\n');
-    
+
     // Migration 1: Changelog System
     console.log('1️⃣  Creating changelog system tables...');
     const sql1 = fs.readFileSync(
-      path.join(__dirname, '../database/migrations/CREATE_CHANGELOG_SYSTEM.sql'),
+      path.join(
+        __dirname,
+        '../database/migrations/CREATE_CHANGELOG_SYSTEM.sql'
+      ),
       'utf8'
     );
     await pool.query(sql1);
     console.log('✅ Changelog system tables created');
-    
+
     // Migration 2: Git Commits Tracking
     console.log('\n2️⃣  Adding git commits tracking...');
     const sql2 = fs.readFileSync(
-      path.join(__dirname, '../database/migrations/ADD_GIT_COMMITS_TRACKING.sql'),
+      path.join(
+        __dirname,
+        '../database/migrations/ADD_GIT_COMMITS_TRACKING.sql'
+      ),
       'utf8'
     );
     await pool.query(sql2);
     console.log('✅ Git commits tracking enabled');
-    
+
     console.log('\n🎉 SUCCESS! All migrations completed!');
     console.log('\n📊 Tables created:');
     console.log('   - versions: Store version releases');
@@ -47,7 +53,7 @@ async function runMigrations() {
     console.log('   - git_commits: Track git commits');
     console.log('   - git_sync_status: Track sync status');
     console.log('\n✅ Production database is ready!');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {

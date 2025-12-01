@@ -27,10 +27,14 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *       200:
  *         description: List of export requests
  */
-router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { status, limit = 50 } = req.query;
+router.get(
+  '/export-requests',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { status, limit = 50 } = req.query;
 
-  let sql = `
+    let sql = `
     SELECT 
       der.id,
       der.user_id,
@@ -49,19 +53,19 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
     JOIN users u ON der.user_id = u.id
   `;
 
-  const params = [];
-  if (status) {
-    sql += ' WHERE der.status = $1';
-    params.push(status);
-  }
+    const params = [];
+    if (status) {
+      sql += ' WHERE der.status = $1';
+      params.push(status);
+    }
 
-  sql += ' ORDER BY der.requested_at DESC LIMIT $' + (params.length + 1);
-  params.push(limit);
+    sql += ' ORDER BY der.requested_at DESC LIMIT $' + (params.length + 1);
+    params.push(limit);
 
-  const result = await query(sql, params);
+    const result = await query(sql, params);
 
-  // Get stats
-  const statsResult = await query(`
+    // Get stats
+    const statsResult = await query(`
     SELECT 
       status,
       COUNT(*) as count
@@ -69,24 +73,25 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
     GROUP BY status
   `);
 
-  const stats = {
-    total: 0,
-    pending: 0,
-    processing: 0,
-    completed: 0,
-    failed: 0
-  };
+    const stats = {
+      total: 0,
+      pending: 0,
+      processing: 0,
+      completed: 0,
+      failed: 0,
+    };
 
-  statsResult.rows.forEach(row => {
-    stats[row.status] = parseInt(row.count);
-    stats.total += parseInt(row.count);
-  });
+    statsResult.rows.forEach((row) => {
+      stats[row.status] = parseInt(row.count);
+      stats.total += parseInt(row.count);
+    });
 
-  res.json({
-    requests: result.rows,
-    stats
-  });
-}));
+    res.json({
+      requests: result.rows,
+      stats,
+    });
+  })
+);
 
 /**
  * @swagger
@@ -106,11 +111,15 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
  *       200:
  *         description: List of deleted accounts
  */
-router.get('/deleted-accounts', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { limit = 50 } = req.query;
+router.get(
+  '/deleted-accounts',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { limit = 50 } = req.query;
 
-  const result = await query(
-    `SELECT 
+    const result = await query(
+      `SELECT 
       id,
       name,
       email,
@@ -123,11 +132,11 @@ router.get('/deleted-accounts', authenticateToken, requireAdmin, asyncHandler(as
     WHERE deleted_at IS NOT NULL
     ORDER BY deleted_at DESC
     LIMIT $1`,
-    [limit]
-  );
+      [limit]
+    );
 
-  // Get stats
-  const statsResult = await query(`
+    // Get stats
+    const statsResult = await query(`
     SELECT 
       COUNT(*) as total_deleted,
       COUNT(CASE WHEN deleted_at > NOW() - INTERVAL '30 days' THEN 1 END) as deleted_last_30_days,
@@ -136,11 +145,12 @@ router.get('/deleted-accounts', authenticateToken, requireAdmin, asyncHandler(as
     WHERE deleted_at IS NOT NULL
   `);
 
-  res.json({
-    accounts: result.rows,
-    stats: statsResult.rows[0]
-  });
-}));
+    res.json({
+      accounts: result.rows,
+      stats: statsResult.rows[0],
+    });
+  })
+);
 
 /**
  * @swagger
@@ -163,49 +173,54 @@ router.get('/deleted-accounts', authenticateToken, requireAdmin, asyncHandler(as
  *       200:
  *         description: Account restored
  */
-router.post('/restore-account', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { userId } = req.body;
+router.post(
+  '/restore-account',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { userId } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID is required' });
-  }
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
 
-  // Get user info
-  const userResult = await query(
-    'SELECT id, email, deleted_at FROM users WHERE id = $1',
-    [userId]
-  );
+    // Get user info
+    const userResult = await query(
+      'SELECT id, email, deleted_at FROM users WHERE id = $1',
+      [userId]
+    );
 
-  if (userResult.rows.length === 0) {
-    return res.status(404).json({ error: 'User not found' });
-  }
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  const user = userResult.rows[0];
+    const user = userResult.rows[0];
 
-  if (!user.deleted_at) {
-    return res.status(400).json({ error: 'Account is not deleted' });
-  }
+    if (!user.deleted_at) {
+      return res.status(400).json({ error: 'Account is not deleted' });
+    }
 
-  // Restore account
-  // Remove "deleted_" prefix from email
-  const originalEmail = user.email.replace(/^deleted_\d+_/, '');
+    // Restore account
+    // Remove "deleted_" prefix from email
+    const originalEmail = user.email.replace(/^deleted_\d+_/, '');
 
-  await query(
-    `UPDATE users 
+    await query(
+      `UPDATE users 
      SET deleted_at = NULL,
          deletion_reason = NULL,
          is_active = true,
          email = $1
      WHERE id = $2`,
-    [originalEmail, userId]
-  );
+      [originalEmail, userId]
+    );
 
-  res.json({
-    message: 'Account restored successfully',
-    userId,
-    email: originalEmail
-  });
-}));
+    res.json({
+      message: 'Account restored successfully',
+      userId,
+      email: originalEmail,
+    });
+  })
+);
 
 /**
  * @swagger
@@ -219,8 +234,12 @@ router.post('/restore-account', authenticateToken, requireAdmin, asyncHandler(as
  *       200:
  *         description: Email preferences statistics
  */
-router.get('/email-preferences-stats', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const result = await query(`
+router.get(
+  '/email-preferences-stats',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const result = await query(`
     SELECT 
       COUNT(*) as total_users,
       COUNT(CASE WHEN (email_preferences->>'marketing')::boolean = true THEN 1 END) as marketing_enabled,
@@ -233,30 +252,40 @@ router.get('/email-preferences-stats', authenticateToken, requireAdmin, asyncHan
     WHERE deleted_at IS NULL
   `);
 
-  const stats = result.rows[0];
+    const stats = result.rows[0];
 
-  // Calculate percentages
-  const totalUsers = parseInt(stats.total_users);
-  
-  res.json({
-    totalUsers,
-    marketing: {
-      enabled: parseInt(stats.marketing_enabled),
-      disabled: parseInt(stats.marketing_disabled),
-      disabledPercentage: totalUsers > 0 ? ((stats.marketing_disabled / totalUsers) * 100).toFixed(1) : 0
-    },
-    notifications: {
-      enabled: parseInt(stats.notifications_enabled),
-      disabled: parseInt(stats.notifications_disabled),
-      disabledPercentage: totalUsers > 0 ? ((stats.notifications_disabled / totalUsers) * 100).toFixed(1) : 0
-    },
-    updates: {
-      enabled: parseInt(stats.updates_enabled),
-      disabled: parseInt(stats.updates_disabled),
-      disabledPercentage: totalUsers > 0 ? ((stats.updates_disabled / totalUsers) * 100).toFixed(1) : 0
-    }
-  });
-}));
+    // Calculate percentages
+    const totalUsers = parseInt(stats.total_users);
+
+    res.json({
+      totalUsers,
+      marketing: {
+        enabled: parseInt(stats.marketing_enabled),
+        disabled: parseInt(stats.marketing_disabled),
+        disabledPercentage:
+          totalUsers > 0
+            ? ((stats.marketing_disabled / totalUsers) * 100).toFixed(1)
+            : 0,
+      },
+      notifications: {
+        enabled: parseInt(stats.notifications_enabled),
+        disabled: parseInt(stats.notifications_disabled),
+        disabledPercentage:
+          totalUsers > 0
+            ? ((stats.notifications_disabled / totalUsers) * 100).toFixed(1)
+            : 0,
+      },
+      updates: {
+        enabled: parseInt(stats.updates_enabled),
+        disabled: parseInt(stats.updates_disabled),
+        disabledPercentage:
+          totalUsers > 0
+            ? ((stats.updates_disabled / totalUsers) * 100).toFixed(1)
+            : 0,
+      },
+    });
+  })
+);
 
 /**
  * @swagger
@@ -270,8 +299,12 @@ router.get('/email-preferences-stats', authenticateToken, requireAdmin, asyncHan
  *       200:
  *         description: Deletion reasons with counts
  */
-router.get('/deletion-reasons', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const result = await query(`
+router.get(
+  '/deletion-reasons',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const result = await query(`
     SELECT 
       deletion_reason,
       COUNT(*) as count,
@@ -284,10 +317,14 @@ router.get('/deletion-reasons', authenticateToken, requireAdmin, asyncHandler(as
     ORDER BY count DESC
   `);
 
-  res.json({
-    reasons: result.rows,
-    totalWithReasons: result.rows.reduce((sum, row) => sum + parseInt(row.count), 0)
-  });
-}));
+    res.json({
+      reasons: result.rows,
+      totalWithReasons: result.rows.reduce(
+        (sum, row) => sum + parseInt(row.count),
+        0
+      ),
+    });
+  })
+);
 
 module.exports = router;

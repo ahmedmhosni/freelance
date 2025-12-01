@@ -1,20 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import LogoLoader from '../components/LogoLoader';
 import AvatarPicker from '../components/AvatarPicker';
 import EmailPreferences from '../components/EmailPreferences';
 import DataPrivacy from '../components/DataPrivacy';
-import { 
-  MdPerson, MdEmail, MdLock, MdWork, MdLocationOn, MdLanguage
+import {
+  MdPerson,
+  MdEmail,
+  MdLock,
+  MdWork,
+  MdLocationOn,
+  MdLanguage,
 } from 'react-icons/md';
-import { 
-  FaLinkedin, FaBehance, FaInstagram, FaFacebook, FaTwitter, FaGithub, FaDribbble
+import {
+  FaLinkedin,
+  FaBehance,
+  FaTwitter,
+  FaGithub,
+  FaDribbble,
 } from 'react-icons/fa';
 
 const Profile = () => {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -35,7 +42,7 @@ const Profile = () => {
     github: '',
     dribbble: '',
     portfolio: '',
-    profile_visibility: 'public'
+    profile_visibility: 'public',
   });
 
   useEffect(() => {
@@ -56,7 +63,7 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile(prev => ({ ...prev, [name]: value }));
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -75,12 +82,15 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="container" style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh'
-      }}>
+      <div
+        className="container"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+        }}
+      >
         <LogoLoader text="Loading profile..." />
       </div>
     );
@@ -97,22 +107,22 @@ const Profile = () => {
 
       {/* View Toggle Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        <button 
-          onClick={() => setActiveTab('profile')} 
+        <button
+          onClick={() => setActiveTab('profile')}
           className={`view-toggle ${activeTab === 'profile' ? 'active' : ''}`}
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
           <MdPerson /> Profile Info
         </button>
-        <button 
-          onClick={() => setActiveTab('email')} 
+        <button
+          onClick={() => setActiveTab('email')}
           className={`view-toggle ${activeTab === 'email' ? 'active' : ''}`}
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
           <MdEmail /> Email Preferences
         </button>
-        <button 
-          onClick={() => setActiveTab('privacy')} 
+        <button
+          onClick={() => setActiveTab('privacy')}
           className={`view-toggle ${activeTab === 'privacy' ? 'active' : ''}`}
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
@@ -124,19 +134,31 @@ const Profile = () => {
       {activeTab === 'profile' && (
         <form onSubmit={handleSubmit}>
           {/* Avatar Section */}
-          <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
+          <div
+            className="card"
+            style={{ padding: '24px', marginBottom: '24px' }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                marginBottom: '20px',
+                fontWeight: '600',
+              }}
+            >
               Profile Picture
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <img
-                src={profile.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=80&background=8b5cf6&color=fff`}
+                src={
+                  profile.profile_picture ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=80&background=8b5cf6&color=fff`
+                }
                 alt="Profile"
                 style={{
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
                 }}
               />
               <button
@@ -150,12 +172,27 @@ const Profile = () => {
           </div>
 
           {/* Basic Info */}
-          <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
+          <div
+            className="card"
+            style={{ padding: '24px', marginBottom: '24px' }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                marginBottom: '20px',
+                fontWeight: '600',
+              }}
+            >
               Basic Information
             </h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '16px',
+              }}
+            >
               <div>
                 <label className="form-label">Full Name</label>
                 <input
@@ -179,7 +216,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <MdWork style={{ fontSize: '14px' }} />
                   Job Title
                 </label>
@@ -194,7 +234,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <MdLocationOn style={{ fontSize: '14px' }} />
                   Location
                 </label>
@@ -224,14 +267,32 @@ const Profile = () => {
           </div>
 
           {/* Social Links */}
-          <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
+          <div
+            className="card"
+            style={{ padding: '24px', marginBottom: '24px' }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                marginBottom: '20px',
+                fontWeight: '600',
+              }}
+            >
               Social Links
             </h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '16px',
+              }}
+            >
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <MdLanguage style={{ fontSize: '14px' }} />
                   Website
                 </label>
@@ -246,7 +307,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <FaLinkedin style={{ fontSize: '14px' }} />
                   LinkedIn
                 </label>
@@ -261,7 +325,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <FaTwitter style={{ fontSize: '14px' }} />
                   Twitter
                 </label>
@@ -276,7 +343,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <FaGithub style={{ fontSize: '14px' }} />
                   GitHub
                 </label>
@@ -291,7 +361,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <FaBehance style={{ fontSize: '14px' }} />
                   Behance
                 </label>
@@ -306,7 +379,10 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label
+                  className="form-label"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <FaDribbble style={{ fontSize: '14px' }} />
                   Dribbble
                 </label>
@@ -323,8 +399,17 @@ const Profile = () => {
           </div>
 
           {/* Privacy Settings */}
-          <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>
+          <div
+            className="card"
+            style={{ padding: '24px', marginBottom: '24px' }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                marginBottom: '20px',
+                fontWeight: '600',
+              }}
+            >
               Profile Visibility
             </h3>
             <select
@@ -334,13 +419,19 @@ const Profile = () => {
               className="form-input"
               style={{ maxWidth: '300px' }}
             >
-              <option value="public">Public - Anyone can view your profile</option>
-              <option value="private">Private - Only you can see your profile</option>
+              <option value="public">
+                Public - Anyone can view your profile
+              </option>
+              <option value="private">
+                Private - Only you can see your profile
+              </option>
             </select>
           </div>
 
           {/* Save Button */}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <div
+            style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}
+          >
             <button
               type="button"
               onClick={fetchProfile}
@@ -349,11 +440,7 @@ const Profile = () => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="btn-primary"
-            >
+            <button type="submit" disabled={saving} className="btn-primary">
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
@@ -361,14 +448,10 @@ const Profile = () => {
       )}
 
       {/* Email Preferences Tab */}
-      {activeTab === 'email' && (
-        <EmailPreferences />
-      )}
+      {activeTab === 'email' && <EmailPreferences />}
 
       {/* Data & Privacy Tab */}
-      {activeTab === 'privacy' && (
-        <DataPrivacy />
-      )}
+      {activeTab === 'privacy' && <DataPrivacy />}
 
       {/* Avatar Picker Modal */}
       {showAvatarPicker && (

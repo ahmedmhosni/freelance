@@ -12,7 +12,7 @@ async function query(text, params = []) {
     const result = await pool.query(text, params);
     return {
       rows: result.rows,
-      rowCount: result.rowCount
+      rowCount: result.rowCount,
     };
   } catch (error) {
     console.error('PostgreSQL Query Error:', error);
@@ -68,5 +68,5 @@ module.exports = {
   getAll,
   insert,
   update,
-  remove
+  remove,
 };

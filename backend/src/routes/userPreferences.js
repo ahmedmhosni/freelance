@@ -37,18 +37,20 @@ const router = express.Router();
 router.get('/preferences', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    
+
     // Get user preferences from database
-    const result = await query('SELECT theme FROM users WHERE id = $1', [userId]);
-    
+    const result = await query('SELECT theme FROM users WHERE id = $1', [
+      userId,
+    ]);
+
     if (!result.rows || result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const user = result.rows[0];
-    
+
     res.json({
-      theme: user.theme || 'light'
+      theme: user.theme || 'light',
     });
   } catch (error) {
     console.error('Error fetching user preferences:', error);
@@ -87,21 +89,23 @@ router.put('/preferences', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { theme } = req.body;
-    
+
     // Validate theme
     if (theme && !['light', 'dark'].includes(theme)) {
-      return res.status(400).json({ error: 'Invalid theme value. Must be "light" or "dark"' });
+      return res
+        .status(400)
+        .json({ error: 'Invalid theme value. Must be "light" or "dark"' });
     }
-    
+
     // Update user preferences
-    await query(
-      'UPDATE users SET theme = $1 WHERE id = $2',
-      [theme || 'light', userId]
-    );
-    
+    await query('UPDATE users SET theme = $1 WHERE id = $2', [
+      theme || 'light',
+      userId,
+    ]);
+
     res.json({
       message: 'Preferences updated successfully',
-      theme: theme || 'light'
+      theme: theme || 'light',
     });
   } catch (error) {
     console.error('Error updating user preferences:', error);

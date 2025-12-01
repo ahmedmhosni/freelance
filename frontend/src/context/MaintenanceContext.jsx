@@ -9,7 +9,9 @@ const MaintenanceContext = createContext();
 export const useMaintenanceMode = () => {
   const context = useContext(MaintenanceContext);
   if (!context) {
-    throw new Error('useMaintenanceMode must be used within MaintenanceProvider');
+    throw new Error(
+      'useMaintenanceMode must be used within MaintenanceProvider'
+    );
   }
   return context;
 };
@@ -25,13 +27,13 @@ export const MaintenanceProvider = ({ children }) => {
     try {
       const response = await api.get('/api/maintenance/status');
       setIsMaintenanceMode(response.data.is_active);
-      
+
       // If maintenance is active, user is logged in, not admin, and not on allowed pages
       const allowedPaths = ['/login', '/coming-soon'];
       if (
-        response.data.is_active && 
-        user && 
-        user.role !== 'admin' && 
+        response.data.is_active &&
+        user &&
+        user.role !== 'admin' &&
         !allowedPaths.includes(location.pathname)
       ) {
         navigate('/coming-soon');
@@ -49,6 +51,7 @@ export const MaintenanceProvider = ({ children }) => {
     // Check every 30 seconds
     const interval = setInterval(checkMaintenanceStatus, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, location.pathname]);
 
   return (

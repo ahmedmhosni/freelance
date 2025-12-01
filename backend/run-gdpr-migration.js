@@ -12,22 +12,22 @@ async function runMigration() {
     user: 'adminuser',
     password: 'AHmed#123456',
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   });
 
   try {
     console.log('🚀 Running GDPR Features Migration');
     console.log('📍 Database: roastifydb');
     console.log('📍 Host: roastifydbpost.postgres.database.azure.com\n');
-    
+
     const sql = fs.readFileSync(
       path.join(__dirname, '../database/migrations/ADD_GDPR_FEATURES.sql'),
       'utf8'
     );
-    
+
     await pool.query(sql);
-    
+
     console.log('\n✅ SUCCESS! GDPR features added to Azure!');
     console.log('📊 Added:');
     console.log('   - email_preferences column to users table');
@@ -40,12 +40,12 @@ async function runMigration() {
     console.log('✅ Email preferences management');
     console.log('✅ Data export (resource-friendly)');
     console.log('✅ Account deletion (soft delete)');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {
     console.error('\n❌ Error running migration:', error.message);
-    
+
     if (error.message.includes('already exists')) {
       console.log('\n✅ Features already exist! Migration not needed.');
       console.log('🎉 GDPR features are already live on production!');

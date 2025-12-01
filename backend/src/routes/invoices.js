@@ -2,14 +2,14 @@ const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
 const { query } = require('../db/postgresql');
 const { generateInvoicePDF } = require('../utils/pdfGenerator');
-const path = require('path');
 
 const router = express.Router();
 router.use(authenticateToken);
 
 router.get('/', async (req, res) => {
   try {
-    const result = await query(`
+    const result = await query(
+      `
       SELECT 
         i.*, 
         c.name as client_name, 
@@ -20,7 +20,9 @@ router.get('/', async (req, res) => {
       LEFT JOIN projects p ON i.project_id = p.id
       WHERE i.user_id = $1 
       ORDER BY i.created_at DESC
-    `, [req.user.id]);
+    `,
+      [req.user.id]
+    );
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -28,10 +30,26 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { client_id, invoice_number, amount, status, issue_date, due_date, notes } = req.body;
+  const {
+    client_id,
+    invoice_number,
+    amount,
+    status,
+    issue_date,
+    due_date,
+    notes,
+  } = req.body;
   try {
-    console.log('Creating invoice with data:', { client_id, invoice_number, amount, status, issue_date, due_date, notes });
-    
+    console.log('Creating invoice with data:', {
+      client_id,
+      invoice_number,
+      amount,
+      status,
+      issue_date,
+      due_date,
+      notes,
+    });
+
     // Validate required fields
     if (!client_id) {
       return res.status(400).json({ error: 'Client is required' });
@@ -42,7 +60,7 @@ router.post('/', async (req, res) => {
     if (!amount || isNaN(parseFloat(amount))) {
       return res.status(400).json({ error: 'Valid amount is required' });
     }
-    
+
     // Note: project_id is set to NULL as projects are linked at the item level
     const result = await query(
       `INSERT INTO invoices (user_id, project_id, client_id, invoice_number, amount, tax, total, status, issue_date, due_date, notes) 
@@ -58,10 +76,10 @@ router.post('/', async (req, res) => {
         status || 'draft',
         issue_date ? new Date(issue_date) : new Date(),
         due_date || null,
-        notes || null
+        notes || null,
       ]
     );
-    
+
     res.status(201).json({ id: result.rows[0].id, message: 'Invoice created' });
   } catch (error) {
     console.error('Error creating invoice:', error);
@@ -70,39 +88,67 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { client_id, amount, status, issue_date, due_date, sent_date, paid_date, notes } = req.body;
+  const {
+    client_id,
+    amount,
+    status,
+    issue_date,
+    due_date,
+    sent_date,
+    paid_date,
+    notes,
+  } = req.body;
   try {
-    console.log('Updating invoice with data:', { client_id, amount, status, issue_date, due_date, sent_date, paid_date, notes });
-    
+    console.log('Updating invoice with data:', {
+      client_id,
+      amount,
+      status,
+      issue_date,
+      due_date,
+      sent_date,
+      paid_date,
+      notes,
+    });
+
     // First, get the current invoice to check status change
     const currentResult = await query(
       'SELECT status, sent_date, paid_date FROM invoices WHERE id = $1 AND user_id = $2',
       [parseInt(req.params.id), req.user.id]
     );
     const currentInvoice = currentResult.rows[0];
-    
+
     // Auto-set dates based on status changes (only if not manually provided)
     let finalSentDate = sent_date ? new Date(sent_date) : null;
     let finalPaidDate = paid_date ? new Date(paid_date) : null;
-    
+
     // If status changed to 'sent' and sent_date is not set, auto-set it
-    if (status === 'sent' && currentInvoice.status !== 'sent' && !currentInvoice.sent_date && !sent_date) {
+    if (
+      status === 'sent' &&
+      currentInvoice.status !== 'sent' &&
+      !currentInvoice.sent_date &&
+      !sent_date
+    ) {
       finalSentDate = new Date();
     } else if (sent_date) {
       finalSentDate = new Date(sent_date);
     } else if (currentInvoice.sent_date) {
       finalSentDate = currentInvoice.sent_date;
     }
-    
+
     // If status changed to 'paid' and paid_date is not set, auto-set it
-    if (status === 'paid' && currentInvoice.status !== 'paid' && !currentInvoice.paid_date && !paid_date) {
+    if (
+      status === 'paid' &&
+      currentInvoice.status !== 'paid' &&
+      !currentInvoice.paid_date &&
+      !paid_date
+    ) {
       finalPaidDate = new Date();
     } else if (paid_date) {
       finalPaidDate = new Date(paid_date);
     } else if (currentInvoice.paid_date) {
       finalPaidDate = currentInvoice.paid_date;
     }
-    
+
     // Update all fields - dates are managed by application logic, not triggers
     await query(
       `UPDATE invoices 
@@ -120,10 +166,10 @@ router.put('/:id', async (req, res) => {
         finalPaidDate,
         notes || null,
         parseInt(req.params.id),
-        req.user.id
+        req.user.id,
       ]
     );
-    
+
     res.json({ message: 'Invoice updated' });
   } catch (error) {
     console.error('Error updating invoice:', error);
@@ -133,10 +179,10 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    await query(
-      'DELETE FROM invoices WHERE id = $1 AND user_id = $2',
-      [req.params.id, req.user.id]
-    );
+    await query('DELETE FROM invoices WHERE id = $1 AND user_id = $2', [
+      req.params.id,
+      req.user.id,
+    ]);
     res.json({ message: 'Invoice deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -152,25 +198,24 @@ router.get('/:id/pdf', async (req, res) => {
       [req.params.id, req.user.id]
     );
     const invoice = invoiceResult.rows[0];
-    
+
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
 
     // Get client
-    const clientResult = await query(
-      'SELECT * FROM clients WHERE id = $1',
-      [invoice.client_id]
-    );
+    const clientResult = await query('SELECT * FROM clients WHERE id = $1', [
+      invoice.client_id,
+    ]);
     const client = clientResult.rows[0];
 
     // Get user
-    const userResult = await query(
-      'SELECT * FROM users WHERE id = $1',
-      [req.user.id]
-    );
+    const userResult = await query('SELECT * FROM users WHERE id = $1', [
+      req.user.id,
+    ]);
     const user = userResult.rows[0];
 
     // Get invoice items
-    const itemsResult = await query(`
+    const itemsResult = await query(
+      `
       SELECT 
         ii.*,
         p.name as project_name,
@@ -180,7 +225,9 @@ router.get('/:id/pdf', async (req, res) => {
       LEFT JOIN tasks t ON ii.task_id = t.id
       WHERE ii.invoice_id = $1
       ORDER BY ii.created_at ASC
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
     const items = itemsResult.rows;
 
     const pdfPath = await generateInvoicePDF(invoice, client, user, items);

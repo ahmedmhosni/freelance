@@ -27,13 +27,15 @@ const Terms = () => {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: isDark ? '#191919' : '#ffffff'
-      }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: isDark ? '#191919' : '#ffffff',
+        }}
+      >
         <LogoLoader size={80} text="" />
       </div>
     );
@@ -48,16 +50,15 @@ const Terms = () => {
             ← Back to home
           </Link>
 
-          <h1 className="legal-title">
-            Terms and Conditions
-          </h1>
+          <h1 className="legal-title">Terms and Conditions</h1>
 
           {content?.lastUpdated && (
             <p className="legal-date">
-              Last updated: {new Date(content.lastUpdated).toLocaleDateString('en-US', {
+              Last updated:{' '}
+              {new Date(content.lastUpdated).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
               })}
             </p>
           )}
@@ -75,13 +76,10 @@ const Terms = () => {
         <div className="legal-footer">
           <p>
             Questions about our terms?{' '}
-            <a href="mailto:support@roastify.com">
-              Contact us
-            </a>
+            <a href="mailto:support@roastify.com">Contact us</a>
           </p>
         </div>
       </div>
-
     </div>
   );
 };

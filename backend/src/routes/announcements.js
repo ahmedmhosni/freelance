@@ -12,13 +12,20 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024, // 50MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'video/mp4',
+      'video/webm',
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(new Error('Invalid file type. Only images and videos are allowed.'));
     }
-  }
+  },
 });
 
 // Get all announcements (public)
@@ -50,15 +57,14 @@ router.get('/featured', async (req, res) => {
 // Get single announcement (public)
 router.get('/:id', async (req, res) => {
   try {
-    const result = await query(
-      'SELECT * FROM announcements WHERE id = $1',
-      [req.params.id]
-    );
-    
+    const result = await query('SELECT * FROM announcements WHERE id = $1', [
+      req.params.id,
+    ]);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Announcement not found' });
     }
-    
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error fetching announcement:', error);
@@ -67,126 +73,165 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create announcement (admin only)
-router.post('/', authenticateToken, requireAdmin, upload.single('media'), async (req, res) => {
-  try {
-    const { title, content, isFeatured } = req.body;
-    
-    if (!title || !content) {
-      return res.status(400).json({ error: 'Title and content are required' });
-    }
+router.post(
+  '/',
+  authenticateToken,
+  requireAdmin,
+  upload.single('media'),
+  async (req, res) => {
+    try {
+      const { title, content, isFeatured } = req.body;
 
-    let mediaUrl = null;
-    let mediaType = null;
-
-    // Upload media to Azure Blob Storage if provided
-    if (req.file) {
-      const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-      const containerName = 'general';
-
-      if (connectionString) {
-        const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-
-        // Generate unique blob name
-        const timestamp = Date.now();
-        const fileExtension = req.file.originalname.split('.').pop();
-        const blobName = `announcements/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
-        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-        // Upload file
-        await blockBlobClient.uploadData(req.file.buffer, {
-          blobHTTPHeaders: { blobContentType: req.file.mimetype }
-        });
-
-        mediaUrl = blockBlobClient.url;
-        mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
+      if (!title || !content) {
+        return res
+          .status(400)
+          .json({ error: 'Title and content are required' });
       }
-    }
 
-    const result = await query(
-      `INSERT INTO announcements (title, content, is_featured, media_url, media_type)
+      let mediaUrl = null;
+      let mediaType = null;
+
+      // Upload media to Azure Blob Storage if provided
+      if (req.file) {
+        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        const containerName = 'general';
+
+        if (connectionString) {
+          const blobServiceClient =
+            BlobServiceClient.fromConnectionString(connectionString);
+          const containerClient =
+            blobServiceClient.getContainerClient(containerName);
+
+          // Generate unique blob name
+          const timestamp = Date.now();
+          const fileExtension = req.file.originalname.split('.').pop();
+          const blobName = `announcements/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+          const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+          // Upload file
+          await blockBlobClient.uploadData(req.file.buffer, {
+            blobHTTPHeaders: { blobContentType: req.file.mimetype },
+          });
+
+          mediaUrl = blockBlobClient.url;
+          mediaType = req.file.mimetype.startsWith('image/')
+            ? 'image'
+            : 'video';
+        }
+      }
+
+      const result = await query(
+        `INSERT INTO announcements (title, content, is_featured, media_url, media_type)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [title, content, isFeatured === 'true' || isFeatured === true, mediaUrl, mediaType]
-    );
+        [
+          title,
+          content,
+          isFeatured === 'true' || isFeatured === true,
+          mediaUrl,
+          mediaType,
+        ]
+      );
 
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Error creating announcement:', error);
-    res.status(500).json({ error: 'Failed to create announcement' });
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error creating announcement:', error);
+      res.status(500).json({ error: 'Failed to create announcement' });
+    }
   }
-});
+);
 
 // Update announcement (admin only)
-router.put('/:id', authenticateToken, requireAdmin, upload.single('media'), async (req, res) => {
-  try {
-    const { title, content, isFeatured } = req.body;
-    const announcementId = req.params.id;
+router.put(
+  '/:id',
+  authenticateToken,
+  requireAdmin,
+  upload.single('media'),
+  async (req, res) => {
+    try {
+      const { title, content, isFeatured } = req.body;
+      const announcementId = req.params.id;
 
-    // Get existing announcement
-    const existing = await query(
-      'SELECT * FROM announcements WHERE id = $1',
-      [announcementId]
-    );
+      // Get existing announcement
+      const existing = await query(
+        'SELECT * FROM announcements WHERE id = $1',
+        [announcementId]
+      );
 
-    if (existing.rows.length === 0) {
-      return res.status(404).json({ error: 'Announcement not found' });
-    }
-
-    let mediaUrl = existing.rows[0].media_url;
-    let mediaType = existing.rows[0].media_type;
-
-    // Upload new media if provided
-    if (req.file) {
-      const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-      const containerName = 'general';
-
-      if (connectionString) {
-        // Delete old media if exists
-        if (mediaUrl) {
-          try {
-            const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-            const oldBlobName = mediaUrl.split('/').pop();
-            const blobClient = containerClient.getBlockBlobClient(`announcements/${oldBlobName}`);
-            await blobClient.deleteIfExists();
-          } catch (deleteError) {
-            console.error('Error deleting old media:', deleteError);
-          }
-        }
-
-        // Upload new media
-        const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-
-        const timestamp = Date.now();
-        const fileExtension = req.file.originalname.split('.').pop();
-        const blobName = `announcements/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
-        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-        await blockBlobClient.uploadData(req.file.buffer, {
-          blobHTTPHeaders: { blobContentType: req.file.mimetype }
-        });
-
-        mediaUrl = blockBlobClient.url;
-        mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
+      if (existing.rows.length === 0) {
+        return res.status(404).json({ error: 'Announcement not found' });
       }
-    }
 
-    const result = await query(
-      `UPDATE announcements 
+      let mediaUrl = existing.rows[0].media_url;
+      let mediaType = existing.rows[0].media_type;
+
+      // Upload new media if provided
+      if (req.file) {
+        const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        const containerName = 'general';
+
+        if (connectionString) {
+          // Delete old media if exists
+          if (mediaUrl) {
+            try {
+              const blobServiceClient =
+                BlobServiceClient.fromConnectionString(connectionString);
+              const containerClient =
+                blobServiceClient.getContainerClient(containerName);
+              const oldBlobName = mediaUrl.split('/').pop();
+              const blobClient = containerClient.getBlockBlobClient(
+                `announcements/${oldBlobName}`
+              );
+              await blobClient.deleteIfExists();
+            } catch (deleteError) {
+              console.error('Error deleting old media:', deleteError);
+            }
+          }
+
+          // Upload new media
+          const blobServiceClient =
+            BlobServiceClient.fromConnectionString(connectionString);
+          const containerClient =
+            blobServiceClient.getContainerClient(containerName);
+
+          const timestamp = Date.now();
+          const fileExtension = req.file.originalname.split('.').pop();
+          const blobName = `announcements/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+          const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+          await blockBlobClient.uploadData(req.file.buffer, {
+            blobHTTPHeaders: { blobContentType: req.file.mimetype },
+          });
+
+          mediaUrl = blockBlobClient.url;
+          mediaType = req.file.mimetype.startsWith('image/')
+            ? 'image'
+            : 'video';
+        }
+      }
+
+      const result = await query(
+        `UPDATE announcements 
        SET title = $1, content = $2, is_featured = $3, media_url = $4, media_type = $5, updated_at = CURRENT_TIMESTAMP
        WHERE id = $6
        RETURNING *`,
-      [title, content, isFeatured === 'true' || isFeatured === true, mediaUrl, mediaType, announcementId]
-    );
+        [
+          title,
+          content,
+          isFeatured === 'true' || isFeatured === true,
+          mediaUrl,
+          mediaType,
+          announcementId,
+        ]
+      );
 
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Error updating announcement:', error);
-    res.status(500).json({ error: 'Failed to update announcement' });
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error('Error updating announcement:', error);
+      res.status(500).json({ error: 'Failed to update announcement' });
+    }
   }
-});
+);
 
 // Delete announcement (admin only)
 router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
@@ -194,10 +239,9 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
     const announcementId = req.params.id;
 
     // Get announcement to delete media
-    const existing = await query(
-      'SELECT * FROM announcements WHERE id = $1',
-      [announcementId]
-    );
+    const existing = await query('SELECT * FROM announcements WHERE id = $1', [
+      announcementId,
+    ]);
 
     if (existing.rows.length === 0) {
       return res.status(404).json({ error: 'Announcement not found' });
@@ -210,10 +254,14 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
 
       if (connectionString) {
         try {
-          const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-          const containerClient = blobServiceClient.getContainerClient(containerName);
+          const blobServiceClient =
+            BlobServiceClient.fromConnectionString(connectionString);
+          const containerClient =
+            blobServiceClient.getContainerClient(containerName);
           const blobName = existing.rows[0].media_url.split('/').pop();
-          const blobClient = containerClient.getBlockBlobClient(`announcements/${blobName}`);
+          const blobClient = containerClient.getBlockBlobClient(
+            `announcements/${blobName}`
+          );
           await blobClient.deleteIfExists();
         } catch (deleteError) {
           console.error('Error deleting media:', deleteError);

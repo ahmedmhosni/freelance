@@ -64,14 +64,16 @@ router.get('/', async (req, res) => {
     const offset = (page - 1) * limit;
 
     let queryText = 'SELECT * FROM clients WHERE user_id = $1';
-    let countQueryText = 'SELECT COUNT(*) as total FROM clients WHERE user_id = $1';
+    let countQueryText =
+      'SELECT COUNT(*) as total FROM clients WHERE user_id = $1';
     let params = [req.user.id];
     let countParams = [req.user.id];
 
     if (search) {
       const searchTerm = `%${search}%`;
       queryText += ' AND (name ILIKE $2 OR email ILIKE $2 OR company ILIKE $2)';
-      countQueryText += ' AND (name ILIKE $2 OR email ILIKE $2 OR company ILIKE $2)';
+      countQueryText +=
+        ' AND (name ILIKE $2 OR email ILIKE $2 OR company ILIKE $2)';
       params.push(searchTerm);
       countParams.push(searchTerm);
     }
@@ -81,7 +83,7 @@ router.get('/', async (req, res) => {
 
     const result = await query(queryText, params);
     const countResult = await query(countQueryText, countParams);
-    
+
     const clients = result.rows;
     const total = parseInt(countResult.rows[0].total);
 
@@ -91,8 +93,8 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -107,7 +109,7 @@ router.get('/:id', async (req, res) => {
       [req.params.id, req.user.id]
     );
     const client = result.rows[0];
-    
+
     if (!client) return res.status(404).json({ error: 'Client not found' });
     res.json(client);
   } catch (error) {
@@ -123,9 +125,16 @@ router.post('/', async (req, res) => {
       `INSERT INTO clients (user_id, name, email, phone, company, notes) 
        VALUES ($1, $2, $3, $4, $5, $6) 
        RETURNING id`,
-      [req.user.id, name, email || null, phone || null, company || null, notes || null]
+      [
+        req.user.id,
+        name,
+        email || null,
+        phone || null,
+        company || null,
+        notes || null,
+      ]
     );
-    
+
     res.status(201).json({ id: result.rows[0].id, message: 'Client created' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -140,9 +149,17 @@ router.put('/:id', async (req, res) => {
       `UPDATE clients 
        SET name = $1, email = $2, phone = $3, company = $4, notes = $5 
        WHERE id = $6 AND user_id = $7`,
-      [name, email || null, phone || null, company || null, notes || null, req.params.id, req.user.id]
+      [
+        name,
+        email || null,
+        phone || null,
+        company || null,
+        notes || null,
+        req.params.id,
+        req.user.id,
+      ]
     );
-    
+
     res.json({ message: 'Client updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -152,10 +169,10 @@ router.put('/:id', async (req, res) => {
 // Delete client
 router.delete('/:id', async (req, res) => {
   try {
-    await query(
-      'DELETE FROM clients WHERE id = $1 AND user_id = $2',
-      [req.params.id, req.user.id]
-    );
+    await query('DELETE FROM clients WHERE id = $1 AND user_id = $2', [
+      req.params.id,
+      req.user.id,
+    ]);
     res.json({ message: 'Client deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });

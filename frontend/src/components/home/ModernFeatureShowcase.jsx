@@ -11,55 +11,59 @@ const ModernFeatureShowcase = () => {
   const features = [
     {
       title: 'Complete Dashboard',
-      description: 'Everything you need to manage your freelance business in one beautiful dashboard. Track revenue, monitor projects, and stay on top of deadlines.',
+      description:
+        'Everything you need to manage your freelance business in one beautiful dashboard. Track revenue, monitor projects, and stay on top of deadlines.',
       image: '/home/Screenshot 2025-11-28 213236.png',
-      color: '#6366f1'
+      color: '#6366f1',
     },
     {
       title: 'Client Management',
-      description: 'Keep all your client information organized and accessible. Manage contacts, track communication history, and build stronger relationships.',
+      description:
+        'Keep all your client information organized and accessible. Manage contacts, track communication history, and build stronger relationships.',
       image: '/home/Screenshot 2025-11-28 213300.png',
-      color: '#8b5cf6'
+      color: '#8b5cf6',
     },
     {
       title: 'Project Tracking',
-      description: 'Track multiple projects with ease and never miss a deadline. Set milestones, monitor progress, and collaborate with your clients.',
+      description:
+        'Track multiple projects with ease and never miss a deadline. Set milestones, monitor progress, and collaborate with your clients.',
       image: '/home/Screenshot 2025-11-28 213356.png',
-      color: '#ec4899'
+      color: '#ec4899',
     },
     {
       title: 'Task Management',
-      description: 'Organize your work with intuitive Kanban boards. Drag and drop tasks, set priorities, and visualize your workflow.',
+      description:
+        'Organize your work with intuitive Kanban boards. Drag and drop tasks, set priorities, and visualize your workflow.',
       image: '/home/Screenshot 2025-11-28 213448.png',
-      color: '#14b8a6'
+      color: '#14b8a6',
     },
     {
       title: 'Time Tracking',
-      description: 'Track every billable hour with precision and generate detailed reports. Start timers, log entries, and maximize your earnings.',
+      description:
+        'Track every billable hour with precision and generate detailed reports. Start timers, log entries, and maximize your earnings.',
       image: '/home/Screenshot 2025-11-28 213503.png',
-      color: '#f59e0b'
+      color: '#f59e0b',
     },
     {
       title: 'Professional Invoicing',
-      description: 'Create and send beautiful invoices in seconds. Track payments, send reminders, and get paid faster with professional invoicing.',
+      description:
+        'Create and send beautiful invoices in seconds. Track payments, send reminders, and get paid faster with professional invoicing.',
       image: '/home/Screenshot 2025-11-28 213520.png',
-      color: '#10b981'
-    }
+      color: '#10b981',
+    },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
 
-      const containerTop = containerRef.current.offsetTop;
-      const containerHeight = containerRef.current.offsetHeight;
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
 
       // Calculate which section should be active
       sectionsRef.current.forEach((section, index) => {
         if (!section) return;
-        
+
         const sectionTop = section.offsetTop;
         const sectionMiddle = sectionTop + section.offsetHeight / 2;
         const viewportMiddle = scrollPosition + windowHeight / 2;
@@ -82,7 +86,7 @@ const ModernFeatureShowcase = () => {
       style={{
         position: 'relative',
         background: isDark ? '#0a0a0a' : '#ffffff',
-        padding: '120px 0'
+        padding: '120px 0',
       }}
     >
       {/* Section Header */}
@@ -91,7 +95,7 @@ const ModernFeatureShowcase = () => {
           maxWidth: '1200px',
           margin: '0 auto',
           padding: '0 40px 100px',
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         <motion.h2
@@ -105,16 +109,17 @@ const ModernFeatureShowcase = () => {
             color: isDark ? '#ffffff' : '#37352f',
             marginBottom: '20px',
             letterSpacing: '-0.03em',
-            lineHeight: '1.2'
+            lineHeight: '1.2',
           }}
         >
           Everything you need to{' '}
           <span
             style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+              background:
+                'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
+              backgroundClip: 'text',
             }}
           >
             run your business
@@ -128,10 +133,12 @@ const ModernFeatureShowcase = () => {
           style={{
             fontSize: '18px',
             fontWeight: '400',
-            color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.65)',
+            color: isDark
+              ? 'rgba(255, 255, 255, 0.65)'
+              : 'rgba(55, 53, 47, 0.65)',
             maxWidth: '680px',
             margin: '0 auto',
-            lineHeight: '1.6'
+            lineHeight: '1.6',
           }}
         >
           Powerful features designed to help freelancers work smarter
@@ -147,7 +154,7 @@ const ModernFeatureShowcase = () => {
           display: 'grid',
           gridTemplateColumns: window.innerWidth <= 1024 ? '1fr' : '1fr 1fr',
           gap: '80px',
-          alignItems: 'start'
+          alignItems: 'start',
         }}
       >
         {/* Left Side - Scrolling Text */}
@@ -160,7 +167,7 @@ const ModernFeatureShowcase = () => {
                 minHeight: '60vh',
                 display: 'flex',
                 alignItems: 'center',
-                padding: '40px 0'
+                padding: '40px 0',
               }}
             >
               <motion.div
@@ -170,7 +177,7 @@ const ModernFeatureShowcase = () => {
                 transition={{ duration: 0.6 }}
                 style={{
                   opacity: activeIndex === index ? 1 : 0.3,
-                  transition: 'opacity 0.5s ease'
+                  transition: 'opacity 0.5s ease',
                 }}
               >
                 <div
@@ -183,7 +190,7 @@ const ModernFeatureShowcase = () => {
                     fontSize: '13px',
                     fontWeight: '600',
                     color: feature.color,
-                    marginBottom: '20px'
+                    marginBottom: '20px',
                   }}
                 >
                   Feature {index + 1} of {features.length}
@@ -196,7 +203,7 @@ const ModernFeatureShowcase = () => {
                     color: isDark ? '#ffffff' : '#37352f',
                     marginBottom: '20px',
                     letterSpacing: '-0.02em',
-                    lineHeight: '1.2'
+                    lineHeight: '1.2',
                   }}
                 >
                   {feature.title}
@@ -206,8 +213,10 @@ const ModernFeatureShowcase = () => {
                   style={{
                     fontSize: '18px',
                     fontWeight: '400',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
-                    lineHeight: '1.7'
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.7)'
+                      : 'rgba(55, 53, 47, 0.7)',
+                    lineHeight: '1.7',
                   }}
                 >
                   {feature.description}
@@ -223,7 +232,7 @@ const ModernFeatureShowcase = () => {
             position: 'sticky',
             top: '120px',
             height: 'fit-content',
-            display: window.innerWidth <= 1024 ? 'none' : 'block'
+            display: window.innerWidth <= 1024 ? 'none' : 'block',
           }}
         >
           <div style={{ position: 'relative' }}>
@@ -244,7 +253,7 @@ const ModernFeatureShowcase = () => {
                   height: '85%',
                   background: `radial-gradient(circle, ${features[activeIndex].color}60 0%, transparent 70%)`,
                   filter: 'blur(80px)',
-                  zIndex: 0
+                  zIndex: 0,
                 }}
               />
             </AnimatePresence>
@@ -253,12 +262,12 @@ const ModernFeatureShowcase = () => {
             <motion.div
               animate={{
                 scale: [1, 1.1, 1],
-                opacity: [0.3, 0.5, 0.3]
+                opacity: [0.3, 0.5, 0.3],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
-                ease: 'easeInOut'
+                ease: 'easeInOut',
               }}
               style={{
                 position: 'absolute',
@@ -269,7 +278,7 @@ const ModernFeatureShowcase = () => {
                 height: '90%',
                 background: `radial-gradient(circle, ${features[activeIndex].color}40 0%, transparent 70%)`,
                 filter: 'blur(60px)',
-                zIndex: 0
+                zIndex: 0,
               }}
             />
 
@@ -288,7 +297,7 @@ const ModernFeatureShowcase = () => {
                     boxShadow: isDark
                       ? `0 40px 100px rgba(0, 0, 0, 0.6), 0 0 0 1px ${features[activeIndex].color}30`
                       : `0 40px 100px rgba(0, 0, 0, 0.15), 0 0 0 1px ${features[activeIndex].color}30`,
-                    border: `2px solid ${features[activeIndex].color}40`
+                    border: `2px solid ${features[activeIndex].color}40`,
                   }}
                 >
                   <img
@@ -297,7 +306,7 @@ const ModernFeatureShowcase = () => {
                     style={{
                       width: '100%',
                       height: 'auto',
-                      display: 'block'
+                      display: 'block',
                     }}
                   />
                 </motion.div>
@@ -310,7 +319,7 @@ const ModernFeatureShowcase = () => {
                 display: 'flex',
                 gap: '8px',
                 marginTop: '32px',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}
             >
               {features.map((feature, index) => (
@@ -318,12 +327,17 @@ const ModernFeatureShowcase = () => {
                   key={index}
                   animate={{
                     width: activeIndex === index ? '40px' : '8px',
-                    backgroundColor: activeIndex === index ? feature.color : isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(55, 53, 47, 0.2)'
+                    backgroundColor:
+                      activeIndex === index
+                        ? feature.color
+                        : isDark
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : 'rgba(55, 53, 47, 0.2)',
                   }}
                   transition={{ duration: 0.3 }}
                   style={{
                     height: '8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
                   }}
                 />
               ))}

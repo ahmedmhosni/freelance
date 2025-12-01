@@ -1,4 +1,11 @@
-import { MdClose, MdEdit, MdDelete, MdAccessTime, MdFlag, MdFolder } from 'react-icons/md';
+import {
+  MdClose,
+  MdEdit,
+  MdDelete,
+  MdAccessTime,
+  MdFlag,
+  MdFolder,
+} from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 
 const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
@@ -10,18 +17,18 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
     low: '#2eaadc',
     medium: '#ffd426',
     high: '#ffa344',
-    urgent: '#eb5757'
+    urgent: '#eb5757',
   };
 
   const statusLabels = {
     todo: 'To Do',
     'in-progress': 'In Progress',
     review: 'Review',
-    completed: 'Completed'
+    completed: 'Completed',
   };
 
   return (
-    <div 
+    <div
       style={{
         position: 'fixed',
         top: 0,
@@ -33,11 +40,11 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000,
-        padding: '20px'
+        padding: '20px',
       }}
       onClick={onClose}
     >
-      <div 
+      <div
         className="card"
         style={{
           maxWidth: '600px',
@@ -45,19 +52,23 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
           maxHeight: '90vh',
           overflowY: 'auto',
           position: 'relative',
-          animation: 'slideIn 0.2s ease-out'
+          animation: 'slideIn 0.2s ease-out',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'start',
-          marginBottom: '20px',
-          paddingBottom: '16px',
-          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'start',
+            marginBottom: '20px',
+            paddingBottom: '16px',
+            borderBottom: isDark
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : '1px solid rgba(55, 53, 47, 0.09)',
+          }}
+        >
           <h2 style={{ margin: 0, flex: 1, fontSize: '24px' }}>{task.title}</h2>
           <button
             onClick={onClose}
@@ -68,7 +79,9 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
               padding: '4px',
               display: 'flex',
               alignItems: 'center',
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'
+              color: isDark
+                ? 'rgba(255, 255, 255, 0.6)'
+                : 'rgba(55, 53, 47, 0.6)',
             }}
           >
             <MdClose size={24} />
@@ -76,13 +89,24 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
         </div>
 
         {/* Status and Priority */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            marginBottom: '20px',
+            flexWrap: 'wrap',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ 
-              fontSize: '12px', 
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-              fontWeight: '500'
-            }}>
+            <span
+              style={{
+                fontSize: '12px',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.5)'
+                  : 'rgba(55, 53, 47, 0.5)',
+                fontWeight: '500',
+              }}
+            >
               STATUS
             </span>
             <span className={`status-badge status-${task.status}`}>
@@ -90,14 +114,18 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ 
-              fontSize: '12px', 
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-              fontWeight: '500'
-            }}>
+            <span
+              style={{
+                fontSize: '12px',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.5)'
+                  : 'rgba(55, 53, 47, 0.5)',
+                fontWeight: '500',
+              }}
+            >
               PRIORITY
             </span>
-            <span 
+            <span
               className={`priority-${task.priority}`}
               style={{
                 padding: '3px 8px',
@@ -108,7 +136,7 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
                 alignItems: 'center',
                 gap: '4px',
                 background: `${priorityColors[task.priority]}20`,
-                color: priorityColors[task.priority]
+                color: priorityColors[task.priority],
               }}
             >
               <MdFlag size={12} />
@@ -120,49 +148,72 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
         {/* Description */}
         {task.description && (
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ 
-              fontSize: '14px', 
-              fontWeight: '600',
-              marginBottom: '8px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
-            }}>
+            <h3
+              style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                marginBottom: '8px',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.5)'
+                  : 'rgba(55, 53, 47, 0.5)',
+              }}
+            >
               DESCRIPTION
             </h3>
-            <p style={{ 
-              margin: 0, 
-              lineHeight: '1.6',
-              color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)'
-            }}>
+            <p
+              style={{
+                margin: 0,
+                lineHeight: '1.6',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.8)'
+                  : 'rgba(55, 53, 47, 0.8)',
+              }}
+            >
               {task.description}
             </p>
           </div>
         )}
 
         {/* Details */}
-        <div style={{ 
-          display: 'grid', 
-          gap: '16px',
-          marginBottom: '24px',
-          padding: '16px',
-          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
-          borderRadius: '4px'
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gap: '16px',
+            marginBottom: '24px',
+            padding: '16px',
+            background: isDark
+              ? 'rgba(255, 255, 255, 0.03)'
+              : 'rgba(55, 53, 47, 0.03)',
+            borderRadius: '4px',
+          }}
+        >
           {task.due_date && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <MdAccessTime size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
+              <MdAccessTime
+                size={18}
+                style={{
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.4)'
+                    : 'rgba(55, 53, 47, 0.4)',
+                }}
+              />
               <div>
-                <div style={{ 
-                  fontSize: '12px', 
-                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                  marginBottom: '2px'
-                }}>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.5)'
+                      : 'rgba(55, 53, 47, 0.5)',
+                    marginBottom: '2px',
+                  }}
+                >
                   Due Date
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date(task.due_date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {new Date(task.due_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
                   })}
                 </div>
               </div>
@@ -171,13 +222,24 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
 
           {task.project_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <MdFolder size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
+              <MdFolder
+                size={18}
+                style={{
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.4)'
+                    : 'rgba(55, 53, 47, 0.4)',
+                }}
+              />
               <div>
-                <div style={{ 
-                  fontSize: '12px', 
-                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                  marginBottom: '2px'
-                }}>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.5)'
+                      : 'rgba(55, 53, 47, 0.5)',
+                    marginBottom: '2px',
+                  }}
+                >
                   Project
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
@@ -189,20 +251,31 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
 
           {task.created_at && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <MdAccessTime size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
+              <MdAccessTime
+                size={18}
+                style={{
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.4)'
+                    : 'rgba(55, 53, 47, 0.4)',
+                }}
+              />
               <div>
-                <div style={{ 
-                  fontSize: '12px', 
-                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                  marginBottom: '2px'
-                }}>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: isDark
+                      ? 'rgba(255, 255, 255, 0.5)'
+                      : 'rgba(55, 53, 47, 0.5)',
+                    marginBottom: '2px',
+                  }}
+                >
                   Created
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date(task.created_at).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
+                  {new Date(task.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
                   })}
                 </div>
               </div>
@@ -211,15 +284,17 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div
+          style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}
+        >
           <button
             onClick={onDelete}
             className="btn-delete"
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
               gap: '6px',
-              padding: '8px 16px'
+              padding: '8px 16px',
             }}
           >
             <MdDelete size={18} />
@@ -228,11 +303,11 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
           <button
             onClick={onEdit}
             className="btn-primary"
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
               gap: '6px',
-              padding: '8px 16px'
+              padding: '8px 16px',
             }}
           >
             <MdEdit size={18} />

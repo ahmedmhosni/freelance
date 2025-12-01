@@ -9,7 +9,7 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: isDevelopment ? 10000 : 500, // 500 requests per 15 min per user in production
   // Use user ID if authenticated, otherwise use IP (handled by express-rate-limit)
-  keyGenerator: (req, res) => {
+  keyGenerator: (req, _res) => {
     if (req.user && req.user.id) {
       return `user_${req.user.id}`;
     }
@@ -21,7 +21,10 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => {
     // Skip rate limiting for localhost in development
-    if (isDevelopment && (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')) {
+    if (
+      isDevelopment &&
+      (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')
+    ) {
       return true;
     }
     return false;
@@ -31,10 +34,11 @@ const apiLimiter = rateLimit({
     logger.warn(`Rate limit exceeded for ${identifier}`);
     res.status(429).json({
       error: 'Too many requests',
-      message: 'You have exceeded the rate limit. Please slow down and try again in a few minutes.',
-      retryAfter: req.rateLimit.resetTime
+      message:
+        'You have exceeded the rate limit. Please slow down and try again in a few minutes.',
+      retryAfter: req.rateLimit.resetTime,
     });
-  }
+  },
 });
 
 // Strict rate limiter for authentication endpoints (per IP)
@@ -48,26 +52,32 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => {
     // Skip rate limiting for localhost in development
-    if (isDevelopment && (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')) {
+    if (
+      isDevelopment &&
+      (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')
+    ) {
       return true;
     }
     return false;
   },
   handler: (req, res) => {
-    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}, Email: ${req.body.email}`);
+    logger.warn(
+      `Auth rate limit exceeded for IP: ${req.ip}, Email: ${req.body.email}`
+    );
     res.status(429).json({
       error: 'Too many login attempts',
-      message: 'Too many failed login attempts. Please try again in 15 minutes.',
-      retryAfter: req.rateLimit.resetTime
+      message:
+        'Too many failed login attempts. Please try again in 15 minutes.',
+      retryAfter: req.rateLimit.resetTime,
     });
-  }
+  },
 });
 
 // Rate limiter for file uploads (per user or IP)
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: isDevelopment ? 1000 : 50, // 50 uploads per hour per user in production
-  keyGenerator: (req, res) => {
+  keyGenerator: (req, _res) => {
     if (req.user && req.user.id) {
       return `user_${req.user.id}`;
     }
@@ -79,7 +89,10 @@ const uploadLimiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => {
     // Skip rate limiting for localhost in development
-    if (isDevelopment && (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')) {
+    if (
+      isDevelopment &&
+      (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === 'localhost')
+    ) {
       return true;
     }
     return false;
@@ -89,14 +102,15 @@ const uploadLimiter = rateLimit({
     logger.warn(`Upload rate limit exceeded for ${identifier}`);
     res.status(429).json({
       error: 'Too many uploads',
-      message: 'You have exceeded the upload limit. Please try again in an hour.',
-      retryAfter: req.rateLimit.resetTime
+      message:
+        'You have exceeded the upload limit. Please try again in an hour.',
+      retryAfter: req.rateLimit.resetTime,
     });
-  }
+  },
 });
 
 module.exports = {
   apiLimiter,
   authLimiter,
-  uploadLimiter
+  uploadLimiter,
 };

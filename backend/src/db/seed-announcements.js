@@ -1,4 +1,6 @@
-require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+require('dotenv').config({
+  path: require('path').join(__dirname, '../../.env'),
+});
 const { query } = require('./postgresql');
 
 async function seedAnnouncements() {
@@ -13,7 +15,7 @@ async function seedAnnouncements() {
 This is a featured announcement that will appear on your home page and dashboard. You can create, edit, and manage announcements from the Admin Panel.
 
 Stay tuned for more updates and new features!`,
-        is_featured: true
+        is_featured: true,
       },
       {
         title: 'New Features Coming Soon',
@@ -27,7 +29,7 @@ Upcoming features include:
 - Automated invoice reminders
 
 Keep an eye on this space for announcements about new releases!`,
-        is_featured: false
+        is_featured: false,
       },
       {
         title: 'Tips for Getting Started',
@@ -41,8 +43,8 @@ Keep an eye on this space for announcements about new releases!`,
 6. Monitor your income and expenses in the dashboard
 
 Need help? Check out our documentation or contact support at support@roastify.online`,
-        is_featured: false
-      }
+        is_featured: false,
+      },
     ];
 
     for (const announcement of announcements) {

@@ -4,7 +4,7 @@
 
 export const validatePassword = (password) => {
   const errors = [];
-  
+
   if (!password) {
     return { isValid: false, errors: ['Password is required'] };
   }
@@ -26,29 +26,31 @@ export const validatePassword = (password) => {
   }
 
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
+    errors.push(
+      'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)'
+    );
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
 /**
  * Get password strength level
- * @param {string} password 
+ * @param {string} password
  * @returns {object} { strength: 'weak'|'medium'|'strong', score: 0-5 }
  */
 export const getPasswordStrength = (password) => {
   if (!password) return { strength: 'weak', score: 0 };
 
   let score = 0;
-  
+
   // Length
   if (password.length >= 8) score++;
   if (password.length >= 12) score++;
-  
+
   // Character types
   if (/[A-Z]/.test(password)) score++;
   if (/[a-z]/.test(password)) score++;
@@ -64,7 +66,7 @@ export const getPasswordStrength = (password) => {
 
 /**
  * Get password requirements status
- * @param {string} password 
+ * @param {string} password
  * @returns {object} Object with each requirement and its status
  */
 export const getPasswordRequirements = (password) => {
@@ -73,6 +75,6 @@ export const getPasswordRequirements = (password) => {
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /\d/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 };

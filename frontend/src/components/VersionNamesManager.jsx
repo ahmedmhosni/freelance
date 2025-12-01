@@ -12,7 +12,11 @@ const VersionNamesManager = () => {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', description: '' });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', name_type: 'minor', description: '' });
+  const [addForm, setAddForm] = useState({
+    name: '',
+    name_type: 'minor',
+    description: '',
+  });
 
   useEffect(() => {
     fetchNames();
@@ -23,7 +27,7 @@ const VersionNamesManager = () => {
       setLoading(true);
       const [minorRes, majorRes] = await Promise.all([
         api.get('/api/changelog/admin/version-names?type=minor'),
-        api.get('/api/changelog/admin/version-names?type=major')
+        api.get('/api/changelog/admin/version-names?type=major'),
       ]);
       setMinorNames(minorRes.data.names);
       setMajorNames(majorRes.data.names);
@@ -56,7 +60,7 @@ const VersionNamesManager = () => {
     try {
       await api.put(`/api/changelog/admin/version-names/${id}`, {
         ...editForm,
-        sort_order
+        sort_order,
       });
       fetchNames();
       setEditingId(null);
@@ -79,50 +83,73 @@ const VersionNamesManager = () => {
 
   const renderNamesList = (names, title, icon) => (
     <div style={{ marginBottom: '32px' }}>
-      <h3 style={{ 
-        fontSize: '16px', 
-        fontWeight: '600', 
-        marginBottom: '12px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px'
-      }}>
+      <h3
+        style={{
+          fontSize: '16px',
+          fontWeight: '600',
+          marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
         {icon} {title}
-        <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '400' }}>
+        <span
+          style={{
+            fontSize: '13px',
+            color: 'var(--text-secondary)',
+            fontWeight: '400',
+          }}
+        >
           ({names.length} names)
         </span>
       </h3>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {names.map(name => (
+        {names.map((name) => (
           <div
             key={name.id}
             style={{
               padding: '12px',
               borderRadius: '3px',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-              background: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.5)',
+              border: isDark
+                ? '1px solid rgba(255, 255, 255, 0.1)'
+                : '1px solid rgba(55, 53, 47, 0.09)',
+              background: isDark
+                ? 'rgba(255, 255, 255, 0.02)'
+                : 'rgba(255, 255, 255, 0.5)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '12px'
+              gap: '12px',
             }}
           >
             {editingId === name.id ? (
               <>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                  }}
+                >
                   <input
                     type="text"
                     className="form-input"
                     value={editForm.name}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
                     style={{ fontSize: '14px', padding: '6px 10px' }}
                   />
                   <input
                     type="text"
                     className="form-input"
                     value={editForm.description}
-                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, description: e.target.value })
+                    }
                     placeholder="Description (optional)"
                     style={{ fontSize: '13px', padding: '6px 10px' }}
                   />
@@ -136,7 +163,7 @@ const VersionNamesManager = () => {
                       border: 'none',
                       background: '#10b981',
                       color: 'white',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
                     <MdSave size={16} />
@@ -146,10 +173,14 @@ const VersionNamesManager = () => {
                     style={{
                       padding: '6px',
                       borderRadius: '3px',
-                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                        : '1px solid rgba(55, 53, 47, 0.16)',
                       background: 'transparent',
-                      color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-                      cursor: 'pointer'
+                      color: isDark
+                        ? 'rgba(255, 255, 255, 0.6)'
+                        : 'rgba(55, 53, 47, 0.65)',
+                      cursor: 'pointer',
                     }}
                   >
                     <MdClose size={16} />
@@ -159,11 +190,22 @@ const VersionNamesManager = () => {
             ) : (
               <>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '2px' }}>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      marginBottom: '2px',
+                    }}
+                  >
                     {name.name}
                   </div>
                   {name.description && (
-                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
                       {name.description}
                     </div>
                   )}
@@ -174,10 +216,14 @@ const VersionNamesManager = () => {
                     style={{
                       padding: '6px',
                       borderRadius: '3px',
-                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                        : '1px solid rgba(55, 53, 47, 0.16)',
                       background: 'transparent',
-                      color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-                      cursor: 'pointer'
+                      color: isDark
+                        ? 'rgba(255, 255, 255, 0.6)'
+                        : 'rgba(55, 53, 47, 0.65)',
+                      cursor: 'pointer',
                     }}
                   >
                     <MdEdit size={14} />
@@ -187,10 +233,12 @@ const VersionNamesManager = () => {
                     style={{
                       padding: '6px',
                       borderRadius: '3px',
-                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                        : '1px solid rgba(55, 53, 47, 0.16)',
                       background: 'transparent',
                       color: '#eb5757',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
                     <MdDelete size={14} />
@@ -205,30 +253,38 @@ const VersionNamesManager = () => {
   );
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>
+    );
   }
 
   return (
     <div className="card" style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '24px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '24px',
+        }}
+      >
         <div>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
             Version Names Library
           </h2>
-          <p style={{ 
-            margin: '4px 0 0 0', 
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)'
-          }}>
+          <p
+            style={{
+              margin: '4px 0 0 0',
+              fontSize: '13px',
+              color: isDark
+                ? 'rgba(255, 255, 255, 0.6)'
+                : 'rgba(55, 53, 47, 0.65)',
+            }}
+          >
             Manage coffee-themed version names
           </p>
         </div>
-        
+
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="btn-primary"
@@ -237,7 +293,7 @@ const VersionNamesManager = () => {
             alignItems: 'center',
             gap: '6px',
             padding: '8px 16px',
-            fontSize: '14px'
+            fontSize: '14px',
           }}
         >
           <MdAdd size={18} />
@@ -247,14 +303,28 @@ const VersionNamesManager = () => {
 
       {/* Add Form */}
       {showAddForm && (
-        <form onSubmit={handleAdd} style={{ 
-          marginBottom: '32px',
-          padding: '16px',
-          borderRadius: '3px',
-          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
-        }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+        <form
+          onSubmit={handleAdd}
+          style={{
+            marginBottom: '32px',
+            padding: '16px',
+            borderRadius: '3px',
+            background: isDark
+              ? 'rgba(255, 255, 255, 0.03)'
+              : 'rgba(55, 53, 47, 0.03)',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : '1px solid rgba(55, 53, 47, 0.09)',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+              marginBottom: '12px',
+            }}
+          >
             <input
               type="text"
               className="form-input"
@@ -266,7 +336,9 @@ const VersionNamesManager = () => {
             <select
               className="form-input"
               value={addForm.name_type}
-              onChange={(e) => setAddForm({ ...addForm, name_type: e.target.value })}
+              onChange={(e) =>
+                setAddForm({ ...addForm, name_type: e.target.value })
+              }
             >
               <option value="minor">☕ Minor (Roast Level)</option>
               <option value="major">🔥 Major (Coffee Drink)</option>
@@ -276,11 +348,17 @@ const VersionNamesManager = () => {
             type="text"
             className="form-input"
             value={addForm.description}
-            onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
+            onChange={(e) =>
+              setAddForm({ ...addForm, description: e.target.value })
+            }
             placeholder="Description (optional)"
             style={{ marginBottom: '12px' }}
           />
-          <button type="submit" className="btn-primary" style={{ fontSize: '13px', padding: '6px 12px' }}>
+          <button
+            type="submit"
+            className="btn-primary"
+            style={{ fontSize: '13px', padding: '6px 12px' }}
+          >
             Add Name
           </button>
         </form>

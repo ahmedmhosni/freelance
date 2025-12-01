@@ -11,15 +11,16 @@ import logger from '../utils/logger';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
-  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
-  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, invoiceId: null });
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    invoiceId: null,
+  });
 
   useEffect(() => {
     fetchInvoices();
-    fetchClients();
   }, []);
 
   const fetchInvoices = async () => {
@@ -35,18 +36,6 @@ const Invoices = () => {
       setLoading(false);
     }
   };
-
-  const fetchClients = async () => {
-    try {
-      const response = await api.get('/api/clients');
-      const data = response.data.data || response.data;
-      setClients(Array.isArray(data) ? data : []);
-    } catch (error) {
-      logger.error('Error fetching clients:', error);
-    }
-  };
-
-
 
   const handleCreateNew = () => {
     const newInvoiceNumber = generateInvoiceNumber(invoices);
@@ -87,9 +76,9 @@ const Invoices = () => {
   const handleDownloadPDF = async (invoiceId) => {
     try {
       const response = await api.get(`/api/invoices/${invoiceId}/pdf`, {
-        responseType: 'blob'
+        responseType: 'blob',
       });
-      
+
       // Create a blob URL and download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -99,7 +88,7 @@ const Invoices = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       toast.success('PDF downloaded!');
     } catch (error) {
       logger.error('Error downloading PDF:', error);
@@ -107,53 +96,57 @@ const Invoices = () => {
     }
   };
 
-  const statusColors = {
-    draft: '#6c757d', sent: '#007bff', paid: '#28a745', overdue: '#dc3545', cancelled: '#6c757d'
-  };
-
-  const totalRevenue = invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
-  const pendingAmount = invoices.filter(inv => inv.status === 'sent').reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
+  const totalRevenue = invoices
+    .filter((inv) => inv.status === 'paid')
+    .reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
+  const pendingAmount = invoices
+    .filter((inv) => inv.status === 'sent')
+    .reduce((sum, inv) => sum + parseFloat(inv.total || inv.amount || 0), 0);
 
   return (
     <div className="container">
-      <div className="page-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        marginBottom: '24px',
-        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-        gap: window.innerWidth <= 768 ? '16px' : '0'
-      }}>
+      <div
+        className="page-header"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '24px',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          gap: window.innerWidth <= 768 ? '16px' : '0',
+        }}
+      >
         <div>
           <h1 style={{ marginBottom: '4px' }}>Invoices</h1>
-          <p className="page-subtitle">
-            Manage billing and payments
-          </p>
+          <p className="page-subtitle">Manage billing and payments</p>
         </div>
-        <div className="page-actions" style={{ 
-          display: 'flex', 
-          gap: '8px',
-          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-          width: window.innerWidth <= 768 ? '100%' : 'auto'
-        }}>
+        <div
+          className="page-actions"
+          style={{
+            display: 'flex',
+            gap: '8px',
+            flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+            width: window.innerWidth <= 768 ? '100%' : 'auto',
+          }}
+        >
           {invoices.length > 0 && (
-            <button 
-              className="btn-edit" 
+            <button
+              className="btn-edit"
               onClick={handleExportCSV}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                width: window.innerWidth <= 768 ? '100%' : 'auto'
+                width: window.innerWidth <= 768 ? '100%' : 'auto',
               }}
             >
               <MdFileDownload size={18} />
               Export CSV
             </button>
           )}
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             onClick={handleCreateNew}
             style={{ width: window.innerWidth <= 768 ? '100%' : 'auto' }}
           >
@@ -165,25 +158,51 @@ const Invoices = () => {
       {loading ? (
         <LoadingSkeleton type="stat" count={3} />
       ) : (
-        <div className="stats-grid" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: window.innerWidth <= 768 
-            ? '1fr' 
-            : window.innerWidth <= 1024 
-              ? 'repeat(2, 1fr)' 
-              : 'repeat(3, 1fr)', 
-          gap: '12px', 
-          marginBottom: '32px' 
-        }}>
-          <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
+        <div
+          className="stats-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              window.innerWidth <= 768
+                ? '1fr'
+                : window.innerWidth <= 1024
+                  ? 'repeat(2, 1fr)'
+                  : 'repeat(3, 1fr)',
+            gap: '12px',
+            marginBottom: '32px',
+          }}
+        >
+          <div
+            className="card"
+            style={{
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'start',
+              gap: '12px',
+            }}
+          >
             <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
               <MdAttachMoney />
             </div>
             <div style={{ flex: 1 }}>
-              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+              <div
+                className="stat-label"
+                style={{
+                  fontSize: '12px',
+                  marginBottom: '8px',
+                  fontWeight: '500',
+                }}
+              >
                 TOTAL REVENUE
               </div>
-              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              <div
+                className="stat-value"
+                style={{
+                  fontSize: '28px',
+                  fontWeight: '600',
+                  marginBottom: '4px',
+                }}
+              >
                 ${totalRevenue.toFixed(2)}
               </div>
               <div className="stat-description" style={{ fontSize: '13px' }}>
@@ -191,15 +210,37 @@ const Invoices = () => {
               </div>
             </div>
           </div>
-          <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
+          <div
+            className="card"
+            style={{
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'start',
+              gap: '12px',
+            }}
+          >
             <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
               <MdReceipt />
             </div>
             <div style={{ flex: 1 }}>
-              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+              <div
+                className="stat-label"
+                style={{
+                  fontSize: '12px',
+                  marginBottom: '8px',
+                  fontWeight: '500',
+                }}
+              >
                 PENDING
               </div>
-              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              <div
+                className="stat-value"
+                style={{
+                  fontSize: '28px',
+                  fontWeight: '600',
+                  marginBottom: '4px',
+                }}
+              >
                 ${pendingAmount.toFixed(2)}
               </div>
               <div className="stat-description" style={{ fontSize: '13px' }}>
@@ -207,15 +248,37 @@ const Invoices = () => {
               </div>
             </div>
           </div>
-          <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'start', gap: '12px' }}>
+          <div
+            className="card"
+            style={{
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'start',
+              gap: '12px',
+            }}
+          >
             <div style={{ fontSize: '32px', color: 'rgba(55, 53, 47, 0.4)' }}>
               <MdReceipt />
             </div>
             <div style={{ flex: 1 }}>
-              <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
+              <div
+                className="stat-label"
+                style={{
+                  fontSize: '12px',
+                  marginBottom: '8px',
+                  fontWeight: '500',
+                }}
+              >
                 TOTAL INVOICES
               </div>
-              <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              <div
+                className="stat-value"
+                style={{
+                  fontSize: '28px',
+                  fontWeight: '600',
+                  marginBottom: '4px',
+                }}
+              >
                 {invoices.length}
               </div>
               <div className="stat-description" style={{ fontSize: '13px' }}>
@@ -243,66 +306,230 @@ const Invoices = () => {
         <div className="card">
           {invoices.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state-icon"><MdReceipt /></div>
+              <div className="empty-state-icon">
+                <MdReceipt />
+              </div>
               <p>No invoices yet. Create your first invoice to get started!</p>
             </div>
           ) : (
             <div className="table-container" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: window.innerWidth <= 768 ? '700px' : 'auto', fontFamily: 'inherit' }}>
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  minWidth: window.innerWidth <= 768 ? '700px' : 'auto',
+                  fontFamily: 'inherit',
+                }}
+              >
                 <thead>
                   <tr style={{ borderBottom: '2px solid #ddd' }}>
-                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Invoice #</th>
-                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Client</th>
-                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Items</th>
-                    <th style={{ textAlign: 'right', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Amount</th>
-                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Due Date</th>
-                    <th style={{ textAlign: 'right', padding: '12px', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', color: 'rgba(55, 53, 47, 0.9)' }}>Actions</th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Invoice #
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Client
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Items
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'right',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Amount
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Due Date
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'right',
+                        padding: '12px',
+                        fontFamily: 'inherit',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: 'rgba(55, 53, 47, 0.9)',
+                      }}
+                    >
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map(invoice => (
-                    <tr key={invoice.id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px' }}>
-                        <strong style={{ fontFamily: 'inherit' }}>{invoice.invoice_number}</strong>
+                  {invoices.map((invoice) => (
+                    <tr
+                      key={invoice.id}
+                      style={{ borderBottom: '1px solid #eee' }}
+                    >
+                      <td
+                        style={{
+                          padding: '12px',
+                          fontFamily: 'inherit',
+                          fontSize: '13px',
+                        }}
+                      >
+                        <strong style={{ fontFamily: 'inherit' }}>
+                          {invoice.invoice_number}
+                        </strong>
                       </td>
-                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
+                      <td
+                        style={{
+                          padding: '12px',
+                          fontFamily: 'inherit',
+                          fontSize: '13px',
+                          color: 'rgba(55, 53, 47, 0.9)',
+                        }}
+                      >
                         {invoice.client_name || '-'}
                       </td>
-                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)' }}>
-                        {invoice.item_count || 0} {invoice.item_count === 1 ? 'item' : 'items'}
+                      <td
+                        style={{
+                          padding: '12px',
+                          fontFamily: 'inherit',
+                          fontSize: '12px',
+                          color: 'rgba(55, 53, 47, 0.65)',
+                        }}
+                      >
+                        {invoice.item_count || 0}{' '}
+                        {invoice.item_count === 1 ? 'item' : 'items'}
                       </td>
-                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', textAlign: 'right', fontWeight: '500' }}>
-                        ${parseFloat(invoice.total || invoice.amount || 0).toFixed(2)}
+                      <td
+                        style={{
+                          padding: '12px',
+                          fontFamily: 'inherit',
+                          fontSize: '13px',
+                          textAlign: 'right',
+                          fontWeight: '500',
+                        }}
+                      >
+                        $
+                        {parseFloat(
+                          invoice.total || invoice.amount || 0
+                        ).toFixed(2)}
                       </td>
                       <td style={{ padding: '12px', fontFamily: 'inherit' }}>
-                        <span className={`status-badge status-${invoice.status}`} style={{ fontFamily: 'inherit' }}>
+                        <span
+                          className={`status-badge status-${invoice.status}`}
+                          style={{ fontFamily: 'inherit' }}
+                        >
                           {invoice.status}
                         </span>
                       </td>
-                      <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
-                        {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}
+                      <td
+                        style={{
+                          padding: '12px',
+                          fontFamily: 'inherit',
+                          fontSize: '13px',
+                          color: 'rgba(55, 53, 47, 0.9)',
+                        }}
+                      >
+                        {invoice.due_date
+                          ? new Date(invoice.due_date).toLocaleDateString()
+                          : '-'}
                       </td>
                       <td style={{ padding: '12px', textAlign: 'right' }}>
-                        <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                          <button 
+                        <div
+                          className="table-actions"
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            justifyContent: 'flex-end',
+                            flexWrap: 'nowrap',
+                          }}
+                        >
+                          <button
                             onClick={() => handleDownloadPDF(invoice.id)}
                             className="btn-edit"
-                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                            style={{
+                              fontSize:
+                                window.innerWidth <= 768 ? '11px' : '13px',
+                              padding:
+                                window.innerWidth <= 768
+                                  ? '6px 8px'
+                                  : '6px 12px',
+                            }}
                           >
                             PDF
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleEdit(invoice)}
                             className="btn-edit"
-                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                            style={{
+                              fontSize:
+                                window.innerWidth <= 768 ? '11px' : '13px',
+                              padding:
+                                window.innerWidth <= 768
+                                  ? '6px 8px'
+                                  : '6px 12px',
+                            }}
                           >
                             Edit
                           </button>
-                          <button 
+                          <button
                             onClick={() => confirmDelete(invoice.id)}
                             className="btn-delete"
-                            style={{ fontSize: window.innerWidth <= 768 ? '11px' : '13px', padding: window.innerWidth <= 768 ? '6px 8px' : '6px 12px' }}
+                            style={{
+                              fontSize:
+                                window.innerWidth <= 768 ? '11px' : '13px',
+                              padding:
+                                window.innerWidth <= 768
+                                  ? '6px 8px'
+                                  : '6px 12px',
+                            }}
                           >
                             Delete
                           </button>

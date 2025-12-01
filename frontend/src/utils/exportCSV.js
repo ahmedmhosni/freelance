@@ -10,35 +10,38 @@ export const exportToCSV = (data, filename, columns = null) => {
   }
 
   // If columns not provided, use all keys from first object
-  const cols = columns || Object.keys(data[0]).map(key => ({ key, label: key }));
+  const cols =
+    columns || Object.keys(data[0]).map((key) => ({ key, label: key }));
 
   // Create CSV header
-  const header = cols.map(col => `"${col.label}"`).join(',');
+  const header = cols.map((col) => `"${col.label}"`).join(',');
 
   // Create CSV rows
-  const rows = data.map(row => {
-    return cols.map(col => {
-      let value = row[col.key];
-      
-      // Handle null/undefined
-      if (value === null || value === undefined) {
-        return '""';
-      }
-      
-      // Handle dates
-      if (value instanceof Date) {
-        value = value.toISOString();
-      }
-      
-      // Handle objects/arrays
-      if (typeof value === 'object') {
-        value = JSON.stringify(value);
-      }
-      
-      // Escape quotes and wrap in quotes
-      value = String(value).replace(/"/g, '""');
-      return `"${value}"`;
-    }).join(',');
+  const rows = data.map((row) => {
+    return cols
+      .map((col) => {
+        let value = row[col.key];
+
+        // Handle null/undefined
+        if (value === null || value === undefined) {
+          return '""';
+        }
+
+        // Handle dates
+        if (value instanceof Date) {
+          value = value.toISOString();
+        }
+
+        // Handle objects/arrays
+        if (typeof value === 'object') {
+          value = JSON.stringify(value);
+        }
+
+        // Escape quotes and wrap in quotes
+        value = String(value).replace(/"/g, '""');
+        return `"${value}"`;
+      })
+      .join(',');
   });
 
   // Combine header and rows
@@ -48,11 +51,14 @@ export const exportToCSV = (data, filename, columns = null) => {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
+  link.setAttribute(
+    'download',
+    `${filename}_${new Date().toISOString().split('T')[0]}.csv`
+  );
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -69,7 +75,7 @@ export const exportClientsCSV = (clients) => {
     { key: 'phone', label: 'Phone' },
     { key: 'company', label: 'Company' },
     { key: 'notes', label: 'Notes' },
-    { key: 'created_at', label: 'Created Date' }
+    { key: 'created_at', label: 'Created Date' },
   ];
   exportToCSV(clients, 'clients', columns);
 };
@@ -86,7 +92,7 @@ export const exportProjectsCSV = (projects) => {
     { key: 'budget', label: 'Budget' },
     { key: 'start_date', label: 'Start Date' },
     { key: 'end_date', label: 'End Date' },
-    { key: 'created_at', label: 'Created Date' }
+    { key: 'created_at', label: 'Created Date' },
   ];
   exportToCSV(projects, 'projects', columns);
 };
@@ -102,7 +108,7 @@ export const exportTasksCSV = (tasks) => {
     { key: 'status', label: 'Status' },
     { key: 'priority', label: 'Priority' },
     { key: 'due_date', label: 'Due Date' },
-    { key: 'created_at', label: 'Created Date' }
+    { key: 'created_at', label: 'Created Date' },
   ];
   exportToCSV(tasks, 'tasks', columns);
 };
@@ -120,7 +126,7 @@ export const exportInvoicesCSV = (invoices) => {
     { key: 'sent_date', label: 'Sent Date' },
     { key: 'paid_date', label: 'Paid Date' },
     { key: 'notes', label: 'Notes' },
-    { key: 'created_at', label: 'Created Date' }
+    { key: 'created_at', label: 'Created Date' },
   ];
   exportToCSV(invoices, 'invoices', columns);
 };
@@ -135,7 +141,7 @@ export const exportTimeEntriesCSV = (entries) => {
     { key: 'start_time', label: 'Start Time' },
     { key: 'end_time', label: 'End Time' },
     { key: 'duration', label: 'Duration (minutes)' },
-    { key: 'created_at', label: 'Created Date' }
+    { key: 'created_at', label: 'Created Date' },
   ];
   exportToCSV(entries, 'time_entries', columns);
 };

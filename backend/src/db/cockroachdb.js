@@ -3,10 +3,15 @@ const { Pool } = require('pg');
 // Create connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: true,
-    ca: process.env.DATABASE_CA_CERT ? require('fs').readFileSync(process.env.DATABASE_CA_CERT, 'utf8') : undefined
-  } : false,
+  ssl:
+    process.env.NODE_ENV === 'production'
+      ? {
+          rejectUnauthorized: true,
+          ca: process.env.DATABASE_CA_CERT
+            ? require('fs').readFileSync(process.env.DATABASE_CA_CERT, 'utf8')
+            : undefined,
+        }
+      : false,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
@@ -51,5 +56,5 @@ module.exports = {
   pool,
   query,
   getOne,
-  getAll
+  getAll,
 };

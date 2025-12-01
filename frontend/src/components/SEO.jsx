@@ -1,15 +1,15 @@
 import { Helmet } from 'react-helmet-async';
 
-const SEO = ({ 
-  title = "Roastify - Freelancer Management Platform",
-  description = "Everything you need to run your freelance business. Manage clients, track time, create invoices, and get paid faster.",
-  image = "https://roastify.online/og-image.png",
-  url = "https://roastify.online",
-  type = "website",
-  keywords = "freelancer management, time tracking, invoicing, client management"
+const SEO = ({
+  title = 'Roastify - Freelancer Management Platform',
+  description = 'Everything you need to run your freelance business. Manage clients, track time, create invoices, and get paid faster.',
+  image = 'https://roastify.online/og-image.png',
+  url = 'https://roastify.online',
+  type = 'website',
+  keywords = 'freelancer management, time tracking, invoicing, client management',
 }) => {
   const fullTitle = title.includes('Roastify') ? title : `${title} | Roastify`;
-  
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
@@ -17,7 +17,7 @@ const SEO = ({
       <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
-      
+
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
       <meta property="og:url" content={url} />
@@ -26,14 +26,14 @@ const SEO = ({
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      
+
       {/* Twitter */}
       <meta property="twitter:card" content="summary_large_image" />
       <meta property="twitter:url" content={url} />
       <meta property="twitter:title" content={fullTitle} />
       <meta property="twitter:description" content={description} />
       <meta property="twitter:image" content={image} />
-      
+
       {/* Canonical URL */}
       <link rel="canonical" href={url} />
     </Helmet>

@@ -9,12 +9,12 @@ const LoaderTest = () => {
   const Loader1 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'bounce1 1.5s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -31,12 +31,12 @@ const LoaderTest = () => {
   const Loader2 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'pulse2 1.5s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -53,12 +53,12 @@ const LoaderTest = () => {
   const Loader3 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'rotate3 2s linear infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -75,12 +75,12 @@ const LoaderTest = () => {
   const Loader4 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'fade4 2s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -97,12 +97,12 @@ const LoaderTest = () => {
   const Loader5 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'bounceRotate5 2s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -120,12 +120,12 @@ const LoaderTest = () => {
   const Loader6 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'swing6 1.5s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -143,25 +143,27 @@ const LoaderTest = () => {
   const Loader7 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px', position: 'relative' }}>
       <div style={{ position: 'relative', display: 'inline-block' }}>
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: size + 30,
-          height: size + 30,
-          border: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-          borderTop: `2px solid ${isDark ? '#fff' : '#000'}`,
-          borderRadius: '50%',
-          animation: 'spin7 1s linear infinite'
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: size + 30,
+            height: size + 30,
+            border: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+            borderTop: `2px solid ${isDark ? '#fff' : '#000'}`,
+            borderRadius: '50%',
+            animation: 'spin7 1s linear infinite',
+          }}
+        />
         <div style={{ animation: 'bounce7 1.5s ease-in-out infinite' }}>
-          <img 
-            src="/Asset 7.svg" 
-            alt="Logo" 
-            style={{ 
+          <img
+            src="/Asset 7.svg"
+            alt="Logo"
+            style={{
               height: size,
-              filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+              filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
             }}
           />
         </div>
@@ -182,13 +184,18 @@ const LoaderTest = () => {
   // Loader Variation 8: Pulse with Dots
   const Loader8 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
-      <div style={{ animation: 'pulse8 1.5s ease-in-out infinite', marginBottom: '20px' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+      <div
+        style={{
+          animation: 'pulse8 1.5s ease-in-out infinite',
+          marginBottom: '20px',
+        }}
+      >
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -201,7 +208,7 @@ const LoaderTest = () => {
               height: '8px',
               borderRadius: '50%',
               backgroundColor: isDark ? '#fff' : '#000',
-              animation: `dot8 1.4s ease-in-out ${i * 0.2}s infinite`
+              animation: `dot8 1.4s ease-in-out ${i * 0.2}s infinite`,
             }}
           />
         ))}
@@ -223,12 +230,12 @@ const LoaderTest = () => {
   const Loader9 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'float9 3s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -245,12 +252,12 @@ const LoaderTest = () => {
   const Loader10 = ({ size = 80 }) => (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div style={{ animation: 'heartbeat10 1.5s ease-in-out infinite' }}>
-        <img 
-          src="/Asset 7.svg" 
-          alt="Logo" 
-          style={{ 
+        <img
+          src="/Asset 7.svg"
+          alt="Logo"
+          style={{
             height: size,
-            filter: isDark ? 'invert(1) brightness(1.2)' : 'none'
+            filter: isDark ? 'invert(1) brightness(1.2)' : 'none',
           }}
         />
       </div>
@@ -267,43 +274,88 @@ const LoaderTest = () => {
   );
 
   const loaders = [
-    { id: 1, name: 'Simple Bounce', component: Loader1, description: 'Clean up and down bounce' },
-    { id: 2, name: 'Pulse Scale', component: Loader2, description: 'Gentle scale pulse' },
-    { id: 3, name: 'Rotate', component: Loader3, description: 'Continuous rotation' },
+    {
+      id: 1,
+      name: 'Simple Bounce',
+      component: Loader1,
+      description: 'Clean up and down bounce',
+    },
+    {
+      id: 2,
+      name: 'Pulse Scale',
+      component: Loader2,
+      description: 'Gentle scale pulse',
+    },
+    {
+      id: 3,
+      name: 'Rotate',
+      component: Loader3,
+      description: 'Continuous rotation',
+    },
     { id: 4, name: 'Fade', component: Loader4, description: 'Fade in and out' },
-    { id: 5, name: 'Bounce + Tilt', component: Loader5, description: 'Bounce with slight rotation' },
-    { id: 6, name: 'Swing', component: Loader6, description: 'Pendulum swing motion' },
-    { id: 7, name: 'Bounce + Ring', component: Loader7, description: 'Bounce with spinning ring' },
-    { id: 8, name: 'Pulse + Dots', component: Loader8, description: 'Pulse with animated dots' },
-    { id: 9, name: 'Float Smooth', component: Loader9, description: 'Smooth floating motion' },
-    { id: 10, name: 'Heartbeat', component: Loader10, description: 'Double pulse heartbeat' },
+    {
+      id: 5,
+      name: 'Bounce + Tilt',
+      component: Loader5,
+      description: 'Bounce with slight rotation',
+    },
+    {
+      id: 6,
+      name: 'Swing',
+      component: Loader6,
+      description: 'Pendulum swing motion',
+    },
+    {
+      id: 7,
+      name: 'Bounce + Ring',
+      component: Loader7,
+      description: 'Bounce with spinning ring',
+    },
+    {
+      id: 8,
+      name: 'Pulse + Dots',
+      component: Loader8,
+      description: 'Pulse with animated dots',
+    },
+    {
+      id: 9,
+      name: 'Float Smooth',
+      component: Loader9,
+      description: 'Smooth floating motion',
+    },
+    {
+      id: 10,
+      name: 'Heartbeat',
+      component: Loader10,
+      description: 'Double pulse heartbeat',
+    },
   ];
 
   return (
     <div className="container">
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ marginBottom: '4px' }}>🎨 Loader Variations Test</h1>
-        <p className="page-subtitle">
-          Choose your favorite loader animation
-        </p>
+        <p className="page-subtitle">Choose your favorite loader animation</p>
       </div>
 
       {/* Full Page Preview */}
       {selectedLoader && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: '20px'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
           {React.createElement(selectedLoader.component, { size: 100 })}
           <button
             onClick={() => setSelectedLoader(null)}
@@ -315,7 +367,7 @@ const LoaderTest = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '14px',
-              fontWeight: '500'
+              fontWeight: '500',
             }}
           >
             Close Preview
@@ -324,51 +376,59 @@ const LoaderTest = () => {
       )}
 
       {/* Loader Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: '20px',
-        marginBottom: '40px'
-      }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '20px',
+          marginBottom: '40px',
+        }}
+      >
         {loaders.map((loader) => (
-          <div 
+          <div
             key={loader.id}
-            className="card" 
-            style={{ 
+            className="card"
+            style={{
               padding: '24px',
               cursor: 'pointer',
               transition: 'transform 0.2s, box-shadow 0.2s',
               ':hover': {
-                transform: 'translateY(-4px)'
-              }
+                transform: 'translateY(-4px)',
+              },
             }}
             onClick={() => setSelectedLoader(loader)}
           >
-            <div style={{ 
-              backgroundColor: isDark ? '#2d2d44' : '#f8f9fa',
-              borderRadius: '12px',
-              minHeight: '200px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px'
-            }}>
+            <div
+              style={{
+                backgroundColor: isDark ? '#2d2d44' : '#f8f9fa',
+                borderRadius: '12px',
+                minHeight: '200px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '16px',
+              }}
+            >
               {React.createElement(loader.component, { size: 70 })}
             </div>
-            <h3 style={{ 
-              fontSize: '16px', 
-              fontWeight: '600', 
-              marginBottom: '8px',
-              textAlign: 'center'
-            }}>
+            <h3
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                marginBottom: '8px',
+                textAlign: 'center',
+              }}
+            >
               {loader.name}
             </h3>
-            <p style={{ 
-              fontSize: '13px', 
-              opacity: 0.7,
-              textAlign: 'center',
-              marginBottom: '12px'
-            }}>
+            <p
+              style={{
+                fontSize: '13px',
+                opacity: 0.7,
+                textAlign: 'center',
+                marginBottom: '12px',
+              }}
+            >
               {loader.description}
             </p>
             <button
@@ -385,7 +445,7 @@ const LoaderTest = () => {
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '13px',
-                fontWeight: '500'
+                fontWeight: '500',
               }}
             >
               Preview Full Screen
@@ -396,16 +456,20 @@ const LoaderTest = () => {
 
       {/* Instructions */}
       <div className="card" style={{ padding: '24px' }}>
-        <h2 style={{ fontSize: '18px', marginBottom: '16px', fontWeight: '600' }}>
+        <h2
+          style={{ fontSize: '18px', marginBottom: '16px', fontWeight: '600' }}
+        >
           📝 Instructions
         </h2>
-        <ul style={{ 
-          listStyle: 'none', 
-          padding: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px'
-        }}>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
           <li style={{ padding: '8px 0' }}>
             1️⃣ Click on any card to preview the loader in full screen
           </li>

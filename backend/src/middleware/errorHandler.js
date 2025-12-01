@@ -12,7 +12,7 @@ class AppError extends Error {
 }
 
 // Error handler middleware
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   let error = { ...err };
   error.message = err.message;
   error.stack = err.stack;
@@ -25,7 +25,7 @@ const errorHandler = (err, req, res, next) => {
     method: req.method,
     ip: req.ip,
     userId: req.user?.id,
-    statusCode: err.statusCode || 500
+    statusCode: err.statusCode || 500,
   });
 
   // SQL Server errors
@@ -44,7 +44,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Validation errors
   if (err.name === 'ValidationError') {
-    const messages = Object.values(err.errors).map(e => e.message);
+    const messages = Object.values(err.errors).map((e) => e.message);
     error = new AppError(messages.join(', '), 400, 'VALIDATION_ERROR');
   }
 
@@ -58,7 +58,7 @@ const errorHandler = (err, req, res, next) => {
     success: false,
     error: error.message || 'Internal server error',
     code: error.code || 'INTERNAL_ERROR',
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
   });
 };
 
@@ -70,5 +70,5 @@ const asyncHandler = (fn) => (req, res, next) => {
 module.exports = {
   AppError,
   errorHandler,
-  asyncHandler
+  asyncHandler,
 };

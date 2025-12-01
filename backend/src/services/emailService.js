@@ -10,7 +10,9 @@ const logger = require('../utils/logger');
 class EmailService {
   constructor() {
     if (!emailConfig.azure.connectionString) {
-      logger.warn('Azure Communication Services connection string not configured');
+      logger.warn(
+        'Azure Communication Services connection string not configured'
+      );
       this.client = null;
     } else {
       this.client = new EmailClient(emailConfig.azure.connectionString);
@@ -23,7 +25,9 @@ class EmailService {
    */
   async sendEmail({ to, subject, html, text }) {
     if (!this.client) {
-      logger.error('Email client not initialized. Check AZURE_COMMUNICATION_CONNECTION_STRING');
+      logger.error(
+        'Email client not initialized. Check AZURE_COMMUNICATION_CONNECTION_STRING'
+      );
       throw new Error('Email service not configured');
     }
 
@@ -33,11 +37,11 @@ class EmailService {
         content: {
           subject,
           plainText: text,
-          html
+          html,
         },
         recipients: {
-          to: [{ address: to }]
-        }
+          to: [{ address: to }],
+        },
       };
 
       const poller = await this.client.beginSend(message);
@@ -45,7 +49,7 @@ class EmailService {
 
       logger.info(`Email sent successfully to ${to}`, {
         messageId: result.id,
-        status: result.status
+        status: result.status,
       });
 
       return result;
@@ -53,7 +57,7 @@ class EmailService {
       logger.error('Failed to send email', {
         to,
         subject,
-        error: error.message
+        error: error.message,
       });
       throw error;
     }
@@ -64,7 +68,7 @@ class EmailService {
    */
   async sendVerificationEmail(user, token, code) {
     const verificationUrl = `${emailConfig.templates.appUrl}/verify-email?token=${token}`;
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -143,7 +147,7 @@ class EmailService {
       to: user.email,
       subject: `Verify your ${emailConfig.templates.appName} account`,
       html,
-      text
+      text,
     });
   }
 
@@ -152,7 +156,7 @@ class EmailService {
    */
   async sendPasswordResetEmail(user, token) {
     const resetUrl = `${emailConfig.templates.appUrl}/reset-password?token=${token}`;
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -219,7 +223,7 @@ class EmailService {
       to: user.email,
       subject: `Reset your ${emailConfig.templates.appName} password`,
       html,
-      text
+      text,
     });
   }
 
@@ -228,7 +232,7 @@ class EmailService {
    */
   async sendWelcomeEmail(user) {
     const dashboardUrl = `${emailConfig.templates.appUrl}/dashboard`;
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -296,7 +300,7 @@ class EmailService {
       to: user.email,
       subject: `Welcome to ${emailConfig.templates.appName}! 🎉`,
       html,
-      text
+      text,
     });
   }
 
@@ -304,9 +308,10 @@ class EmailService {
    * Send invoice notification
    */
   async sendInvoiceEmail(user, invoice, type = 'sent') {
-    const subject = type === 'sent' 
-      ? `Invoice ${invoice.invoice_number} has been sent`
-      : `Invoice ${invoice.invoice_number} has been paid`;
+    const subject =
+      type === 'sent'
+        ? `Invoice ${invoice.invoice_number} has been sent`
+        : `Invoice ${invoice.invoice_number} has been paid`;
 
     const html = `
       <!DOCTYPE html>
@@ -352,7 +357,7 @@ class EmailService {
       to: user.email,
       subject,
       html,
-      text: `Invoice ${invoice.invoice_number} has been ${type}. Amount: $${invoice.amount}`
+      text: `Invoice ${invoice.invoice_number} has been ${type}. Amount: $${invoice.amount}`,
     });
   }
 
@@ -361,7 +366,7 @@ class EmailService {
    */
   async sendTaskReminder(user, task) {
     const taskUrl = `${emailConfig.templates.appUrl}/tasks`;
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -409,7 +414,7 @@ class EmailService {
       to: user.email,
       subject: `⏰ Task Reminder: ${task.title}`,
       html,
-      text: `Task Reminder: ${task.title}\nDue: ${new Date(task.due_date).toLocaleDateString()}\nPriority: ${task.priority}`
+      text: `Task Reminder: ${task.title}\nDue: ${new Date(task.due_date).toLocaleDateString()}\nPriority: ${task.priority}`,
     });
   }
 }

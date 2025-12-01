@@ -23,16 +23,17 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *       200:
  *         description: List of inactive users
  */
-router.get('/inactive-users', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { days = 90 } = req.query;
+router.get(
+  '/inactive-users',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { days = 90 } = req.query;
 
-  const result = await query(
-    'SELECT * FROM get_inactive_users($1)',
-    [days]
-  );
+    const result = await query('SELECT * FROM get_inactive_users($1)', [days]);
 
-  // Get stats
-  const statsResult = await query(`
+    // Get stats
+    const statsResult = await query(`
     SELECT 
       COUNT(*) FILTER (WHERE last_login_at IS NULL) as never_logged_in,
       COUNT(*) FILTER (WHERE last_login_at < NOW() - INTERVAL '30 days') as inactive_30_days,
@@ -42,15 +43,16 @@ router.get('/inactive-users', authenticateToken, requireAdmin, asyncHandler(asyn
     WHERE deleted_at IS NULL
   `);
 
-  res.json({
-    users: result.rows,
-    stats: statsResult.rows[0],
-    criteria: {
-      days_inactive: parseInt(days),
-      total_found: result.rows.length
-    }
-  });
-}));
+    res.json({
+      users: result.rows,
+      stats: statsResult.rows[0],
+      criteria: {
+        days_inactive: parseInt(days),
+        total_found: result.rows.length,
+      },
+    });
+  })
+);
 
 /**
  * @swagger
@@ -74,10 +76,14 @@ router.get('/inactive-users', authenticateToken, requireAdmin, asyncHandler(asyn
  *       200:
  *         description: Activity logs
  */
-router.get('/user-activity', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { userId, limit = 50 } = req.query;
+router.get(
+  '/user-activity',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { userId, limit = 50 } = req.query;
 
-  let sql = `
+    let sql = `
     SELECT 
       al.id,
       al.user_id,
@@ -93,22 +99,23 @@ router.get('/user-activity', authenticateToken, requireAdmin, asyncHandler(async
     JOIN users u ON al.user_id = u.id
   `;
 
-  const params = [];
-  if (userId) {
-    sql += ' WHERE al.user_id = $1';
-    params.push(userId);
-  }
+    const params = [];
+    if (userId) {
+      sql += ' WHERE al.user_id = $1';
+      params.push(userId);
+    }
 
-  sql += ' ORDER BY al.created_at DESC LIMIT $' + (params.length + 1);
-  params.push(limit);
+    sql += ' ORDER BY al.created_at DESC LIMIT $' + (params.length + 1);
+    params.push(limit);
 
-  const result = await query(sql, params);
+    const result = await query(sql, params);
 
-  res.json({
-    activities: result.rows,
-    total: result.rows.length
-  });
-}));
+    res.json({
+      activities: result.rows,
+      total: result.rows.length,
+    });
+  })
+);
 
 /**
  * @swagger
@@ -137,27 +144,31 @@ router.get('/user-activity', authenticateToken, requireAdmin, asyncHandler(async
  *       200:
  *         description: Users deleted
  */
-router.post('/delete-inactive', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { days, userIds } = req.body;
+router.post(
+  '/delete-inactive',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { days, userIds } = req.body;
 
-  let deletedCount = 0;
+    let deletedCount = 0;
 
-  if (userIds && userIds.length > 0) {
-    // Delete specific users
-    const placeholders = userIds.map((_, i) => `$${i + 1}`).join(',');
-    const result = await query(
-      `UPDATE users 
+    if (userIds && userIds.length > 0) {
+      // Delete specific users
+      const placeholders = userIds.map((_, i) => `$${i + 1}`).join(',');
+      const result = await query(
+        `UPDATE users 
        SET deleted_at = NOW(),
            deletion_reason = 'Deleted by admin - inactive account'
        WHERE id IN (${placeholders})
        AND deleted_at IS NULL`,
-      userIds
-    );
-    deletedCount = result.rowCount;
-  } else if (days) {
-    // Delete users inactive for X days
-    const result = await query(
-      `UPDATE users 
+        userIds
+      );
+      deletedCount = result.rowCount;
+    } else if (days) {
+      // Delete users inactive for X days
+      const result = await query(
+        `UPDATE users 
        SET deleted_at = NOW(),
            deletion_reason = $1
        WHERE deleted_at IS NULL
@@ -167,28 +178,29 @@ router.post('/delete-inactive', authenticateToken, requireAdmin, asyncHandler(as
        )
        AND created_at < NOW() - ($2 || ' days')::INTERVAL
        AND role != 'admin'`,
-      [`Deleted by admin - inactive for ${days}+ days`, days]
-    );
-    deletedCount = result.rowCount;
-  }
+        [`Deleted by admin - inactive for ${days}+ days`, days]
+      );
+      deletedCount = result.rowCount;
+    }
 
-  // Log this action
-  await query(
-    `INSERT INTO activity_logs (user_id, action, details)
+    // Log this action
+    await query(
+      `INSERT INTO activity_logs (user_id, action, details)
      VALUES ($1, $2, $3)`,
-    [
-      req.user.id,
-      'bulk_delete_inactive_users',
-      JSON.stringify({ days, userIds, deletedCount })
-    ]
-  );
+      [
+        req.user.id,
+        'bulk_delete_inactive_users',
+        JSON.stringify({ days, userIds, deletedCount }),
+      ]
+    );
 
-  res.json({
-    success: true,
-    message: `Successfully deleted ${deletedCount} inactive user(s)`,
-    deletedCount
-  });
-}));
+    res.json({
+      success: true,
+      message: `Successfully deleted ${deletedCount} inactive user(s)`,
+      deletedCount,
+    });
+  })
+);
 
 /**
  * @swagger
@@ -202,8 +214,12 @@ router.post('/delete-inactive', authenticateToken, requireAdmin, asyncHandler(as
  *       200:
  *         description: Activity statistics
  */
-router.get('/stats', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const stats = await query(`
+router.get(
+  '/stats',
+  authenticateToken,
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const stats = await query(`
     SELECT 
       COUNT(*) as total_users,
       COUNT(*) FILTER (WHERE last_login_at IS NOT NULL) as users_logged_in,
@@ -218,7 +234,7 @@ router.get('/stats', authenticateToken, requireAdmin, asyncHandler(async (req, r
     WHERE deleted_at IS NULL
   `);
 
-  const recentActivity = await query(`
+    const recentActivity = await query(`
     SELECT 
       action,
       COUNT(*) as count
@@ -229,10 +245,11 @@ router.get('/stats', authenticateToken, requireAdmin, asyncHandler(async (req, r
     LIMIT 10
   `);
 
-  res.json({
-    userStats: stats.rows[0],
-    recentActions: recentActivity.rows
-  });
-}));
+    res.json({
+      userStats: stats.rows[0],
+      recentActions: recentActivity.rows,
+    });
+  })
+);
 
 module.exports = router;

@@ -22,9 +22,11 @@ const generateToken = (length = 32) => {
 const generateTokenExpiry = (duration = '24h') => {
   const now = new Date();
   const match = duration.match(/^(\d+)([hmd])$/);
-  
+
   if (!match) {
-    throw new Error('Invalid duration format. Use format like: 24h, 1h, 30m, 7d');
+    throw new Error(
+      'Invalid duration format. Use format like: 24h, 1h, 30m, 7d'
+    );
   }
 
   const [, value, unit] = match;
@@ -41,7 +43,9 @@ const generateTokenExpiry = (duration = '24h') => {
       now.setDate(now.getDate() + numValue);
       break;
     default:
-      throw new Error('Invalid duration unit. Use h (hours), m (minutes), or d (days)');
+      throw new Error(
+        'Invalid duration unit. Use h (hours), m (minutes), or d (days)'
+      );
   }
 
   return now;
@@ -59,5 +63,5 @@ const isTokenExpired = (expiryDate) => {
 module.exports = {
   generateToken,
   generateTokenExpiry,
-  isTokenExpired
+  isTokenExpired,
 };

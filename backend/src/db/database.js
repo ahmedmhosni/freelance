@@ -2,7 +2,8 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = process.env.DATABASE_URL || path.join(__dirname, '../../database.sqlite');
+const dbPath =
+  process.env.DATABASE_URL || path.join(__dirname, '../../database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
 // Initialize database with schema
@@ -20,7 +21,7 @@ const initDatabase = () => {
 // Promisify database methods
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
+    db.run(sql, params, function (err) {
       if (err) reject(err);
       else resolve({ id: this.lastID, changes: this.changes });
     });
@@ -55,8 +56,8 @@ async function getPool() {
         const sqliteQuery = queryText.replace(/@param(\d+)/g, '?');
         const rows = await getAll(sqliteQuery);
         return { recordset: rows, rowsAffected: [rows.length] };
-      }
-    })
+      },
+    }),
   };
 }
 

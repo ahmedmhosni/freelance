@@ -11,20 +11,23 @@ async function runMigration() {
     database: process.env.PG_DATABASE || 'roastify_local',
     user: process.env.PG_USER || 'postgres',
     password: process.env.PG_PASSWORD || 'postgres',
-    ssl: false
+    ssl: false,
   });
 
   try {
     console.log('🚀 Running Git Commits Tracking Migration');
     console.log('📍 Database:', process.env.PG_DATABASE || 'roastify_local\n');
-    
+
     const sql = fs.readFileSync(
-      path.join(__dirname, '../database/migrations/ADD_GIT_COMMITS_TRACKING.sql'),
+      path.join(
+        __dirname,
+        '../database/migrations/ADD_GIT_COMMITS_TRACKING.sql'
+      ),
       'utf8'
     );
-    
+
     await pool.query(sql);
-    
+
     console.log('\n✅ SUCCESS! Git commits tracking enabled!');
     console.log('📊 Tables created:');
     console.log('   - git_commits: Track all git commits');
@@ -35,7 +38,7 @@ async function runMigration() {
     console.log('   - Admin reviews and creates versions');
     console.log('   - Commits marked as processed');
     console.log('\n🎉 Ready to track commits!');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {

@@ -1,10 +1,16 @@
-const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalItems,
+  itemsPerPage,
+}) => {
   const pages = [];
   const maxVisible = 5;
-  
+
   let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
   let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-  
+
   if (endPage - startPage < maxVisible - 1) {
     startPage = Math.max(1, endPage - maxVisible + 1);
   }
@@ -21,7 +27,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
       <div className="pagination-info">
         {startItem}–{endItem} of {totalItems}
       </div>
-      
+
       <div className="pagination-buttons">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -33,17 +39,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
 
         {startPage > 1 && (
           <>
-            <button
-              onClick={() => onPageChange(1)}
-              className="pagination-btn"
-            >
+            <button onClick={() => onPageChange(1)} className="pagination-btn">
               1
             </button>
             {startPage > 2 && <span className="pagination-ellipsis">···</span>}
           </>
         )}
 
-        {pages.map(page => (
+        {pages.map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page)}
@@ -55,7 +58,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
 
         {endPage < totalPages && (
           <>
-            {endPage < totalPages - 1 && <span className="pagination-ellipsis">···</span>}
+            {endPage < totalPages - 1 && (
+              <span className="pagination-ellipsis">···</span>
+            )}
             <button
               onClick={() => onPageChange(totalPages)}
               className="pagination-btn"

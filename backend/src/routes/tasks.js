@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
 
     const result = await query(queryText, params);
     const countResult = await query(countQueryText, countParams);
-    
+
     const tasks = result.rows;
     const total = parseInt(countResult.rows[0].total);
 
@@ -63,8 +63,8 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -73,13 +73,22 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { project_id, title, description, priority, status, due_date } = req.body;
+  const { project_id, title, description, priority, status, due_date } =
+    req.body;
   try {
     const result = await query(
       `INSERT INTO tasks (user_id, project_id, title, description, priority, status, due_date) 
        VALUES ($1, $2, $3, $4, $5, $6, $7) 
        RETURNING *`,
-      [req.user.id, project_id || null, title, description || null, priority || 'medium', status || 'pending', due_date || null]
+      [
+        req.user.id,
+        project_id || null,
+        title,
+        description || null,
+        priority || 'medium',
+        status || 'pending',
+        due_date || null,
+      ]
     );
 
     const task = result.rows[0];
@@ -97,17 +106,37 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { project_id, title, description, priority, status, due_date, comments } = req.body;
+  const {
+    project_id,
+    title,
+    description,
+    priority,
+    status,
+    due_date,
+    comments,
+  } = req.body;
   try {
     await query(
       `UPDATE tasks 
        SET project_id = $1, title = $2, description = $3, priority = $4, status = $5, due_date = $6, comments = $7, updated_at = NOW() 
        WHERE id = $8 AND user_id = $9`,
-      [project_id || null, title, description || null, priority, status, due_date || null, comments || null, req.params.id, req.user.id]
+      [
+        project_id || null,
+        title,
+        description || null,
+        priority,
+        status,
+        due_date || null,
+        comments || null,
+        req.params.id,
+        req.user.id,
+      ]
     );
 
     // Get updated task
-    const taskResult = await query('SELECT * FROM tasks WHERE id = $1', [req.params.id]);
+    const taskResult = await query('SELECT * FROM tasks WHERE id = $1', [
+      req.params.id,
+    ]);
     const task = taskResult.rows[0];
 
     // Emit real-time update
@@ -124,10 +153,10 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    await query(
-      'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
-      [req.params.id, req.user.id]
-    );
+    await query('DELETE FROM tasks WHERE id = $1 AND user_id = $2', [
+      req.params.id,
+      req.user.id,
+    ]);
 
     // Emit real-time update
     const io = req.app.get('io');

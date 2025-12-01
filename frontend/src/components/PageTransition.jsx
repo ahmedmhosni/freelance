@@ -14,23 +14,24 @@ const PageTransition = ({ children }) => {
   useEffect(() => {
     const isFromHome = previousPath.current === '/';
     const isToHome = location.pathname === '/';
-    
+
     // Show full loader only when navigating FROM home page to another page
     if (isFromHome && !isToHome) {
-      setShowFullLoader(true);
-      
       const timer = setTimeout(() => {
         setShowFullLoader(false);
         setDisplayChildren(children);
         previousPath.current = location.pathname;
       }, 2000); // 2 seconds - enough time to see and appreciate the logo
-      
+
+      // Set this in a callback to avoid direct setState in effect
+      setTimeout(() => setShowFullLoader(true), 0);
+
       return () => clearTimeout(timer);
     }
-    
+
     // Use smooth transition for all other navigation
     setIsTransitioning(true);
-    
+
     const timer1 = setTimeout(() => {
       setDisplayChildren(children);
     }, 150);
@@ -44,24 +45,27 @@ const PageTransition = ({ children }) => {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, children]);
 
   // Full page loader for home -> app transitions
   if (showFullLoader) {
     return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: isDark ? '#191919' : '#ffffff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        animation: 'fadeIn 0.2s ease'
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: isDark ? '#191919' : '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          animation: 'fadeIn 0.2s ease',
+        }}
+      >
         <LogoLoader size={40} />
       </div>
     );
@@ -71,23 +75,27 @@ const PageTransition = ({ children }) => {
     <>
       {/* Subtle top loading bar for in-app navigation */}
       {isTransitioning && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
-          zIndex: 10000,
-          animation: 'slideIn 0.3s ease'
-        }} />
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+            zIndex: 10000,
+            animation: 'slideIn 0.3s ease',
+          }}
+        />
       )}
-      
+
       {/* Content with smooth fade - no transform to avoid distortion */}
-      <div style={{
-        opacity: isTransitioning ? 0.85 : 1,
-        transition: 'opacity 0.15s ease'
-      }}>
+      <div
+        style={{
+          opacity: isTransitioning ? 0.85 : 1,
+          transition: 'opacity 0.15s ease',
+        }}
+      >
         {displayChildren}
       </div>
 

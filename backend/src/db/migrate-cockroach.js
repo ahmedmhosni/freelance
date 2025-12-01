@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 async function migrate() {
   try {
     console.log('🚀 Starting CockroachDB migration...\n');
-    
+
     // Create users table
     console.log('Creating users table...');
     await pool.query(`
@@ -175,17 +175,20 @@ async function migrate() {
     // Create default admin user
     console.log('\nCreating default admin user...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    
+
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       ['admin@example.com']
     );
 
     if (existingUser.rows.length === 0) {
-      await pool.query(`
+      await pool.query(
+        `
         INSERT INTO users (email, password, name, role, is_active)
         VALUES ($1, $2, $3, $4, $5)
-      `, ['admin@example.com', hashedPassword, 'Admin User', 'admin', 1]);
+      `,
+        ['admin@example.com', hashedPassword, 'Admin User', 'admin', 1]
+      );
       console.log('✓ Default admin user created');
       console.log('  Email: admin@example.com');
       console.log('  Password: admin123');
@@ -196,9 +199,18 @@ async function migrate() {
     // Create some default quotes
     console.log('\nCreating default quotes...');
     const quotes = [
-      { text: 'The only way to do great work is to love what you do.', author: 'Steve Jobs' },
-      { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill' },
-      { text: 'Believe you can and you\'re halfway there.', author: 'Theodore Roosevelt' }
+      {
+        text: 'The only way to do great work is to love what you do.',
+        author: 'Steve Jobs',
+      },
+      {
+        text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.',
+        author: 'Winston Churchill',
+      },
+      {
+        text: "Believe you can and you're halfway there.",
+        author: 'Theodore Roosevelt',
+      },
     ];
 
     for (const quote of quotes) {
@@ -206,7 +218,7 @@ async function migrate() {
         'SELECT id FROM quotes WHERE text = $1',
         [quote.text]
       );
-      
+
       if (existing.rows.length === 0) {
         await pool.query(
           'INSERT INTO quotes (text, author, is_active) VALUES ($1, $2, $3)',
@@ -222,7 +234,7 @@ async function migrate() {
     console.log('  - Admin user ready');
     console.log('  - Sample data added');
     console.log('\n🚀 Your app is ready to use!');
-    
+
     await pool.end();
     process.exit(0);
   } catch (error) {
