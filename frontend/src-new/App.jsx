@@ -14,6 +14,9 @@ import { LoginPage, RegisterPage, ForgotPasswordPage } from './features/auth';
 // Feature Pages
 import { ClientsPage } from './features/clients';
 import { ProjectsPage } from './features/projects';
+import { TasksPage } from './features/tasks';
+import { InvoicesPage } from './features/invoices';
+import { DashboardPage } from './features/dashboard';
 
 // Shared Components
 import { LoadingSpinner } from './shared/components';
@@ -48,13 +51,15 @@ function App() {
           }
         >
           <Route index element={<Navigate to="/dashboard" />} />
-          <Route path="dashboard" element={<div>Dashboard</div>} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="clients" element={<ClientsPage />} />
           <Route path="projects" element={<ProjectsPage />} />
-          <Route path="tasks" element={<div>Tasks</div>} />
-          <Route path="invoices" element={<div>Invoices</div>} />
-          <Route path="reports" element={<div>Reports</div>} />
-          <Route path="profile" element={<div>Profile</div>} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="reports" element={<div>Reports - Coming Soon</div>} />
+          <Route path="profile" element={<div>Profile - Coming Soon</div>} />
+          <Route path="time-tracking" element={<div>Time Tracking - Coming Soon</div>} />
+          <Route path="quotes" element={<div>Quotes - Coming Soon</div>} />
         </Route>
 
         {/* 404 */}
