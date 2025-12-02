@@ -1,11 +1,14 @@
 {
   "name": "freelancer-backend",
-  "version": "1.0.1",
-  "description": "Backend API for freelancer management with PostgreSQL",
-  "main": "src/server.js",
+  "version": "2.0.0",
+  "description": "Backend API for freelancer management with PostgreSQL - Modular Monolith",
+  "main": "src-new/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "dev": "nodemon src-new/server.js",
+    "dev:old": "nodemon src/server.js",
+    "start": "node src-new/server.js",
+    "start:old": "node src/server.js",
+    "test": "echo \"Tests coming soon\" && exit 0",
     "seed": "node src/db/seed.js"
   },
   "dependencies": {
@@ -25,6 +28,7 @@
     "express-validator": "^7.3.1",
     "googleapis": "^166.0.0",
     "helmet": "^7.1.0",
+    "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",

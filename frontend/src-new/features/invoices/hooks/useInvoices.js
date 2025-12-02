@@ -24,7 +24,7 @@ export const useInvoices = (filters = {}) => {
   }, [filters]);
 
   useEffect(() => {
-    fetchTasks();
+    fetchInvoices();
   }, [fetchInvoices]);
 
   const createInvoice = useCallback(async (invoiceData) => {
