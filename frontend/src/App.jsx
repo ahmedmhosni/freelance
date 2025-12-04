@@ -1,42 +1,52 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { SocketProvider } from './context/SocketContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { MaintenanceProvider } from './context/MaintenanceContext';
-import ErrorBoundary from './components/ErrorBoundary';
-import FullPageLoader from './components/FullPageLoader';
-import PageTransition from './components/PageTransition';
 import './styles/responsive-fixes.css';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import VerifyEmail from './pages/VerifyEmail';
-import ResendVerification from './pages/ResendVerification';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import PublicStatus from './pages/PublicStatus';
-import AdminStatus from './pages/Status';
+
+// Shared imports (not lazy loaded - needed immediately)
+import { 
+  AuthProvider, 
+  useAuth,
+  ThemeProvider,
+  SocketProvider,
+  MaintenanceProvider,
+  ErrorBoundary,
+  FullPageLoader,
+  PageTransition,
+  Layout
+} from './shared';
+
+// Lazy load feature modules
+const Home = lazy(() => import('./features/home').then(m => ({ default: m.Home })));
+const Login = lazy(() => import('./features/auth').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('./features/auth').then(m => ({ default: m.Register })));
+const VerifyEmail = lazy(() => import('./features/auth').then(m => ({ default: m.VerifyEmail })));
+const ResendVerification = lazy(() => import('./features/auth').then(m => ({ default: m.ResendVerification })));
+const ForgotPassword = lazy(() => import('./features/auth').then(m => ({ default: m.ForgotPassword })));
+const ResetPassword = lazy(() => import('./features/auth').then(m => ({ default: m.ResetPassword })));
+const PublicStatus = lazy(() => import('./features/status').then(m => ({ default: m.PublicStatus })));
+const AdminStatus = lazy(() => import('./features/status').then(m => ({ default: m.Status })));
+const Dashboard = lazy(() => import('./features/dashboard').then(m => ({ default: m.Dashboard })));
+const Clients = lazy(() => import('./features/clients').then(m => ({ default: m.Clients })));
+const ClientDetail = lazy(() => import('./features/clients').then(m => ({ default: m.ClientDetail })));
+const Projects = lazy(() => import('./features/projects').then(m => ({ default: m.Projects })));
+const Tasks = lazy(() => import('./features/tasks').then(m => ({ default: m.Tasks })));
+const Invoices = lazy(() => import('./features/invoices').then(m => ({ default: m.Invoices })));
+const Reports = lazy(() => import('./features/reports').then(m => ({ default: m.Reports })));
+const TimeTracking = lazy(() => import('./features/time-tracking').then(m => ({ default: m.TimeTracking })));
+const AdminPanel = lazy(() => import('./features/admin').then(m => ({ default: m.AdminPanel })));
+const AdminGDPR = lazy(() => import('./features/admin').then(m => ({ default: m.AdminGDPR })));
+const Profile = lazy(() => import('./features/profile').then(m => ({ default: m.Profile })));
+const PublicProfile = lazy(() => import('./features/profile').then(m => ({ default: m.PublicProfile })));
+const Terms = lazy(() => import('./features/legal').then(m => ({ default: m.Terms })));
+const Privacy = lazy(() => import('./features/legal').then(m => ({ default: m.Privacy })));
+const Changelog = lazy(() => import('./features/changelog').then(m => ({ default: m.Changelog })));
+const Announcements = lazy(() => import('./features/announcements').then(m => ({ default: m.Announcements })));
+const AnnouncementDetail = lazy(() => import('./features/announcements').then(m => ({ default: m.AnnouncementDetail })));
+
+// Pages not yet moved to features (keep direct imports for now)
 import ComingSoon from './pages/ComingSoon';
-import Dashboard from './pages/Dashboard';
-import Clients from './pages/Clients';
-import ClientDetail from './pages/ClientDetail';
-import Projects from './pages/Projects';
-import Tasks from './pages/Tasks';
-import Invoices from './pages/Invoices';
-import Reports from './pages/Reports';
-import TimeTracking from './pages/TimeTracking';
-import AdminPanel from './pages/AdminPanel';
-import AdminGDPR from './pages/AdminGDPR';
 import LoaderTest from './pages/LoaderTest';
-import Profile from './pages/Profile';
-import PublicProfile from './pages/PublicProfile';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import Changelog from './pages/Changelog';
-import Announcements from './pages/Announcements';
-import AnnouncementDetail from './pages/AnnouncementDetail';
-import Layout from './components/Layout';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
@@ -89,6 +99,7 @@ function App() {
                 },
               }}
             />
+            <Suspense fallback={<FullPageLoader text="Loading..." />}>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
@@ -130,6 +141,7 @@ function App() {
               <Route path="/status" element={<Navigate to="/public-status" replace />} />
               <Route path="/admin/status" element={<Navigate to="/app/admin/status" replace />} />
             </Routes>
+            </Suspense>
               </PageTransition>
             </MaintenanceProvider>
           </BrowserRouter>

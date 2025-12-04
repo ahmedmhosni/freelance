@@ -25,17 +25,8 @@ const socketIo = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 
-const authRoutes = require('./routes/auth-pg');
-const clientRoutes = require('./routes/clients');
-const projectRoutes = require('./routes/projects');
-const taskRoutes = require('./routes/tasks');
-const invoiceRoutes = require('./routes/invoices');
-const invoiceItemsRoutes = require('./routes/invoiceItems');
+// Old routes that are still needed (no new architecture equivalent yet)
 const fileRoutes = require('./routes/files');
-const adminRoutes = require('./routes/admin');
-const notificationRoutes = require('./routes/notifications');
-const reportRoutes = require('./routes/reports');
-const timeTrackingRoutes = require('./routes/timeTracking');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
 const maintenanceRoutes = require('./routes/maintenance');
@@ -58,6 +49,10 @@ const { errorHandler } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 const { swaggerUi, specs } = require('./swagger');
 
+// New architecture imports
+const { bootstrap } = require('./core/bootstrap');
+const { loggingMiddleware } = require('./shared/middleware/loggingMiddleware');
+
 // Create logs directory if it doesn't exist
 const logsDir = path.join(__dirname, '../logs');
 if (!fs.existsSync(logsDir)) {
@@ -75,6 +70,7 @@ app.set('trust proxy', true);
 const allowedOrigins = process.env.FRONTEND_URL 
   ? [
       'http://localhost:3000',
+      'http://localhost:3001',
       'http://localhost:5173',
       process.env.FRONTEND_URL,
       'https://roastify.online',
@@ -83,6 +79,7 @@ const allowedOrigins = process.env.FRONTEND_URL
     ]
   : [
       'http://localhost:3000',
+      'http://localhost:3001',
       'http://localhost:5173',
       'https://white-sky-0a7e9f003.3.azurestaticapps.net',
       'https://roastify.online',
@@ -138,6 +135,9 @@ app.use(morgan('combined', {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Add logging middleware for new architecture routes
+app.use('/api/', loggingMiddleware);
+
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
@@ -173,18 +173,45 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/clients', clientRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/invoices', invoiceRoutes);
-app.use('/api/invoices', invoiceItemsRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/time-tracking', timeTrackingRoutes);
+// Bootstrap new architecture (DI container and modules)
+bootstrap({ createApp: false }).then(({ container }) => {
+  // New architecture routes (now default at /api/*)
+  const clientController = container.resolve('clientController');
+  app.use('/api/clients', clientController.router);
+
+  const projectController = container.resolve('projectController');
+  app.use('/api/projects', projectController.router);
+
+  const taskController = container.resolve('taskController');
+  app.use('/api/tasks', taskController.router);
+
+  const invoiceController = container.resolve('invoiceController');
+  app.use('/api/invoices', invoiceController.router);
+
+  const timeEntryController = container.resolve('timeEntryController');
+  app.use('/api/time-tracking', timeEntryController.router);
+
+  // Reports module (new architecture)
+  const reportsController = container.resolve('reportsController');
+  app.use('/api/reports', reportsController.router);
+
+  // Notifications module (new architecture)
+  const notificationController = container.resolve('notificationController');
+  app.use('/api/notifications', notificationController.router);
+
+  // Auth module (new architecture)
+  const authController = container.resolve('authController');
+  app.use('/api/auth', authController.router);
+
+  // Admin module (new architecture)
+  const adminController = container.resolve('adminController');
+  app.use('/api/admin', adminController.router);
+}).catch(error => {
+  logger.error('Failed to bootstrap application', error);
+  process.exit(1);
+});
+
+// Additional routes that don't have new architecture equivalents yet
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quotes', quotesRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
@@ -192,6 +219,7 @@ app.use('/api/status', statusRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/user', userPreferencesRoutes);
 app.use('/api/legal', legalRoutes);
+app.use('/api/files', fileRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/preferences', preferencesRoutes);
 app.use('/api/gdpr', gdprRoutes);

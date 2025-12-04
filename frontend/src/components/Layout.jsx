@@ -42,7 +42,7 @@ const Layout = () => {
   const fetchVersion = async () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await axios.get(`${apiUrl}/api/changelog/current-version`);
+      const response = await axios.get(`${apiUrl}/changelog/current-version`);
       setVersion(response.data);
     } catch (error) {
       console.error('Failed to fetch version:', error);

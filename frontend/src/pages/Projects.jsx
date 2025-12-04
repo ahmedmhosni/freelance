@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { MdFolder } from 'react-icons/md';
 import logger from '../utils/logger';
+import { fetchProjects, createProject, updateProject, deleteProject } from '../features/projects/services/projectApi';
+import { fetchClients } from '../features/clients/services/clientApi';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -18,15 +19,15 @@ const Projects = () => {
   });
 
   useEffect(() => {
-    fetchProjects();
-    fetchClients();
+    loadProjects();
+    loadClients();
   }, []);
 
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/projects');
-      const data = response.data.data || response.data;
+      const response = await fetchProjects();
+      const data = response.data || response;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching projects:', error);
@@ -36,10 +37,10 @@ const Projects = () => {
     }
   };
 
-  const fetchClients = async () => {
+  const loadClients = async () => {
     try {
-      const response = await api.get('/api/clients');
-      const data = response.data.data || response.data;
+      const response = await fetchClients();
+      const data = response.data || response;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching clients:', error);
@@ -60,16 +61,16 @@ const Projects = () => {
       };
       
       if (editingProject) {
-        await api.put(`/api/projects/${editingProject.id}`, projectData);
+        await updateProject(editingProject.id, projectData);
         toast.success('Project updated successfully!');
       } else {
-        await api.post('/api/projects', projectData);
+        await createProject(projectData);
         toast.success('Project created successfully!');
       }
       setShowForm(false);
       setEditingProject(null);
       setFormData({ title: '', description: '', client_id: '', status: 'active', deadline: '' });
-      fetchProjects();
+      loadProjects();
     } catch (error) {
       logger.error('Error saving project:', error);
       toast.error('Failed to save project');
@@ -96,10 +97,10 @@ const Projects = () => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/projects/${deleteDialog.projectId}`);
+      await deleteProject(deleteDialog.projectId);
       toast.success('Project deleted successfully!');
       setDeleteDialog({ isOpen: false, projectId: null });
-      fetchProjects();
+      loadProjects();
     } catch (error) {
       logger.error('Error deleting project:', error);
       toast.error('Failed to delete project');

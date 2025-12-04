@@ -1,0 +1,366 @@
+paths:
+  /api/v2/invoices:
+    get:
+      tags:
+        - Invoices
+      summary: Get all invoices
+      description: Retrieve a list of all invoices for the authenticated user
+      parameters:
+        - in: query
+          name: clientId
+          schema:
+            type: integer
+          description: Filter by client ID
+          example: 1
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [draft, sent, paid, overdue, cancelled]
+          description: Filter by invoice status
+          example: sent
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of items to skip
+      responses:
+        '200':
+          description: Invoices retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              example:
+                data:
+                  - id: 1
+                    invoiceNumber: INV-2024-001
+                    clientId: 1
+                    status: sent
+                    amount: 5000.00
+                    dueDate: '2024-02-15'
+                    createdAt: '2024-01-15T00:00:00.000Z'
+                meta:
+                  total: 25
+                  limit: 10
+                  offset: 0
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Invoices
+      summary: Create a new invoice
+      description: Create a new invoice for a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - clientId
+                - amount
+                - dueDate
+              properties:
+                clientId:
+                  type: integer
+                  example: 1
+                invoiceNumber:
+                  type: string
+                  description: Auto-generated if not provided
+                  example: INV-2024-001
+                amount:
+                  type: number
+                  minimum: 0.01
+                  example: 5000.00
+                tax:
+                  type: number
+                  minimum: 0
+                  default: 0
+                  example: 500.00
+                discount:
+                  type: number
+                  minimum: 0
+                  default: 0
+                  example: 250.00
+                status:
+                  type: string
+                  enum: [draft, sent, paid, overdue, cancelled]
+                  default: draft
+                  example: draft
+                issueDate:
+                  type: string
+                  format: date
+                  example: '2024-01-15'
+                dueDate:
+                  type: string
+                  format: date
+                  example: '2024-02-15'
+                notes:
+                  type: string
+                  example: 'Payment terms: Net 30'
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                        example: Web development services
+                      quantity:
+                        type: number
+                        example: 40
+                      rate:
+                        type: number
+                        example: 125.00
+                      amount:
+                        type: number
+                        example: 5000.00
+      responses:
+        '201':
+          description: Invoice created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Client not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/invoices/{id}:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice by ID
+      description: Retrieve a specific invoice by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Invoice ID
+          example: 1
+      responses:
+        '200':
+          description: Invoice retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Invoices
+      summary: Update invoice
+      description: Update an existing invoice
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Invoice ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  example: 5500.00
+                tax:
+                  type: number
+                  example: 550.00
+                discount:
+                  type: number
+                  example: 0
+                status:
+                  type: string
+                  enum: [draft, sent, paid, overdue, cancelled]
+                  example: sent
+                issueDate:
+                  type: string
+                  format: date
+                  example: '2024-01-15'
+                dueDate:
+                  type: string
+                  format: date
+                  example: '2024-02-28'
+                notes:
+                  type: string
+                  example: Updated payment terms
+      responses:
+        '200':
+          description: Invoice updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Invoices
+      summary: Delete invoice
+      description: Delete an invoice
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Invoice ID
+          example: 1
+      responses:
+        '200':
+          description: Invoice deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invoice deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/invoices/{id}/pdf:
+    get:
+      tags:
+        - Invoices
+      summary: Download invoice PDF
+      description: Generate and download invoice as PDF
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Invoice ID
+          example: 1
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        invoiceNumber:
+          type: string
+          example: INV-2024-001
+        clientId:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        amount:
+          type: number
+          example: 5000.00
+        tax:
+          type: number
+          example: 500.00
+        discount:
+          type: number
+          example: 250.00
+        total:
+          type: number
+          description: Calculated as amount + tax - discount
+          example: 5250.00
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue, cancelled]
+          example: sent
+        issueDate:
+          type: string
+          format: date
+          example: '2024-01-15'
+        dueDate:
+          type: string
+          format: date
+          example: '2024-02-15'
+        paidDate:
+          type: string
+          format: date
+          nullable: true
+          example: null
+        notes:
+          type: string
+          example: 'Payment terms: Net 30'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T00:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-16T00:00:00.000Z'

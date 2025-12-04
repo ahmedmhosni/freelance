@@ -21,7 +21,7 @@ const PendingCommits = ({ onCreateVersion }) => {
   const fetchPendingCommits = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/changelog/admin/pending-commits');
+      const response = await api.get('/changelog/admin/pending-commits');
       setCommits(response.data.commits);
       setCurrentPage(1); // Reset to first page when fetching
     } catch (error) {
@@ -73,7 +73,7 @@ const PendingCommits = ({ onCreateVersion }) => {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      const response = await api.post('/api/changelog/admin/sync-commits');
+      const response = await api.post('/changelog/admin/sync-commits');
       fetchPendingCommits();
       alert(response.data.message || 'Commits synced successfully!');
     } catch (error) {

@@ -19,7 +19,7 @@ const MaintenanceEditor = () => {
 
   const fetchContent = async () => {
     try {
-      const response = await api.get('/api/maintenance');
+      const response = await api.get('/maintenance');
       setContent({
         ...response.data,
         launch_date: response.data.launch_date ? response.data.launch_date.split('T')[0] : ''
@@ -35,7 +35,7 @@ const MaintenanceEditor = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      await api.put('/api/maintenance', content);
+      await api.put('/maintenance', content);
       setMessage({ type: 'success', text: 'Maintenance page updated successfully!' });
     } catch (error) {
       setMessage({ 

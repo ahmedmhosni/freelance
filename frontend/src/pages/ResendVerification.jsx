@@ -17,7 +17,7 @@ const ResendVerification = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/api/auth/resend-verification', { email });
+      const response = await api.post('/auth/resend-verification', { email });
       setSuccess(true);
       toast.success(response.data.message);
       

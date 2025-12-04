@@ -44,7 +44,7 @@ const AdminStatus = () => {
       const token = localStorage.getItem('token');
       
       // Fetch current status
-      const statusResponse = await fetch(`${apiUrl}/api/status`, {
+      const statusResponse = await fetch(`${apiUrl}/status`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -57,7 +57,7 @@ const AdminStatus = () => {
       
       // Fetch history
       try {
-        const historyResponse = await fetch(`${apiUrl}/api/status/history`, {
+        const historyResponse = await fetch(`${apiUrl}/status/history`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

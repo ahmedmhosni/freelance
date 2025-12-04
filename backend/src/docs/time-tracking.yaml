@@ -1,0 +1,345 @@
+paths:
+  /api/v2/time-tracking:
+    get:
+      tags:
+        - Time Tracking
+      summary: Get all time entries
+      description: Retrieve a list of all time entries for the authenticated user
+      parameters:
+        - in: query
+          name: taskId
+          schema:
+            type: integer
+          description: Filter by task ID
+          example: 1
+        - in: query
+          name: projectId
+          schema:
+            type: integer
+          description: Filter by project ID
+          example: 1
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          description: Filter entries starting from this date
+          example: '2024-01-01'
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          description: Filter entries up to this date
+          example: '2024-01-31'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of items to skip
+      responses:
+        '200':
+          description: Time entries retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimeEntry'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              example:
+                data:
+                  - id: 1
+                    taskId: 1
+                    description: Working on homepage design
+                    startTime: '2024-01-15T09:00:00.000Z'
+                    endTime: '2024-01-15T12:30:00.000Z'
+                    duration: 3.5
+                    createdAt: '2024-01-15T09:00:00.000Z'
+                meta:
+                  total: 100
+                  limit: 10
+                  offset: 0
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Time Tracking
+      summary: Create a new time entry
+      description: Create a new time entry for a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - taskId
+                - startTime
+              properties:
+                taskId:
+                  type: integer
+                  example: 1
+                description:
+                  type: string
+                  example: Working on homepage design
+                startTime:
+                  type: string
+                  format: date-time
+                  example: '2024-01-15T09:00:00.000Z'
+                endTime:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: Leave null for running timer
+                  example: '2024-01-15T12:30:00.000Z'
+                duration:
+                  type: number
+                  description: Duration in hours (calculated if not provided)
+                  example: 3.5
+      responses:
+        '201':
+          description: Time entry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Task not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/time-tracking/{id}:
+    get:
+      tags:
+        - Time Tracking
+      summary: Get time entry by ID
+      description: Retrieve a specific time entry by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Time entry ID
+          example: 1
+      responses:
+        '200':
+          description: Time entry retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Time Tracking
+      summary: Update time entry
+      description: Update an existing time entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Time entry ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Updated description
+                startTime:
+                  type: string
+                  format: date-time
+                  example: '2024-01-15T09:00:00.000Z'
+                endTime:
+                  type: string
+                  format: date-time
+                  example: '2024-01-15T13:00:00.000Z'
+                duration:
+                  type: number
+                  example: 4.0
+      responses:
+        '200':
+          description: Time entry updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Time Tracking
+      summary: Delete time entry
+      description: Delete a time entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Time entry ID
+          example: 1
+      responses:
+        '200':
+          description: Time entry deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Time entry deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/time-tracking/running:
+    get:
+      tags:
+        - Time Tracking
+      summary: Get running timer
+      description: Get the currently running time entry for the authenticated user
+      responses:
+        '200':
+          description: Running timer retrieved successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TimeEntry'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: No running timer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/time-tracking/{id}/stop:
+    post:
+      tags:
+        - Time Tracking
+      summary: Stop running timer
+      description: Stop a running time entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Time entry ID
+          example: 1
+      responses:
+        '200':
+          description: Timer stopped successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+        '400':
+          description: Timer already stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Timer is already stopped
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    TimeEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        taskId:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        description:
+          type: string
+          example: Working on homepage design
+        startTime:
+          type: string
+          format: date-time
+          example: '2024-01-15T09:00:00.000Z'
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2024-01-15T12:30:00.000Z'
+        duration:
+          type: number
+          description: Duration in hours
+          example: 3.5
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T09:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T12:30:00.000Z'

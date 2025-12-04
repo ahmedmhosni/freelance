@@ -18,12 +18,12 @@ const Reports = () => {
   const fetchReports = async () => {
     try {
       const [financial, projects, clients, timeTasks, timeProjects, timeClients] = await Promise.all([
-        api.get('/api/reports/financial'),
-        api.get('/api/reports/projects'),
-        api.get('/api/reports/clients'),
-        api.get('/api/reports/time-tracking/tasks'),
-        api.get('/api/reports/time-tracking/projects'),
-        api.get('/api/reports/time-tracking/clients')
+        api.get('/reports/financial'),
+        api.get('/reports/projects'),
+        api.get('/reports/clients'),
+        api.get('/reports/time-tracking/tasks'),
+        api.get('/reports/time-tracking/projects'),
+        api.get('/reports/time-tracking/clients')
       ]);
       setFinancialReport(financial.data);
       setProjectReport(projects.data);

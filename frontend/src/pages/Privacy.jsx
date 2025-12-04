@@ -16,7 +16,7 @@ const Privacy = () => {
 
   const fetchPrivacy = async () => {
     try {
-      const response = await api.get('/api/legal/privacy');
+      const response = await api.get('/legal/privacy');
       setContent(response.data);
     } catch (error) {
       logger.error('Error fetching privacy policy:', error);

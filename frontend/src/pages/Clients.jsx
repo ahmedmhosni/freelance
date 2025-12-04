@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -7,6 +6,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import { MdPeople, MdFileDownload } from 'react-icons/md';
 import { exportClientsCSV } from '../utils/exportCSV';
 import logger from '../utils/logger';
+import { fetchClients, createClient, updateClient, deleteClient } from '../features/clients/services/clientApi';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
@@ -21,17 +21,21 @@ const Clients = () => {
   });
 
   useEffect(() => {
-    fetchClients();
+    loadClients();
   }, [pagination.page, searchTerm]);
 
-  const fetchClients = async () => {
+  const loadClients = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/api/clients?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`);
-      const data = response.data.data || response.data;
+      const response = await fetchClients({ 
+        page: pagination.page, 
+        limit: pagination.limit, 
+        search: searchTerm 
+      });
+      const data = response.data || response;
       setClients(Array.isArray(data) ? data : []);
-      if (response.data.pagination) {
-        setPagination(prev => ({ ...prev, ...response.data.pagination }));
+      if (response.pagination) {
+        setPagination(prev => ({ ...prev, ...response.pagination }));
       }
     } catch (error) {
       logger.error('Error fetching clients:', error);
@@ -45,16 +49,16 @@ const Clients = () => {
     e.preventDefault();
     try {
       if (editingClient) {
-        await api.put(`/api/clients/${editingClient.id}`, formData);
+        await updateClient(editingClient.id, formData);
         toast.success('Client updated successfully!');
       } else {
-        await api.post('/api/clients', formData);
+        await createClient(formData);
         toast.success('Client created successfully!');
       }
       setShowForm(false);
       setEditingClient(null);
       setFormData({ name: '', email: '', phone: '', company: '', notes: '', tags: '' });
-      fetchClients();
+      loadClients();
     } catch (error) {
       logger.error('Error saving client:', error);
       toast.error('Failed to save client');
@@ -73,10 +77,10 @@ const Clients = () => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/clients/${deleteDialog.clientId}`);
+      await deleteClient(deleteDialog.clientId);
       toast.success('Client deleted successfully!');
       setDeleteDialog({ isOpen: false, clientId: null });
-      fetchClients();
+      loadClients();
     } catch (error) {
       logger.error('Error deleting client:', error);
       toast.error('Failed to delete client');

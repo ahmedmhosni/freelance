@@ -35,18 +35,18 @@ const AdminGDPR = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (activeTab === 'exports') {
-        const response = await axios.get(`${apiUrl}/api/admin/gdpr/export-requests`, { headers });
+        const response = await axios.get(`${apiUrl}/admin/gdpr/export-requests`, { headers });
         setExportRequests(response.data.requests);
         setExportStats(response.data.stats);
       } else if (activeTab === 'deleted') {
-        const response = await axios.get(`${apiUrl}/api/admin/gdpr/deleted-accounts`, { headers });
+        const response = await axios.get(`${apiUrl}/admin/gdpr/deleted-accounts`, { headers });
         setDeletedAccounts(response.data.accounts);
         setDeletedStats(response.data.stats);
       } else if (activeTab === 'email') {
-        const response = await axios.get(`${apiUrl}/api/admin/gdpr/email-preferences-stats`, { headers });
+        const response = await axios.get(`${apiUrl}/admin/gdpr/email-preferences-stats`, { headers });
         setEmailStats(response.data);
       } else if (activeTab === 'reasons') {
-        const response = await axios.get(`${apiUrl}/api/admin/gdpr/deletion-reasons`, { headers });
+        const response = await axios.get(`${apiUrl}/admin/gdpr/deletion-reasons`, { headers });
         setDeletionReasons(response.data.reasons);
       }
     } catch (error) {
@@ -67,7 +67,7 @@ const AdminGDPR = () => {
       const token = localStorage.getItem('token');
       
       await axios.post(
-        `${apiUrl}/api/admin/gdpr/restore-account`,
+        `${apiUrl}/admin/gdpr/restore-account`,
         { userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

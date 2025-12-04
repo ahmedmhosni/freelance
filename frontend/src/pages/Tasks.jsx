@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { useSocket } from '../context/SocketContext';
 import Calendar from 'react-calendar';
@@ -9,6 +8,8 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import 'react-calendar/dist/Calendar.css';
 import { MdViewKanban, MdViewList, MdCalendarToday } from 'react-icons/md';
 import logger from '../utils/logger';
+import { fetchTasks, createTask, updateTask, deleteTask } from '../features/tasks/services/taskApi';
+import { fetchProjects } from '../features/projects/services/projectApi';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -26,14 +27,14 @@ const Tasks = () => {
   const { socket } = useSocket();
 
   useEffect(() => {
-    fetchTasks();
-    fetchProjects();
+    loadTasks();
+    loadProjects();
   }, []);
 
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     try {
-      const response = await api.get('/api/projects');
-      const data = response.data.data || response.data;
+      const response = await fetchProjects();
+      const data = response.data || response;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching projects:', error);
@@ -63,10 +64,10 @@ const Tasks = () => {
     }
   }, [socket]);
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     try {
-      const response = await api.get('/api/tasks');
-      const data = response.data.data || response.data;
+      const response = await fetchTasks();
+      const data = response.data || response;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching tasks:', error);
@@ -79,16 +80,16 @@ const Tasks = () => {
     e.preventDefault();
     try {
       if (editingTask) {
-        await api.put(`/api/tasks/${editingTask.id}`, formData);
+        await updateTask(editingTask.id, formData);
         toast.success('Task updated successfully!');
       } else {
-        await api.post('/api/tasks', formData);
+        await createTask(formData);
         toast.success('Task created successfully!');
       }
       setShowForm(false);
       setEditingTask(null);
       setFormData({ title: '', description: '', priority: 'medium', status: 'todo', due_date: '', project_id: null });
-      fetchTasks();
+      loadTasks();
     } catch (error) {
       logger.error('Error saving task:', error);
       toast.error('Failed to save task');
@@ -111,10 +112,10 @@ const Tasks = () => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/tasks/${deleteDialog.taskId}`);
+      await deleteTask(deleteDialog.taskId);
       toast.success('Task deleted successfully!');
       setDeleteDialog({ isOpen: false, taskId: null });
-      fetchTasks();
+      loadTasks();
     } catch (error) {
       logger.error('Error deleting task:', error);
       toast.error('Failed to delete task');
@@ -124,8 +125,8 @@ const Tasks = () => {
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       const task = tasks.find(t => t.id === taskId);
-      await api.put(`/api/tasks/${taskId}`, { ...task, status: newStatus });
-      fetchTasks();
+      await updateTask(taskId, { ...task, status: newStatus });
+      loadTasks();
     } catch (error) {
       logger.error('Error updating task:', error);
     }

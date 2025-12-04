@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -8,6 +7,8 @@ import { MdReceipt, MdAttachMoney, MdFileDownload } from 'react-icons/md';
 import { exportInvoicesCSV } from '../utils/exportCSV';
 import { generateInvoiceNumber } from '../utils/invoiceGenerator';
 import logger from '../utils/logger';
+import { fetchInvoices, deleteInvoice, downloadInvoicePDF } from '../features/invoices/services/invoiceApi';
+import { fetchClients } from '../features/clients/services/clientApi';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -18,15 +19,15 @@ const Invoices = () => {
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, invoiceId: null });
 
   useEffect(() => {
-    fetchInvoices();
-    fetchClients();
+    loadInvoices();
+    loadClients();
   }, []);
 
-  const fetchInvoices = async () => {
+  const loadInvoices = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/invoices');
-      const data = response.data.data || response.data;
+      const response = await fetchInvoices();
+      const data = response.data || response;
       setInvoices(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching invoices:', error);
@@ -36,10 +37,10 @@ const Invoices = () => {
     }
   };
 
-  const fetchClients = async () => {
+  const loadClients = async () => {
     try {
-      const response = await api.get('/api/clients');
-      const data = response.data.data || response.data;
+      const response = await fetchClients();
+      const data = response.data || response;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching clients:', error);
@@ -74,10 +75,10 @@ const Invoices = () => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/invoices/${deleteDialog.invoiceId}`);
+      await deleteInvoice(deleteDialog.invoiceId);
       toast.success('Invoice deleted successfully!');
       setDeleteDialog({ isOpen: false, invoiceId: null });
-      fetchInvoices();
+      loadInvoices();
     } catch (error) {
       logger.error('Error deleting invoice:', error);
       toast.error('Failed to delete invoice');
@@ -86,12 +87,10 @@ const Invoices = () => {
 
   const handleDownloadPDF = async (invoiceId) => {
     try {
-      const response = await api.get(`/api/invoices/${invoiceId}/pdf`, {
-        responseType: 'blob'
-      });
+      const blob = await downloadInvoicePDF(invoiceId);
       
       // Create a blob URL and download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `invoice-${invoiceId}.pdf`);

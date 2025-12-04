@@ -38,7 +38,7 @@ const AdminPanel = () => {
 
   const fetchSystemStatus = async () => {
     try {
-      const response = await api.get('/api/status');
+      const response = await api.get('/status');
       setSystemStatus(response.data);
     } catch (error) {
       logger.error('Error fetching system status:', error);
@@ -47,7 +47,7 @@ const AdminPanel = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/api/admin/users');
+      const response = await api.get('/admin/users');
       setUsers(response.data);
     } catch (error) {
       logger.error('Error fetching users:', error);
@@ -65,7 +65,7 @@ const AdminPanel = () => {
 
   const fetchActivityStats = async () => {
     try {
-      const response = await api.get('/api/admin/activity/stats');
+      const response = await api.get('/admin/activity/stats');
       setActivityStats(response.data);
     } catch (error) {
       logger.error('Error fetching activity stats:', error);
@@ -78,7 +78,7 @@ const AdminPanel = () => {
     }
 
     try {
-      await api.post('/api/admin/activity/delete-inactive', { userIds });
+      await api.post('/admin/activity/delete-inactive', { userIds });
       fetchUsers();
       fetchInactiveUsers();
       fetchActivityStats();
@@ -95,7 +95,7 @@ const AdminPanel = () => {
     }
 
     try {
-      await api.post('/api/admin/activity/delete-inactive', { days: inactiveDays });
+      await api.post('/admin/activity/delete-inactive', { days: inactiveDays });
       fetchUsers();
       fetchInactiveUsers();
       fetchActivityStats();
@@ -108,7 +108,7 @@ const AdminPanel = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/api/admin/reports');
+      const response = await api.get('/admin/reports');
       setStats(response.data);
     } catch (error) {
       logger.error('Error fetching stats:', error);

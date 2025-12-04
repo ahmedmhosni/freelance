@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { MdAdd, MdDelete, MdAccessTime } from 'react-icons/md';
 import logger from '../utils/logger';
+import { fetchInvoices, createInvoice, updateInvoice } from '../features/invoices/services/invoiceApi';
+import { fetchClients } from '../features/clients/services/clientApi';
+import { fetchProjects } from '../features/projects/services/projectApi';
+import { fetchTasks } from '../features/tasks/services/taskApi';
+import api from '../utils/api';
 
 // Consistent styling matching Login page
 const styles = {
@@ -62,8 +66,8 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
 
   const fetchAllInvoices = async () => {
     try {
-      const response = await api.get('/api/invoices');
-      const invoices = response.data.data || response.data;
+      const response = await fetchInvoices();
+      const invoices = response.data || response;
       setAllInvoices(invoices);
       
       // Generate next invoice number
@@ -103,36 +107,36 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   });
 
   useEffect(() => {
-    fetchClients();
-    fetchProjects();
-    fetchTasks();
+    loadClients();
+    loadProjects();
+    loadTasks();
     if (invoice) {
       fetchInvoiceItems();
     }
   }, [invoice]);
 
-  const fetchClients = async () => {
+  const loadClients = async () => {
     try {
-      const response = await api.get('/api/clients');
-      setClients(response.data.data || response.data);
+      const response = await fetchClients();
+      setClients(response.data || response);
     } catch (error) {
       logger.error('Error fetching clients:', error);
     }
   };
 
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     try {
-      const response = await api.get('/api/projects');
-      setProjects(response.data.data || response.data);
+      const response = await fetchProjects();
+      setProjects(response.data || response);
     } catch (error) {
       logger.error('Error fetching projects:', error);
     }
   };
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     try {
-      const response = await api.get('/api/tasks');
-      setTasks(response.data.data || response.data);
+      const response = await fetchTasks();
+      setTasks(response.data || response);
     } catch (error) {
       logger.error('Error fetching tasks:', error);
     }
@@ -260,7 +264,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
         };
         
         logger.log('Updating invoice with:', updateData);
-        await api.put(`/api/invoices/${invoice.id}`, updateData);
+        await updateInvoice(invoice.id, updateData);
         toast.success('Invoice updated!');
         invoiceId = invoice.id;
       } else {
@@ -275,8 +279,8 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
         };
         
         logger.log('Creating invoice with:', createData);
-        const response = await api.post('/api/invoices', createData);
-        invoiceId = response.data.id;
+        const response = await createInvoice(createData);
+        invoiceId = response.data?.id || response.id;
         toast.success('Invoice created!');
       }
 

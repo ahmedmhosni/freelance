@@ -75,7 +75,7 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
       const formData = new FormData();
       formData.append('profilePicture', file);
 
-      const response = await api.post('/api/profile/upload-picture', formData, {
+      const response = await api.post('/profile/upload-picture', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

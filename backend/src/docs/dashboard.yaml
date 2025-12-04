@@ -1,0 +1,215 @@
+paths:
+  /api/v2/dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard data
+      description: Retrieve aggregated dashboard data for the authenticated user
+      responses:
+        '200':
+          description: Dashboard data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      totalClients:
+                        type: integer
+                        example: 15
+                      activeProjects:
+                        type: integer
+                        example: 8
+                      pendingTasks:
+                        type: integer
+                        example: 25
+                      hoursThisWeek:
+                        type: number
+                        example: 32.5
+                      revenueThisMonth:
+                        type: number
+                        example: 12500.00
+                  recentActivity:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        type:
+                          type: string
+                          enum: [task, project, invoice, time_entry]
+                          example: task
+                        action:
+                          type: string
+                          example: completed
+                        description:
+                          type: string
+                          example: Completed task "Design homepage"
+                        timestamp:
+                          type: string
+                          format: date-time
+                          example: '2024-01-15T10:00:00.000Z'
+                  upcomingDeadlines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        type:
+                          type: string
+                          enum: [task, project, invoice]
+                          example: task
+                        title:
+                          type: string
+                          example: Complete homepage design
+                        dueDate:
+                          type: string
+                          format: date
+                          example: '2024-01-20'
+                        priority:
+                          type: string
+                          enum: [low, medium, high, urgent]
+                          example: high
+                  projectProgress:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        projectId:
+                          type: integer
+                          example: 1
+                        projectName:
+                          type: string
+                          example: Website Redesign
+                        totalTasks:
+                          type: integer
+                          example: 20
+                        completedTasks:
+                          type: integer
+                          example: 15
+                        progress:
+                          type: number
+                          description: Completion percentage
+                          example: 75.0
+                  revenueChart:
+                    type: object
+                    properties:
+                      labels:
+                        type: array
+                        items:
+                          type: string
+                        example: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+                      data:
+                        type: array
+                        items:
+                          type: number
+                        example: [10000, 12000, 11500, 13000, 12500, 14000]
+                  timeTrackingChart:
+                    type: object
+                    properties:
+                      labels:
+                        type: array
+                        items:
+                          type: string
+                        example: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      data:
+                        type: array
+                        items:
+                          type: number
+                        example: [8, 7.5, 8, 6, 8.5, 0, 0]
+              example:
+                summary:
+                  totalClients: 15
+                  activeProjects: 8
+                  pendingTasks: 25
+                  hoursThisWeek: 32.5
+                  revenueThisMonth: 12500.00
+                recentActivity:
+                  - id: 1
+                    type: task
+                    action: completed
+                    description: Completed task "Design homepage"
+                    timestamp: '2024-01-15T10:00:00.000Z'
+                  - id: 2
+                    type: invoice
+                    action: sent
+                    description: Sent invoice INV-2024-001
+                    timestamp: '2024-01-15T09:30:00.000Z'
+                upcomingDeadlines:
+                  - id: 1
+                    type: task
+                    title: Complete homepage design
+                    dueDate: '2024-01-20'
+                    priority: high
+                  - id: 2
+                    type: project
+                    title: Website Redesign
+                    dueDate: '2024-02-15'
+                    priority: medium
+                projectProgress:
+                  - projectId: 1
+                    projectName: Website Redesign
+                    totalTasks: 20
+                    completedTasks: 15
+                    progress: 75.0
+                  - projectId: 2
+                    projectName: Mobile App
+                    totalTasks: 30
+                    completedTasks: 10
+                    progress: 33.3
+                revenueChart:
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+                  data: [10000, 12000, 11500, 13000, 12500, 14000]
+                timeTrackingChart:
+                  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  data: [8, 7.5, 8, 6, 8.5, 0, 0]
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/dashboard/quick-stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get quick statistics
+      description: Retrieve quick summary statistics for the authenticated user
+      responses:
+        '200':
+          description: Quick stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clients:
+                    type: integer
+                    example: 15
+                  projects:
+                    type: integer
+                    example: 8
+                  tasks:
+                    type: integer
+                    example: 25
+                  hoursToday:
+                    type: number
+                    example: 6.5
+                  hoursThisWeek:
+                    type: number
+                    example: 32.5
+                  pendingInvoices:
+                    type: integer
+                    example: 3
+                  overdueInvoices:
+                    type: integer
+                    example: 1
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'

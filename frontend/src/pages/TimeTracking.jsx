@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 import logger from '../utils/logger';
+import { 
+  fetchTimeEntries, 
+  startTimer, 
+  stopTimer, 
+  deleteTimeEntry, 
+  fetchTimeTrackingSummary, 
+  fetchGroupedTimeTracking 
+} from '../features/time-tracking/services/timeTrackingApi';
+import { fetchTasks } from '../features/tasks/services/taskApi';
+import { fetchProjects } from '../features/projects/services/projectApi';
 
 const TimeTracking = () => {
   const [entries, setEntries] = useState([]);
@@ -15,16 +24,16 @@ const TimeTracking = () => {
   });
 
   useEffect(() => {
-    fetchEntries();
-    fetchTasks();
-    fetchProjects();
-    fetchSummary();
+    loadEntries();
+    loadTasks();
+    loadProjects();
+    loadSummary();
   }, []);
 
-  const fetchEntries = async () => {
+  const loadEntries = async () => {
     try {
-      const response = await api.get('/api/time-tracking');
-      const data = response.data.data || response.data;
+      const response = await fetchTimeEntries();
+      const data = response.data || response;
       const entriesData = Array.isArray(data) ? data : [];
       setEntries(entriesData);
       
@@ -38,10 +47,10 @@ const TimeTracking = () => {
     }
   };
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     try {
-      const response = await api.get('/api/tasks');
-      const data = response.data.data || response.data;
+      const response = await fetchTasks();
+      const data = response.data || response;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching tasks:', error);
@@ -49,10 +58,10 @@ const TimeTracking = () => {
     }
   };
 
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     try {
-      const response = await api.get('/api/projects');
-      const data = response.data.data || response.data;
+      const response = await fetchProjects();
+      const data = response.data || response;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching projects:', error);
@@ -60,20 +69,20 @@ const TimeTracking = () => {
     }
   };
 
-  const fetchSummary = async () => {
+  const loadSummary = async () => {
     try {
-      const response = await api.get('/api/time-tracking/summary');
-      setSummary(response.data || { total_hours: 0, total_entries: 0 });
+      const response = await fetchTimeTrackingSummary();
+      setSummary(response.data || response || { total_hours: 0, total_entries: 0 });
     } catch (error) {
       logger.error('Error fetching summary:', error);
       setSummary({ total_hours: 0, total_entries: 0 });
     }
   };
 
-  const fetchGroupedData = async (groupBy) => {
+  const loadGroupedData = async (groupBy) => {
     try {
-      const response = await api.get(`/api/time-tracking/grouped?group_by=${groupBy}`);
-      const data = response.data.data || response.data;
+      const response = await fetchGroupedTimeTracking(groupBy);
+      const data = response.data || response;
       setGroupedData(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching grouped data:', error);
@@ -83,37 +92,37 @@ const TimeTracking = () => {
 
   useEffect(() => {
     if (viewMode === 'tasks') {
-      fetchGroupedData('task');
+      loadGroupedData('task');
     } else if (viewMode === 'projects') {
-      fetchGroupedData('project');
+      loadGroupedData('project');
     } else if (viewMode === 'clients') {
-      fetchGroupedData('client');
+      loadGroupedData('client');
     }
   }, [viewMode]);
 
 
 
-  const startTimer = async () => {
+  const handleStartTimer = async () => {
     if (!formData.description && !formData.task_id && !formData.project_id) {
       alert('Please provide a description, task, or project');
       return;
     }
     try {
-      await api.post('/api/time-tracking/start', formData);
+      await startTimer(formData);
       setFormData({ task_id: '', project_id: '', description: '' });
-      await fetchEntries();
-      await fetchSummary();
+      await loadEntries();
+      await loadSummary();
     } catch (error) {
       logger.error('Error starting timer:', error);
       alert('Failed to start timer');
     }
   };
 
-  const stopTimer = async (id) => {
+  const handleStopTimer = async (id) => {
     try {
-      await api.post(`/api/time-tracking/stop/${id}`);
-      await fetchEntries();
-      await fetchSummary();
+      await stopTimer(id);
+      await loadEntries();
+      await loadSummary();
       setActiveEntry(null);
     } catch (error) {
       logger.error('Error stopping timer:', error);
@@ -121,12 +130,12 @@ const TimeTracking = () => {
     }
   };
 
-  const deleteEntry = async (id) => {
+  const handleDeleteEntry = async (id) => {
     if (!confirm('Delete this time entry?')) return;
     try {
-      await api.delete(`/api/time-tracking/${id}`);
-      await fetchEntries();
-      await fetchSummary();
+      await deleteTimeEntry(id);
+      await loadEntries();
+      await loadSummary();
     } catch (error) {
       logger.error('Error deleting entry:', error);
       alert('Failed to delete entry');
@@ -226,7 +235,7 @@ const TimeTracking = () => {
             onChange={(e) => setFormData({...formData, description: e.target.value})}
           />
           <button
-            onClick={activeEntry ? () => stopTimer(activeEntry.id) : startTimer}
+            onClick={activeEntry ? () => handleStopTimer(activeEntry.id) : handleStartTimer}
             className="btn-primary"
             style={{ minWidth: '120px' }}
           >
@@ -314,7 +323,7 @@ const TimeTracking = () => {
                   <td style={{ padding: '10px', textAlign: 'right' }}>
                     {entry.is_running ? (
                       <button 
-                        onClick={() => stopTimer(entry.id)}
+                        onClick={() => handleStopTimer(entry.id)}
                         className="btn-primary"
                         style={{ marginRight: '8px', fontSize: '13px' }}
                       >
@@ -322,7 +331,7 @@ const TimeTracking = () => {
                       </button>
                     ) : null}
                     <button 
-                      onClick={() => deleteEntry(entry.id)}
+                      onClick={() => handleDeleteEntry(entry.id)}
                       className="btn-delete"
                       style={{ fontSize: '13px' }}
                     >

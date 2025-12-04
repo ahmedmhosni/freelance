@@ -19,7 +19,7 @@ const ComingSoon = () => {
 
   const fetchMaintenanceContent = async () => {
     try {
-      const response = await api.get('/api/maintenance');
+      const response = await api.get('/maintenance');
       if (response.data) {
         setContent(response.data);
       }

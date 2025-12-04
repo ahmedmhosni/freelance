@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/api/dashboard/stats');
+      const response = await api.get('/dashboard/stats');
       setStats(response.data);
     } catch (error) {
       logger.error('Error fetching stats:', error);
@@ -41,7 +41,7 @@ const Dashboard = () => {
 
   const fetchRecentTasks = async () => {
     try {
-      const response = await api.get('/api/dashboard/recent-tasks?limit=5');
+      const response = await api.get('/dashboard/recent-tasks?limit=5');
       const tasks = response.data.map(task => ({
         ...task,
         projectName: task.project_name || 'No Project'
@@ -55,7 +55,7 @@ const Dashboard = () => {
 
   const fetchChartData = async () => {
     try {
-      const response = await api.get('/api/dashboard/charts');
+      const response = await api.get('/dashboard/charts');
       setTaskData(response.data.taskData || []);
       setInvoiceData(response.data.invoiceData || []);
     } catch (error) {

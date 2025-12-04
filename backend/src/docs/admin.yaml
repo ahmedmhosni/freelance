@@ -1,0 +1,427 @@
+paths:
+  /api/v2/admin/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get system statistics
+      description: Retrieve system-wide statistics (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 150
+                      active:
+                        type: integer
+                        example: 120
+                      newThisMonth:
+                        type: integer
+                        example: 15
+                  projects:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 500
+                      active:
+                        type: integer
+                        example: 200
+                      completed:
+                        type: integer
+                        example: 250
+                  tasks:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 2500
+                      completed:
+                        type: integer
+                        example: 1800
+                      inProgress:
+                        type: integer
+                        example: 400
+                  revenue:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                        example: 500000.00
+                      thisMonth:
+                        type: number
+                        example: 45000.00
+                      pending:
+                        type: number
+                        example: 75000.00
+              example:
+                users:
+                  total: 150
+                  active: 120
+                  newThisMonth: 15
+                projects:
+                  total: 500
+                  active: 200
+                  completed: 250
+                tasks:
+                  total: 2500
+                  completed: 1800
+                  inProgress: 400
+                revenue:
+                  total: 500000.00
+                  thisMonth: 45000.00
+                  pending: 75000.00
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Get all users
+      description: Retrieve a list of all users (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [freelancer, client, admin]
+          description: Filter by user role
+          example: freelancer
+        - in: query
+          name: emailVerified
+          schema:
+            type: boolean
+          description: Filter by email verification status
+          example: true
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by name or email
+          example: john
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of items to skip
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminUser'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              example:
+                data:
+                  - id: 1
+                    name: John Doe
+                    email: john@example.com
+                    role: freelancer
+                    emailVerified: true
+                    createdAt: '2024-01-01T00:00:00.000Z'
+                    lastLogin: '2024-01-15T10:00:00.000Z'
+                meta:
+                  total: 150
+                  limit: 10
+                  offset: 0
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/admin/users/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get user by ID
+      description: Retrieve a specific user by ID (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+          example: 1
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Admin
+      summary: Update user
+      description: Update a user's information (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: John Doe Updated
+                email:
+                  type: string
+                  format: email
+                  example: john.updated@example.com
+                role:
+                  type: string
+                  enum: [freelancer, client, admin]
+                  example: freelancer
+                emailVerified:
+                  type: boolean
+                  example: true
+                active:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Admin
+      summary: Delete user
+      description: Delete a user account (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+          example: 1
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/admin/activity:
+    get:
+      tags:
+        - Admin
+      summary: Get system activity log
+      description: Retrieve system-wide activity log (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: Filter by user ID
+          example: 1
+        - in: query
+          name: action
+          schema:
+            type: string
+          description: Filter by action type
+          example: login
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          description: Filter from this date
+          example: '2024-01-01'
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          description: Filter to this date
+          example: '2024-01-31'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+          description: Number of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of items to skip
+      responses:
+        '200':
+          description: Activity log retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        userId:
+                          type: integer
+                          example: 1
+                        userName:
+                          type: string
+                          example: John Doe
+                        action:
+                          type: string
+                          example: login
+                        details:
+                          type: string
+                          example: User logged in from IP 192.168.1.1
+                        timestamp:
+                          type: string
+                          format: date-time
+                          example: '2024-01-15T10:00:00.000Z'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        role:
+          type: string
+          enum: [freelancer, client, admin]
+          example: freelancer
+        emailVerified:
+          type: boolean
+          example: true
+        active:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00.000Z'
+        lastLogin:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2024-01-15T10:00:00.000Z'
+        stats:
+          type: object
+          properties:
+            projectsCount:
+              type: integer
+              example: 10
+            tasksCount:
+              type: integer
+              example: 50
+            totalRevenue:
+              type: number
+              example: 25000.00

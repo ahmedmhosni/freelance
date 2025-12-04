@@ -1,0 +1,3 @@
+# Feature Modules
+# This directory contains self-contained feature modules
+# Each module has: controllers/, services/, repositories/, models/, validators/, dto/

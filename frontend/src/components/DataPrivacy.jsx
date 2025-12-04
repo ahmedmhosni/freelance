@@ -21,7 +21,7 @@ const DataPrivacy = () => {
       const token = localStorage.getItem('token');
       
       const response = await axios.post(
-        `${apiUrl}/api/gdpr/export`,
+        `${apiUrl}/gdpr/export`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -50,7 +50,7 @@ const DataPrivacy = () => {
       const token = localStorage.getItem('token');
       
       await axios.post(
-        `${apiUrl}/api/gdpr/delete-account`,
+        `${apiUrl}/gdpr/delete-account`,
         { password: deletePassword, reason: deleteReason },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -22,8 +22,8 @@ const VersionNamesManager = () => {
     try {
       setLoading(true);
       const [minorRes, majorRes] = await Promise.all([
-        api.get('/api/changelog/admin/version-names?type=minor'),
-        api.get('/api/changelog/admin/version-names?type=major')
+        api.get('/changelog/admin/version-names?type=minor'),
+        api.get('/changelog/admin/version-names?type=major')
       ]);
       setMinorNames(minorRes.data.names);
       setMajorNames(majorRes.data.names);
@@ -37,7 +37,7 @@ const VersionNamesManager = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/changelog/admin/version-names', addForm);
+      await api.post('/changelog/admin/version-names', addForm);
       fetchNames();
       setAddForm({ name: '', name_type: 'minor', description: '' });
       setShowAddForm(false);

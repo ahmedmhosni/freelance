@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "seed": "node src/db/seed.js"
+    "seed": "node src/db/seed.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "jest --testPathPatterns=e2e --runInBand",
+    "test:perf": "jest --testPathPatterns=performance --runInBand",
+    "test:all": "jest --runInBand"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
@@ -35,9 +41,12 @@
     "sqlite3": "^5.1.6",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "uuid": "^8.3.2",
     "winston": "^3.18.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "jest": "^30.2.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.1.4"
   }
 }

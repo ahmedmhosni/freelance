@@ -1,0 +1,312 @@
+paths:
+  /api/v2/tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks
+      description: Retrieve a list of all tasks for the authenticated user
+      parameters:
+        - in: query
+          name: projectId
+          schema:
+            type: integer
+          description: Filter by project ID
+          example: 1
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [todo, in-progress, completed, cancelled]
+          description: Filter by task status
+          example: in-progress
+        - in: query
+          name: priority
+          schema:
+            type: string
+            enum: [low, medium, high, urgent]
+          description: Filter by task priority
+          example: high
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of items to skip
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              example:
+                data:
+                  - id: 1
+                    title: Design homepage mockup
+                    description: Create initial design mockups for the homepage
+                    projectId: 1
+                    status: in-progress
+                    priority: high
+                    dueDate: '2024-12-31'
+                    createdAt: '2024-01-01T00:00:00.000Z'
+                meta:
+                  total: 50
+                  limit: 10
+                  offset: 0
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      description: Create a new task for a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - projectId
+              properties:
+                title:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                  example: Design homepage mockup
+                description:
+                  type: string
+                  example: Create initial design mockups for the homepage
+                projectId:
+                  type: integer
+                  example: 1
+                status:
+                  type: string
+                  enum: [todo, in-progress, completed, cancelled]
+                  default: todo
+                  example: todo
+                priority:
+                  type: string
+                  enum: [low, medium, high, urgent]
+                  default: medium
+                  example: high
+                dueDate:
+                  type: string
+                  format: date
+                  example: '2024-12-31'
+                estimatedHours:
+                  type: number
+                  example: 8.5
+                assignedTo:
+                  type: integer
+                  description: User ID of assigned user
+                  example: 1
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Project not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task by ID
+      description: Retrieve a specific task by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+          example: 1
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      tags:
+        - Tasks
+      summary: Update task
+      description: Update an existing task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                  example: Design homepage mockup - Updated
+                description:
+                  type: string
+                  example: Updated description
+                status:
+                  type: string
+                  enum: [todo, in-progress, completed, cancelled]
+                  example: completed
+                priority:
+                  type: string
+                  enum: [low, medium, high, urgent]
+                  example: medium
+                dueDate:
+                  type: string
+                  format: date
+                  example: '2024-12-31'
+                estimatedHours:
+                  type: number
+                  example: 10.0
+                assignedTo:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task
+      description: Delete a task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+          example: 1
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Task deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Design homepage mockup
+        description:
+          type: string
+          example: Create initial design mockups for the homepage
+        projectId:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [todo, in-progress, completed, cancelled]
+          example: in-progress
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: high
+        dueDate:
+          type: string
+          format: date
+          example: '2024-12-31'
+        estimatedHours:
+          type: number
+          example: 8.5
+        assignedTo:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-02T00:00:00.000Z'

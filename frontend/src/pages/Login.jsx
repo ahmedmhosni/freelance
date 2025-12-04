@@ -33,7 +33,7 @@ const Login = () => {
 
   const checkMaintenanceStatus = async () => {
     try {
-      const response = await api.get('/api/maintenance/status');
+      const response = await api.get('/maintenance/status');
       setIsMaintenanceMode(response.data.is_active);
     } catch (err) {
       logger.error('Error checking maintenance status:', err);
@@ -42,7 +42,7 @@ const Login = () => {
 
   const fetchDailyQuote = async () => {
     try {
-      const response = await api.get('/api/quotes/daily');
+      const response = await api.get('/quotes/daily');
       setQuote(response.data);
     } catch (err) {
       // Fallback quote if API fails

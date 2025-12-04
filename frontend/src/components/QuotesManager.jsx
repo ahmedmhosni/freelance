@@ -38,7 +38,7 @@ const QuotesManager = () => {
         await api.put(`/api/quotes/${editingQuote.id}`, formData);
         toast.success('Quote updated successfully!');
       } else {
-        await api.post('/api/quotes', formData);
+        await api.post('/quotes', formData);
         toast.success('Quote created successfully!');
         setCurrentPage(1); // Reset to first page for new quotes
       }

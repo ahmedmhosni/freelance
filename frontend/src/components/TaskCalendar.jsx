@@ -30,7 +30,7 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/tasks');
+      const response = await api.get('/tasks');
       const data = response.data.data || response.data;
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {

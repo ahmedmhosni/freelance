@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../shared/utils/api';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -22,7 +22,7 @@ const AnnouncementBanner = () => {
 
   const fetchFeaturedAnnouncements = async () => {
     try {
-      const response = await axios.get('/api/announcements/featured');
+      const response = await api.get('/announcements/featured');
       // Ensure we always set an array
       const data = Array.isArray(response.data) ? response.data : [];
       setAnnouncements(data);

@@ -42,8 +42,8 @@ const ChangelogEditor = () => {
   const fetchVersionNames = async () => {
     try {
       const [minorRes, majorRes] = await Promise.all([
-        api.get('/api/changelog/admin/version-names?type=minor&unused_only=true'),
-        api.get('/api/changelog/admin/version-names?type=major&unused_only=true')
+        api.get('/changelog/admin/version-names?type=minor&unused_only=true'),
+        api.get('/changelog/admin/version-names?type=major&unused_only=true')
       ]);
       setMinorNames(minorRes.data.names.map(n => n.name));
       setMajorNames(majorRes.data.names.map(n => n.name));
@@ -73,7 +73,7 @@ const ChangelogEditor = () => {
   const fetchVersions = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/changelog/admin/versions');
+      const response = await api.get('/changelog/admin/versions');
       setVersions(response.data);
       
       // Calculate next version
@@ -107,7 +107,7 @@ const ChangelogEditor = () => {
       if (editingVersionId) {
         await api.put(`/api/changelog/admin/versions/${editingVersionId}`, versionForm);
       } else {
-        await api.post('/api/changelog/admin/versions', versionForm);
+        await api.post('/changelog/admin/versions', versionForm);
       }
       fetchVersions();
       fetchVersionNames(); // Refresh available names
@@ -242,7 +242,7 @@ const ChangelogEditor = () => {
         is_major_release: false
       };
       
-      const versionResponse = await api.post('/api/changelog/admin/versions', versionData);
+      const versionResponse = await api.post('/changelog/admin/versions', versionData);
       const newVersionId = versionResponse.data.id;
       
       // Add each commit as an item
@@ -269,7 +269,7 @@ const ChangelogEditor = () => {
       }
       
       // Mark commits as processed
-      await api.post('/api/changelog/admin/mark-commits-processed', {
+      await api.post('/changelog/admin/mark-commits-processed', {
         commitIds: selectedCommits.map(c => c.id),
         versionId: newVersionId
       });

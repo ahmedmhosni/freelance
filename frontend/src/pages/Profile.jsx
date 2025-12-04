@@ -44,7 +44,7 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await api.get('/api/profile');
+      const response = await api.get('/profile');
       setProfile(response.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -63,7 +63,7 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put('/api/profile', profile);
+      await api.put('/profile', profile);
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);

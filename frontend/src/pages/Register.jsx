@@ -39,7 +39,7 @@ const Register = () => {
 
     setIsLoading(true);
     try {
-      await api.post('/api/auth/register', formData);
+      await api.post('/auth/register', formData);
       setSuccess('Account created! Check your email for verification code.');
       setTimeout(() => navigate('/verify-email'), 2000);
     } catch (err) {

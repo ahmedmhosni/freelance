@@ -108,7 +108,7 @@ const VerifyEmail = () => {
 
     setIsVerifying(true);
     try {
-      const response = await api.post('/api/auth/verify-code', {
+      const response = await api.post('/auth/verify-code', {
         email,
         code: codeString
       });

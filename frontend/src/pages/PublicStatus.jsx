@@ -15,13 +15,13 @@ const PublicStatus = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
 
-      const response = await fetch(`${apiUrl}/api/status`);
+      const response = await fetch(`${apiUrl}/status`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       setStatus(data);
 
       try {
-        const historyResponse = await fetch(`${apiUrl}/api/status/history`);
+        const historyResponse = await fetch(`${apiUrl}/status/history`);
         if (historyResponse.ok) {
           const historyData = await historyResponse.json();
           setHistory(historyData.history || {});

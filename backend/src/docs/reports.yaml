@@ -1,0 +1,390 @@
+paths:
+  /api/v2/reports/time-tracking:
+    get:
+      tags:
+        - Reports
+      summary: Get time tracking report
+      description: Generate a time tracking report with aggregated data
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report start date
+          example: '2024-01-01'
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report end date
+          example: '2024-01-31'
+        - in: query
+          name: projectId
+          schema:
+            type: integer
+          description: Filter by project ID
+          example: 1
+        - in: query
+          name: taskId
+          schema:
+            type: integer
+          description: Filter by task ID
+          example: 1
+        - in: query
+          name: groupBy
+          schema:
+            type: string
+            enum: [day, week, month, project, task]
+            default: day
+          description: Group results by time period or entity
+          example: day
+      responses:
+        '200':
+          description: Time tracking report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      totalHours:
+                        type: number
+                        example: 160.5
+                      totalEntries:
+                        type: integer
+                        example: 45
+                      averageHoursPerDay:
+                        type: number
+                        example: 8.0
+                  breakdown:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                          example: '2024-01-15'
+                        hours:
+                          type: number
+                          example: 8.5
+                        entries:
+                          type: integer
+                          example: 3
+              example:
+                summary:
+                  totalHours: 160.5
+                  totalEntries: 45
+                  averageHoursPerDay: 8.0
+                breakdown:
+                  - date: '2024-01-15'
+                    hours: 8.5
+                    entries: 3
+                  - date: '2024-01-16'
+                    hours: 7.0
+                    entries: 2
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/reports/revenue:
+    get:
+      tags:
+        - Reports
+      summary: Get revenue report
+      description: Generate a revenue report based on invoices
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report start date
+          example: '2024-01-01'
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report end date
+          example: '2024-01-31'
+        - in: query
+          name: clientId
+          schema:
+            type: integer
+          description: Filter by client ID
+          example: 1
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [draft, sent, paid, overdue, cancelled]
+          description: Filter by invoice status
+          example: paid
+        - in: query
+          name: groupBy
+          schema:
+            type: string
+            enum: [day, week, month, client]
+            default: month
+          description: Group results by time period or entity
+          example: month
+      responses:
+        '200':
+          description: Revenue report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      totalRevenue:
+                        type: number
+                        example: 50000.00
+                      paidRevenue:
+                        type: number
+                        example: 35000.00
+                      pendingRevenue:
+                        type: number
+                        example: 15000.00
+                      totalInvoices:
+                        type: integer
+                        example: 10
+                  breakdown:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: '2024-01'
+                        revenue:
+                          type: number
+                          example: 25000.00
+                        invoices:
+                          type: integer
+                          example: 5
+              example:
+                summary:
+                  totalRevenue: 50000.00
+                  paidRevenue: 35000.00
+                  pendingRevenue: 15000.00
+                  totalInvoices: 10
+                breakdown:
+                  - period: '2024-01'
+                    revenue: 25000.00
+                    invoices: 5
+                  - period: '2024-02'
+                    revenue: 25000.00
+                    invoices: 5
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/reports/productivity:
+    get:
+      tags:
+        - Reports
+      summary: Get productivity report
+      description: Generate a productivity report with task completion metrics
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report start date
+          example: '2024-01-01'
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Report end date
+          example: '2024-01-31'
+        - in: query
+          name: projectId
+          schema:
+            type: integer
+          description: Filter by project ID
+          example: 1
+      responses:
+        '200':
+          description: Productivity report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      totalTasks:
+                        type: integer
+                        example: 50
+                      completedTasks:
+                        type: integer
+                        example: 35
+                      completionRate:
+                        type: number
+                        description: Percentage of completed tasks
+                        example: 70.0
+                      averageCompletionTime:
+                        type: number
+                        description: Average hours to complete a task
+                        example: 12.5
+                  tasksByStatus:
+                    type: object
+                    properties:
+                      todo:
+                        type: integer
+                        example: 10
+                      in-progress:
+                        type: integer
+                        example: 5
+                      completed:
+                        type: integer
+                        example: 35
+                      cancelled:
+                        type: integer
+                        example: 0
+                  tasksByPriority:
+                    type: object
+                    properties:
+                      low:
+                        type: integer
+                        example: 15
+                      medium:
+                        type: integer
+                        example: 20
+                      high:
+                        type: integer
+                        example: 10
+                      urgent:
+                        type: integer
+                        example: 5
+              example:
+                summary:
+                  totalTasks: 50
+                  completedTasks: 35
+                  completionRate: 70.0
+                  averageCompletionTime: 12.5
+                tasksByStatus:
+                  todo: 10
+                  in-progress: 5
+                  completed: 35
+                  cancelled: 0
+                tasksByPriority:
+                  low: 15
+                  medium: 20
+                  high: 10
+                  urgent: 5
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v2/reports/project-summary:
+    get:
+      tags:
+        - Reports
+      summary: Get project summary report
+      description: Generate a comprehensive summary report for a specific project
+      parameters:
+        - in: query
+          name: projectId
+          required: true
+          schema:
+            type: integer
+          description: Project ID
+          example: 1
+      responses:
+        '200':
+          description: Project summary report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: Website Redesign
+                      status:
+                        type: string
+                        example: active
+                  tasks:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 20
+                      completed:
+                        type: integer
+                        example: 15
+                      completionRate:
+                        type: number
+                        example: 75.0
+                  timeTracking:
+                    type: object
+                    properties:
+                      totalHours:
+                        type: number
+                        example: 120.5
+                      estimatedHours:
+                        type: number
+                        example: 150.0
+                      utilizationRate:
+                        type: number
+                        example: 80.3
+                  revenue:
+                    type: object
+                    properties:
+                      totalInvoiced:
+                        type: number
+                        example: 15000.00
+                      totalPaid:
+                        type: number
+                        example: 10000.00
+                      pending:
+                        type: number
+                        example: 5000.00
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Project not found
+        '500':
+          $ref: '#/components/responses/ServerError'
