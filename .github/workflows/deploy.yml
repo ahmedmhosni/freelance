@@ -1,0 +1,81 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main, kiro ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm ci --omit=dev
+        
+    - name: Create deployment package
+      run: |
+        cd backend
+        tar -czf ../deploy.tar.gz src node_modules package.json
+        
+    - name: Deploy to EC2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        EC2_USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        
+        # Upload package
+        scp -i private_key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${EC2_USER}@${EC2_HOST}:/tmp/
+        
+        # Deploy on server
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+          set -e
+          
+          # Stop app
+          pm2 stop roastify-backend || true
+          
+          # Backup
+          APP_DIR=$HOME/roastify/backend
+          [ -d "$APP_DIR" ] && mv "$APP_DIR" "$HOME/roastify/backend.backup.$(date +%s)" || true
+          
+          # Extract new version
+          mkdir -p "$APP_DIR"
+          cd "$APP_DIR"
+          tar -xzf /tmp/deploy.tar.gz
+          
+          # Copy env file (should already exist on server)
+          if [ ! -f .env ]; then
+            echo "ERROR: .env file not found on server!"
+            exit 1
+          fi
+          
+          # Start app
+          pm2 start src/server.js --name roastify-backend --time
+          pm2 save
+          
+          # Wait and check health
+          sleep 10
+          if curl -f http://localhost:5000/health > /dev/null 2>&1; then
+            echo "✓ Deployment successful!"
+            rm /tmp/deploy.tar.gz
+            pm2 status
+          else
+            echo "✗ Health check failed!"
+            exit 1
+          fi
+        EOF
+        
+        rm private_key.pem
