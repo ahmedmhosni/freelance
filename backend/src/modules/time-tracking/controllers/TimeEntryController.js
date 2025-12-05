@@ -49,6 +49,7 @@ class TimeEntryController extends BaseController {
     // Routes
     this.router.get('/', validateQueryParams, this.getAll.bind(this));
     this.router.get('/running', this.getRunningTimers.bind(this));
+    this.router.get('/summary', validateQueryParams, this.getSummary.bind(this));
     this.router.get('/duration/total', validateQueryParams, this.getTotalDuration.bind(this));
     this.router.get('/duration/by-date', validateQueryParams, this.getDurationByDate.bind(this));
     this.router.get('/duration/task/:taskId', this.getDurationByTask.bind(this));
@@ -138,6 +139,50 @@ class TimeEntryController extends BaseController {
       res.json({
         success: true,
         data: responseData
+      });
+    });
+  }
+
+  /**
+   * Get time tracking summary for authenticated user
+   * GET /api/time-tracking/summary
+   */
+  async getSummary(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const correlationId = req.correlationId;
+      const userId = req.user.id;
+      const { start_date, end_date } = req.query;
+
+      logger.info('Fetching time tracking summary', {
+        correlationId,
+        userId,
+        startDate: start_date,
+        endDate: end_date
+      });
+
+      // Get total duration
+      const totalDuration = await this.timeEntryService.getTotalDuration(userId, start_date, end_date);
+
+      // Get duration by date
+      const durationByDate = await this.timeEntryService.getDurationByDate(userId, start_date, end_date);
+
+      // Get running timers
+      const runningTimers = await this.timeEntryService.getRunningTimers(userId);
+
+      logger.info('Time tracking summary fetched successfully', {
+        correlationId,
+        userId,
+        totalDuration,
+        runningTimersCount: runningTimers.length
+      });
+
+      res.json({
+        success: true,
+        data: {
+          totalDuration,
+          durationByDate,
+          runningTimers: runningTimers.map(entry => new TimeEntryResponseDTO(entry))
+        }
       });
     });
   }

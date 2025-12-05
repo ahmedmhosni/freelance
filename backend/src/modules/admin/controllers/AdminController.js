@@ -26,6 +26,7 @@ class AdminController {
 
     // System statistics
     this.router.get('/stats', this.getSystemStats.bind(this));
+    this.router.get('/reports', this.getSystemReports.bind(this));
   }
 
   /**
@@ -145,6 +146,19 @@ class AdminController {
    * GET /api/v2/admin/stats
    */
   async getSystemStats(req, res, next) {
+    try {
+      const stats = await this.adminService.getSystemStats();
+      res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get system reports
+   * GET /api/admin/reports
+   */
+  async getSystemReports(req, res, next) {
     try {
       const stats = await this.adminService.getSystemStats();
       res.json(stats);
