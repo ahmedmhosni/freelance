@@ -370,29 +370,6 @@ router.post('/upload-picture', authenticateToken, upload.single('profilePicture'
       }
     }
 
-      // Delete old local file if it exists
-      const oldPictureResult = await query(
-        'SELECT profile_picture FROM users WHERE id = $1',
-        [userId]
-      );
-
-      if (oldPictureResult.rows[0]?.profile_picture) {
-        const oldPicture = oldPictureResult.rows[0].profile_picture;
-        
-        if (oldPicture.startsWith('/uploads/') && !oldPicture.includes('dicebear.com')) {
-          try {
-            const oldFilename = path.basename(oldPicture);
-            const oldFilepath = path.join(uploadsDir, oldFilename);
-            if (fs.existsSync(oldFilepath)) {
-              fs.unlinkSync(oldFilepath);
-            }
-          } catch (error) {
-            console.error('Error deleting old file:', error);
-          }
-        }
-      }
-    }
-
     // Update user's profile picture in database
     await query(
       'UPDATE users SET profile_picture = $1 WHERE id = $2',
