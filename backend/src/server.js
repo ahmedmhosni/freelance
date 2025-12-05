@@ -243,7 +243,14 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
   
   // Serve index.html for all non-API routes (SPA support)
-  app.get('*', (req, res) => {
+  // Only catch routes that don't start with /api, /maintenance, /changelog, or /announcements
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || 
+        req.path.startsWith('/maintenance') || 
+        req.path.startsWith('/changelog') || 
+        req.path.startsWith('/announcements')) {
+      return next(); // Let it fall through to 404 handler
+    }
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
