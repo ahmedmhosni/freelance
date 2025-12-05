@@ -206,70 +206,71 @@ bootstrap({ createApp: false }).then(({ container }) => {
   // Admin module (new architecture)
   const adminController = container.resolve('adminController');
   app.use('/api/admin', adminController.router);
+
+  // Additional routes that don't have new architecture equivalents yet
+  app.use('/api/dashboard', dashboardRoutes);
+  app.use('/api/quotes', quotesRoutes);
+  app.use('/api/maintenance', maintenanceRoutes);
+  app.use('/api/status', statusRoutes);
+  app.use('/api/profile', profileRoutes);
+  app.use('/api/user', userPreferencesRoutes);
+  app.use('/api/legal', legalRoutes);
+  app.use('/api/files', fileRoutes);
+  app.use('/api/feedback', feedbackRoutes);
+  app.use('/api/preferences', preferencesRoutes);
+  app.use('/api/gdpr', gdprRoutes);
+  app.use('/api/admin/gdpr', adminGdprRoutes);
+  app.use('/api/admin/activity', adminActivityRoutes);
+  app.use('/api/version', versionRoutes);
+  app.use('/api/changelog', changelogRoutes);
+  app.use('/api/announcements', announcementsRoutes);
+  app.use('/api', healthRoutes);
+
+  // Public route aliases (without /api prefix for frontend compatibility)
+  app.use('/maintenance', maintenanceRoutes);
+  app.use('/changelog', changelogRoutes);
+  app.use('/announcements', announcementsRoutes);
+
+  // Serve static files from frontend build in production
+  if (process.env.NODE_ENV === 'production') {
+    const path = require('path');
+    const frontendPath = path.join(__dirname, '../../frontend/dist');
+    
+    app.use(express.static(frontendPath));
+    
+    // Serve index.html for all non-API routes (SPA support)
+    // Only catch routes that don't start with /api, /maintenance, /changelog, or /announcements
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || 
+          req.path.startsWith('/maintenance') || 
+          req.path.startsWith('/changelog') || 
+          req.path.startsWith('/announcements')) {
+        return next(); // Let it fall through to 404 handler
+      }
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  }
+
+  // 404 handler
+  app.use((req, res, next) => {
+    res.status(404).json({
+      success: false,
+      error: 'Route not found',
+      code: 'NOT_FOUND'
+    });
+  });
+
+  // Global error handler (must be last)
+  app.use(errorHandler);
+
+  // Start server after all routes are registered
+  server.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    logger.info(`WebSocket server ready`);
+    console.log(`✅ Server running on port ${PORT}`);
+  });
 }).catch(error => {
   logger.error('Failed to bootstrap application', error);
   process.exit(1);
-});
-
-// Additional routes that don't have new architecture equivalents yet
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/quotes', quotesRoutes);
-app.use('/api/maintenance', maintenanceRoutes);
-app.use('/api/status', statusRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/user', userPreferencesRoutes);
-app.use('/api/legal', legalRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/feedback', feedbackRoutes);
-app.use('/api/preferences', preferencesRoutes);
-app.use('/api/gdpr', gdprRoutes);
-app.use('/api/admin/gdpr', adminGdprRoutes);
-app.use('/api/admin/activity', adminActivityRoutes);
-app.use('/api/version', versionRoutes);
-app.use('/api/changelog', changelogRoutes);
-app.use('/api/announcements', announcementsRoutes);
-app.use('/api', healthRoutes);
-
-// Public route aliases (without /api prefix for frontend compatibility)
-app.use('/maintenance', maintenanceRoutes);
-app.use('/changelog', changelogRoutes);
-app.use('/announcements', announcementsRoutes);
-
-// Serve static files from frontend build in production
-if (process.env.NODE_ENV === 'production') {
-  const path = require('path');
-  const frontendPath = path.join(__dirname, '../../frontend/dist');
-  
-  app.use(express.static(frontendPath));
-  
-  // Serve index.html for all non-API routes (SPA support)
-  // Only catch routes that don't start with /api, /maintenance, /changelog, or /announcements
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || 
-        req.path.startsWith('/maintenance') || 
-        req.path.startsWith('/changelog') || 
-        req.path.startsWith('/announcements')) {
-      return next(); // Let it fall through to 404 handler
-    }
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}
-
-// 404 handler
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    error: 'Route not found',
-    code: 'NOT_FOUND'
-  });
-});
-
-// Global error handler (must be last)
-app.use(errorHandler);
-
-server.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.info(`WebSocket server ready`);
-  console.log(`✅ Server running on port ${PORT}`);
 });
