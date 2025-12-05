@@ -17,7 +17,7 @@ const FeedbackManager = () => {
     const fetchFeedback = async () => {
         setLoading(true);
         try {
-            let url = '/api/feedback?';
+            let url = '/feedback?';
             if (filters.type) url += `type=${filters.type}&`;
             if (filters.status) url += `status=${filters.status}`;
 
