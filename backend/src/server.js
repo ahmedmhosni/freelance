@@ -75,7 +75,8 @@ const allowedOrigins = process.env.FRONTEND_URL
       process.env.FRONTEND_URL,
       'https://roastify.online',
       'https://www.roastify.online',
-      'https://status.roastify.online'
+      'https://status.roastify.online',
+      'http://roastify-frontend-prod-2024.s3-website-us-east-1.amazonaws.com'
     ]
   : [
       'http://localhost:3000',
@@ -84,7 +85,8 @@ const allowedOrigins = process.env.FRONTEND_URL
       'https://white-sky-0a7e9f003.3.azurestaticapps.net',
       'https://roastify.online',
       'https://www.roastify.online',
-      'https://status.roastify.online'
+      'https://status.roastify.online',
+      'http://roastify-frontend-prod-2024.s3-website-us-east-1.amazonaws.com'
     ];
 
 const io = socketIo(server, {

@@ -55,24 +55,76 @@ cd aws-deployment/scripts
 
 ---
 
-### 3. deploy-frontend.sh
-**Purpose:** Deploy frontend application to S3
+### 3. deploy-frontend-s3.ps1 (Windows PowerShell)
+**Purpose:** Deploy frontend application to AWS S3 + CloudFront
 
 **What it does:**
-- Builds React frontend
-- Uploads to S3 bucket
-- Sets proper cache headers
+- Verifies AWS CLI and credentials
+- Creates/configures S3 bucket for static website hosting
+- Builds React frontend for production
+- Uploads files with optimized cache headers:
+  - HTML: No cache (always fresh)
+  - JS/CSS: 1 year cache (content-hashed filenames)
+  - Other assets: 1 day cache
 - Invalidates CloudFront cache (if configured)
+- Provides interactive prompts for easy deployment
 
 **Usage:**
-```bash
-cd aws-deployment/scripts
-./deploy-frontend.sh
+```powershell
+# Basic deployment (interactive)
+.\deploy-frontend-s3.ps1
+
+# With specific bucket
+.\deploy-frontend-s3.ps1 -BucketName "my-frontend-bucket"
+
+# Skip build (use existing dist folder)
+.\deploy-frontend-s3.ps1 -SkipBuild
+
+# With CloudFront distribution
+.\deploy-frontend-s3.ps1 `
+    -BucketName "my-bucket" `
+    -CloudFrontDistributionId "E1234567890ABC"
 ```
 
 **Prerequisites:**
-- Infrastructure deployed with Terraform
-- Frontend built successfully
+- AWS CLI installed and configured
+- Node.js 18+ installed
+- Valid AWS credentials with S3/CloudFront permissions
+
+**When to use:**
+- Initial frontend deployment
+- Deploying UI updates
+- After configuration changes
+
+---
+
+### 4. deploy-frontend-s3.sh (Linux/Mac Bash)
+**Purpose:** Same as PowerShell version for Unix-based systems
+
+**Usage:**
+```bash
+# Basic deployment (interactive)
+./deploy-frontend-s3.sh
+
+# With specific bucket
+./deploy-frontend-s3.sh --bucket my-frontend-bucket
+
+# Skip build
+./deploy-frontend-s3.sh --skip-build
+
+# With CloudFront distribution
+./deploy-frontend-s3.sh \
+    --bucket my-bucket \
+    --distribution E1234567890ABC
+
+# Show help
+./deploy-frontend-s3.sh --help
+```
+
+**Prerequisites:**
+- AWS CLI installed and configured
+- Node.js 18+ installed
+- Valid AWS credentials with S3/CloudFront permissions
 
 **When to use:**
 - Initial frontend deployment
@@ -105,7 +157,11 @@ cd ../scripts
 ./deploy-backend.sh
 
 # 5. Deploy frontend
-./deploy-frontend.sh
+# Windows PowerShell:
+.\deploy-frontend-s3.ps1
+
+# Linux/Mac:
+./deploy-frontend-s3.sh
 ```
 
 ### Subsequent Deployments
@@ -115,7 +171,11 @@ cd ../scripts
 ./deploy-backend.sh
 
 # Deploy frontend updates
-./deploy-frontend.sh
+# Windows PowerShell:
+.\deploy-frontend-s3.ps1
+
+# Linux/Mac:
+./deploy-frontend-s3.sh
 ```
 
 ---
