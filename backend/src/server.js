@@ -230,6 +230,11 @@ app.use('/api/changelog', changelogRoutes);
 app.use('/api/announcements', announcementsRoutes);
 app.use('/api', healthRoutes);
 
+// Public route aliases (without /api prefix for frontend compatibility)
+app.use('/maintenance', maintenanceRoutes);
+app.use('/changelog', changelogRoutes);
+app.use('/announcements', announcementsRoutes);
+
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {
   const path = require('path');
