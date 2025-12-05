@@ -14,7 +14,7 @@ import api from '../../../utils/api';
  */
 export const fetchInvoices = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const url = queryString ? `/api/invoices?${queryString}` : '/api/invoices';
+  const url = queryString ? `/invoices?${queryString}` : '/invoices';
   const response = await api.get(url);
   return response.data;
 };
@@ -25,7 +25,7 @@ export const fetchInvoices = async (params = {}) => {
  * @returns {Promise<Object>} Invoice data
  */
 export const fetchInvoiceById = async (id) => {
-  const response = await api.get(`/api/invoices/${id}`);
+  const response = await api.get(`/invoices/${id}`);
   return response.data;
 };
 
@@ -53,7 +53,7 @@ export const createInvoice = async (invoiceData) => {
  * @returns {Promise<Object>} Updated invoice data
  */
 export const updateInvoice = async (id, invoiceData) => {
-  const response = await api.put(`/api/invoices/${id}`, invoiceData);
+  const response = await api.put(`/invoices/${id}`, invoiceData);
   return response.data;
 };
 
@@ -63,7 +63,7 @@ export const updateInvoice = async (id, invoiceData) => {
  * @returns {Promise<Object>} Deletion confirmation
  */
 export const deleteInvoice = async (id) => {
-  const response = await api.delete(`/api/invoices/${id}`);
+  const response = await api.delete(`/invoices/${id}`);
   return response.data;
 };
 
@@ -73,7 +73,7 @@ export const deleteInvoice = async (id) => {
  * @returns {Promise<Blob>} PDF blob data
  */
 export const downloadInvoicePDF = async (id) => {
-  const response = await api.get(`/api/invoices/${id}/pdf`, {
+  const response = await api.get(`/invoices/${id}/pdf`, {
     responseType: 'blob'
   });
   return response.data;

@@ -100,7 +100,7 @@ const TimerWidget = () => {
   const stopTimer = async () => {
     if (!activeEntry) return;
     try {
-      await api.post(`/api/time-tracking/stop/${activeEntry.id}`);
+      await api.post(`/time-tracking/stop/${activeEntry.id}`);
       await fetchActiveTimer();
       setElapsedTime(0);
     } catch (error) {

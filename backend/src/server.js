@@ -62,30 +62,27 @@ if (!fs.existsSync(logsDir)) {
 const app = express();
 const server = http.createServer(app);
 
-// Trust proxy - Required for Azure App Service to get real client IP
-// Azure uses X-Forwarded-For header
+// Trust proxy - Required for reverse proxies to get real client IP
 app.set('trust proxy', true);
 
 // Allowed origins for CORS - use environment variable or defaults
-const allowedOrigins = process.env.FRONTEND_URL 
-  ? [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173',
-      process.env.FRONTEND_URL,
-      'https://roastify.online',
-      'https://www.roastify.online',
-      'https://status.roastify.online'
-    ]
-  : [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173',
-      'https://white-sky-0a7e9f003.3.azurestaticapps.net',
-      'https://roastify.online',
-      'https://www.roastify.online',
-      'https://status.roastify.online'
-    ];
+// Allowed origins for CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173'
+];
+
+// Add production URLs from environment variable
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+// Add additional allowed origins from environment (comma-separated)
+if (process.env.ALLOWED_ORIGINS) {
+  const additionalOrigins = process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim());
+  allowedOrigins.push(...additionalOrigins);
+}
 
 const io = socketIo(server, {
   cors: {
@@ -134,6 +131,13 @@ app.use(morgan('combined', {
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded files
+const uploadsPath = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsPath));
 
 // Add logging middleware for new architecture routes
 app.use('/api/', loggingMiddleware);

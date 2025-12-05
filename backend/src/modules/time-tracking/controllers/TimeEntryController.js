@@ -16,6 +16,21 @@ class TimeEntryController extends BaseController {
   }
 
   /**
+   * Handle request with error handling
+   * @param {Object} req - Express request
+   * @param {Object} res - Express response
+   * @param {Function} next - Express next function
+   * @param {Function} handler - Async handler function
+   */
+  async handleRequest(req, res, next, handler) {
+    try {
+      await handler();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Setup routes
    */
   setupRoutes() {

@@ -16,7 +16,7 @@ import api from '../../../utils/api';
  */
 export const fetchTimeEntries = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const url = queryString ? `/api/time-tracking?${queryString}` : '/api/time-tracking';
+  const url = queryString ? `/time-tracking?${queryString}` : '/time-tracking';
   const response = await api.get(url);
   return response.data;
 };
@@ -27,7 +27,7 @@ export const fetchTimeEntries = async (params = {}) => {
  * @returns {Promise<Object>} Time entry data
  */
 export const fetchTimeEntryById = async (id) => {
-  const response = await api.get(`/api/time-tracking/${id}`);
+  const response = await api.get(`/time-tracking/${id}`);
   return response.data;
 };
 
@@ -50,7 +50,7 @@ export const startTimer = async (entryData) => {
  * @returns {Promise<Object>} Updated time entry data
  */
 export const stopTimer = async (id) => {
-  const response = await api.post(`/api/time-tracking/stop/${id}`);
+  const response = await api.post(`/time-tracking/stop/${id}`);
   return response.data;
 };
 
@@ -76,7 +76,7 @@ export const createTimeEntry = async (entryData) => {
  * @returns {Promise<Object>} Updated time entry data
  */
 export const updateTimeEntry = async (id, entryData) => {
-  const response = await api.put(`/api/time-tracking/${id}`, entryData);
+  const response = await api.put(`/time-tracking/${id}`, entryData);
   return response.data;
 };
 
@@ -86,7 +86,7 @@ export const updateTimeEntry = async (id, entryData) => {
  * @returns {Promise<Object>} Deletion confirmation
  */
 export const deleteTimeEntry = async (id) => {
-  const response = await api.delete(`/api/time-tracking/${id}`);
+  const response = await api.delete(`/time-tracking/${id}`);
   return response.data;
 };
 
@@ -99,7 +99,7 @@ export const deleteTimeEntry = async (id) => {
  */
 export const fetchTimeTrackingSummary = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const url = queryString ? `/api/time-tracking/summary?${queryString}` : '/api/time-tracking/summary';
+  const url = queryString ? `/time-tracking/summary?${queryString}` : '/time-tracking/summary';
   const response = await api.get(url);
   return response.data;
 };
@@ -112,6 +112,6 @@ export const fetchTimeTrackingSummary = async (params = {}) => {
  */
 export const fetchGroupedTimeTracking = async (groupBy, params = {}) => {
   const queryParams = new URLSearchParams({ ...params, group_by: groupBy }).toString();
-  const response = await api.get(`/api/time-tracking/grouped?${queryParams}`);
+  const response = await api.get(`/time-tracking/grouped?${queryParams}`);
   return response.data;
 };

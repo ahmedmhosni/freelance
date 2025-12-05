@@ -14,7 +14,7 @@ import api from '../../../utils/api';
  */
 export const fetchProjects = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const url = queryString ? `/api/projects?${queryString}` : '/api/projects';
+  const url = queryString ? `/projects?${queryString}` : '/projects';
   const response = await api.get(url);
   return response.data;
 };
@@ -25,7 +25,7 @@ export const fetchProjects = async (params = {}) => {
  * @returns {Promise<Object>} Project data
  */
 export const fetchProjectById = async (id) => {
-  const response = await api.get(`/api/projects/${id}`);
+  const response = await api.get(`/projects/${id}`);
   return response.data;
 };
 
@@ -52,7 +52,7 @@ export const createProject = async (projectData) => {
  * @returns {Promise<Object>} Updated project data
  */
 export const updateProject = async (id, projectData) => {
-  const response = await api.put(`/api/projects/${id}`, projectData);
+  const response = await api.put(`/projects/${id}`, projectData);
   return response.data;
 };
 
@@ -62,6 +62,6 @@ export const updateProject = async (id, projectData) => {
  * @returns {Promise<Object>} Deletion confirmation
  */
 export const deleteProject = async (id) => {
-  const response = await api.delete(`/api/projects/${id}`);
+  const response = await api.delete(`/projects/${id}`);
   return response.data;
 };

@@ -22,7 +22,7 @@ const Announcements = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get('/api/announcements');
+      const response = await axios.get('/announcements');
       // Ensure we always set an array
       const data = Array.isArray(response.data) ? response.data : [];
       setAnnouncements(data);

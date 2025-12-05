@@ -99,8 +99,6 @@ router.post('/', authenticateToken, upload.single('screenshot'), asyncHandler(as
         });
 
         screenshotUrl = blockBlobClient.url;
-      } else if (process.env.NODE_ENV === 'production') {
-        throw new AppError('Azure Storage configuration missing in production environment', 500);
       }
     } catch (error) {
       console.error('Error uploading screenshot:', error);

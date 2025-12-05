@@ -24,7 +24,7 @@ const AnnouncementDetail = () => {
 
   const fetchAnnouncement = async () => {
     try {
-      const response = await axios.get(`/api/announcements/${id}`);
+      const response = await axios.get(`/announcements/${id}`);
       setAnnouncement(response.data);
     } catch (error) {
       console.error('Error fetching announcement:', error);

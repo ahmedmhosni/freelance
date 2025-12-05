@@ -33,7 +33,7 @@ const FeedbackManager = () => {
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
-            await api.put(`/api/feedback/${id}`, { status: newStatus });
+            await api.put(`/feedback/${id}`, { status: newStatus });
             toast.success('Status updated');
             fetchFeedback();
             if (selectedFeedback && selectedFeedback.id === id) {
@@ -47,7 +47,7 @@ const FeedbackManager = () => {
 
     const handleNotesUpdate = async (id) => {
         try {
-            await api.put(`/api/feedback/${id}`, { admin_notes: adminNotes });
+            await api.put(`/feedback/${id}`, { admin_notes: adminNotes });
             toast.success('Notes updated');
             fetchFeedback();
             if (selectedFeedback && selectedFeedback.id === id) {
@@ -63,7 +63,7 @@ const FeedbackManager = () => {
         if (!confirm('Are you sure you want to delete this feedback?')) return;
 
         try {
-            await api.delete(`/api/feedback/${id}`);
+            await api.delete(`/feedback/${id}`);
             toast.success('Feedback deleted');
             fetchFeedback();
             if (selectedFeedback && selectedFeedback.id === id) {

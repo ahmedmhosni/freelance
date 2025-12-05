@@ -14,7 +14,7 @@ import api from '../../../utils/api';
  * @returns {Promise<Object>} Response with clients data and pagination
  */
 export const fetchClients = async ({ page = 1, limit = 20, search = '' } = {}) => {
-  const response = await api.get(`/api/clients?page=${page}&limit=${limit}&search=${search}`);
+  const response = await api.get(`/clients?page=${page}&limit=${limit}&search=${search}`);
   return response.data;
 };
 
@@ -24,7 +24,7 @@ export const fetchClients = async ({ page = 1, limit = 20, search = '' } = {}) =
  * @returns {Promise<Object>} Client data
  */
 export const fetchClientById = async (id) => {
-  const response = await api.get(`/api/clients/${id}`);
+  const response = await api.get(`/clients/${id}`);
   return response.data;
 };
 
@@ -51,7 +51,7 @@ export const createClient = async (clientData) => {
  * @returns {Promise<Object>} Updated client data
  */
 export const updateClient = async (id, clientData) => {
-  const response = await api.put(`/api/clients/${id}`, clientData);
+  const response = await api.put(`/clients/${id}`, clientData);
   return response.data;
 };
 
@@ -61,6 +61,6 @@ export const updateClient = async (id, clientData) => {
  * @returns {Promise<Object>} Deletion confirmation
  */
 export const deleteClient = async (id) => {
-  const response = await api.delete(`/api/clients/${id}`);
+  const response = await api.delete(`/clients/${id}`);
   return response.data;
 };

@@ -52,7 +52,7 @@ const VersionNamesManager = () => {
 
   const handleSave = async (id, sort_order) => {
     try {
-      await api.put(`/api/changelog/admin/version-names/${id}`, {
+      await api.put(`/changelog/admin/version-names/${id}`, {
         ...editForm,
         sort_order
       });
@@ -67,7 +67,7 @@ const VersionNamesManager = () => {
   const handleDelete = async (id) => {
     if (!confirm('Delete this name?')) return;
     try {
-      await api.delete(`/api/changelog/admin/version-names/${id}`);
+      await api.delete(`/changelog/admin/version-names/${id}`);
       fetchNames();
     } catch (error) {
       logger.error('Error deleting name:', error);

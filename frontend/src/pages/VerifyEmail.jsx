@@ -37,7 +37,7 @@ const VerifyEmail = () => {
   const verifyByToken = async (token) => {
     setIsVerifying(true);
     try {
-      const response = await api.get(`/api/auth/verify-email/${token}`);
+      const response = await api.get(`/auth/verify-email/${token}`);
       setVerificationStatus('success');
       setMessage(response.data.message || 'Email verified successfully!');
       toast.success(response.data.message || 'Email verified successfully!');

@@ -15,7 +15,7 @@ const Terms = () => {
 
   const fetchTerms = async () => {
     try {
-      const response = await fetch('/api/legal/terms');
+      const response = await fetch('/legal/terms');
       const data = await response.json();
       setContent(data);
     } catch (error) {

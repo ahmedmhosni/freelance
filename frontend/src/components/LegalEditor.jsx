@@ -20,7 +20,7 @@ const LegalEditor = () => {
   const fetchContent = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/api/legal/${activeType}`);
+      const response = await api.get(`/legal/${activeType}`);
       setContent(response.data.content || '');
     } catch (error) {
       logger.error('Error fetching legal content:', error);
@@ -38,7 +38,7 @@ const LegalEditor = () => {
 
     setIsSaving(true);
     try {
-      await api.put(`/api/legal/${activeType}`, { content });
+      await api.put(`/legal/${activeType}`, { content });
       toast.success(`${activeType === 'terms' ? 'Terms' : 'Privacy Policy'} updated successfully!`);
     } catch (error) {
       logger.error('Error saving legal content:', error);

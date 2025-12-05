@@ -25,9 +25,9 @@ const ClientDetail = () => {
     setLoading(true);
     try {
       const [clientRes, projectsRes, tasksRes] = await Promise.all([
-        api.get(`/api/clients/${id}`),
-        api.get(`/api/projects?client_id=${id}`),
-        api.get(`/api/tasks?client_id=${id}`)
+        api.get(`/clients/${id}`),
+        api.get(`/projects?client_id=${id}`),
+        api.get(`/tasks?client_id=${id}`)
       ]);
       
       setClient(clientRes.data);
@@ -43,7 +43,7 @@ const ClientDetail = () => {
 
   const handleDeleteProject = async () => {
     try {
-      await api.delete(`/api/projects/${deleteDialog.itemId}`);
+      await api.delete(`/projects/${deleteDialog.itemId}`);
       toast.success('Project deleted successfully!');
       setDeleteDialog({ isOpen: false, type: null, itemId: null });
       fetchClientData();
@@ -55,7 +55,7 @@ const ClientDetail = () => {
 
   const handleDeleteTask = async () => {
     try {
-      await api.delete(`/api/tasks/${deleteDialog.itemId}`);
+      await api.delete(`/tasks/${deleteDialog.itemId}`);
       toast.success('Task deleted successfully!');
       setDeleteDialog({ isOpen: false, type: null, itemId: null });
       fetchClientData();

@@ -20,7 +20,7 @@ const AnnouncementsManager = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get('/api/announcements', {
+      const response = await axios.get('/announcements', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       // Ensure we always set an array
@@ -46,14 +46,14 @@ const AnnouncementsManager = () => {
       }
 
       if (editingId) {
-        await axios.put(`/api/announcements/${editingId}`, formDataToSend, {
+        await axios.put(`/announcements/${editingId}`, formDataToSend, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       } else {
-        await axios.post('/api/announcements', formDataToSend, {
+        await axios.post('/announcements', formDataToSend, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
@@ -88,7 +88,7 @@ const AnnouncementsManager = () => {
     if (!confirm('Are you sure you want to delete this announcement?')) return;
 
     try {
-      await axios.delete(`/api/announcements/${id}`, {
+      await axios.delete(`/announcements/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       fetchAnnouncements();

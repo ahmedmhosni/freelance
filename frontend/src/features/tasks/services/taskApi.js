@@ -15,7 +15,7 @@ import api from '../../../utils/api';
  */
 export const fetchTasks = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const url = queryString ? `/api/tasks?${queryString}` : '/api/tasks';
+  const url = queryString ? `/tasks?${queryString}` : '/tasks';
   const response = await api.get(url);
   return response.data;
 };
@@ -26,7 +26,7 @@ export const fetchTasks = async (params = {}) => {
  * @returns {Promise<Object>} Task data
  */
 export const fetchTaskById = async (id) => {
-  const response = await api.get(`/api/tasks/${id}`);
+  const response = await api.get(`/tasks/${id}`);
   return response.data;
 };
 
@@ -53,7 +53,7 @@ export const createTask = async (taskData) => {
  * @returns {Promise<Object>} Updated task data
  */
 export const updateTask = async (id, taskData) => {
-  const response = await api.put(`/api/tasks/${id}`, taskData);
+  const response = await api.put(`/tasks/${id}`, taskData);
   return response.data;
 };
 
@@ -63,6 +63,6 @@ export const updateTask = async (id, taskData) => {
  * @returns {Promise<Object>} Deletion confirmation
  */
 export const deleteTask = async (id) => {
-  const response = await api.delete(`/api/tasks/${id}`);
+  const response = await api.delete(`/tasks/${id}`);
   return response.data;
 };

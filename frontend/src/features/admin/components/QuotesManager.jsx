@@ -20,7 +20,7 @@ const QuotesManager = () => {
 
   const fetchQuotes = async () => {
     try {
-      const response = await api.get(`/api/quotes?page=${currentPage}&limit=${itemsPerPage}`);
+      const response = await api.get(`/quotes?page=${currentPage}&limit=${itemsPerPage}`);
       setQuotes(response.data.data || []);
       setPagination(response.data.pagination || { total: 0, totalPages: 0 });
     } catch (error) {
@@ -33,7 +33,7 @@ const QuotesManager = () => {
     e.preventDefault();
     try {
       if (editingQuote) {
-        await api.put(`/api/quotes/${editingQuote.id}`, formData);
+        await api.put(`/quotes/${editingQuote.id}`, formData);
         toast.success('Quote updated successfully!');
       } else {
         await api.post('/quotes', formData);
@@ -63,7 +63,7 @@ const QuotesManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this quote?')) {
       try {
-        await api.delete(`/api/quotes/${id}`);
+        await api.delete(`/quotes/${id}`);
         toast.success('Quote deleted successfully!');
         
         // If we're on a page that will be empty after deletion, go to previous page
@@ -81,7 +81,7 @@ const QuotesManager = () => {
 
   const toggleActive = async (quote) => {
     try {
-      await api.put(`/api/quotes/${quote.id}`, {
+      await api.put(`/quotes/${quote.id}`, {
         ...quote,
         is_active: quote.is_active ? 0 : 1
       });

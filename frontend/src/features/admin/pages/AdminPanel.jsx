@@ -55,7 +55,7 @@ const AdminPanel = () => {
 
   const fetchInactiveUsers = async () => {
     try {
-      const response = await api.get(`/api/admin/activity/inactive-users?days=${inactiveDays}`);
+      const response = await api.get(`/admin/activity/inactive-users?days=${inactiveDays}`);
       setInactiveUsers(response.data.users);
     } catch (error) {
       logger.error('Error fetching inactive users:', error);
@@ -116,7 +116,7 @@ const AdminPanel = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await api.put(`/api/admin/users/${userId}/role`, { role: newRole });
+      await api.put(`/admin/users/${userId}/role`, { role: newRole });
       fetchUsers();
       toast.success('User role updated');
     } catch (error) {
@@ -128,7 +128,7 @@ const AdminPanel = () => {
   const handleDeleteUser = async (userId) => {
     if (confirm('Delete this user? This will delete all their data.')) {
       try {
-        await api.delete(`/api/admin/users/${userId}`);
+        await api.delete(`/admin/users/${userId}`);
         fetchUsers();
         toast.success('User deleted successfully');
       } catch (error) {
@@ -145,7 +145,7 @@ const AdminPanel = () => {
     ));
 
     try {
-      await api.put(`/api/admin/users/${userId}/verification`, { email_verified: newStatus });
+      await api.put(`/admin/users/${userId}/verification`, { email_verified: newStatus });
       // No need to fetchUsers() because we already updated the state
       toast.success('Verification status updated');
     } catch (error) {

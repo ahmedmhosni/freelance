@@ -92,7 +92,7 @@ const ChangelogEditor = () => {
 
   const fetchVersionDetails = async (versionId) => {
     try {
-      const response = await api.get(`/api/changelog/admin/versions/${versionId}`);
+      const response = await api.get(`/changelog/admin/versions/${versionId}`);
       setSelectedVersion(response.data);
     } catch (error) {
       logger.error('Error fetching version details:', error);
@@ -103,7 +103,7 @@ const ChangelogEditor = () => {
     e.preventDefault();
     try {
       if (editingVersionId) {
-        await api.put(`/api/changelog/admin/versions/${editingVersionId}`, versionForm);
+        await api.put(`/changelog/admin/versions/${editingVersionId}`, versionForm);
       } else {
         await api.post('/changelog/admin/versions', versionForm);
       }
@@ -118,7 +118,7 @@ const ChangelogEditor = () => {
 
   const handleTogglePublish = async (id, currentStatus) => {
     try {
-      await api.patch(`/api/changelog/admin/versions/${id}/publish`, { 
+      await api.patch(`/changelog/admin/versions/${id}/publish`, { 
         published: !currentStatus 
       });
       fetchVersions();
@@ -134,7 +134,7 @@ const ChangelogEditor = () => {
   const handleDeleteVersion = async (id) => {
     if (!confirm('Delete this version and all its items?')) return;
     try {
-      await api.delete(`/api/changelog/admin/versions/${id}`);
+      await api.delete(`/changelog/admin/versions/${id}`);
       fetchVersions();
       if (selectedVersion?.id === id) {
         setSelectedVersion(null);
@@ -151,9 +151,9 @@ const ChangelogEditor = () => {
     
     try {
       if (editingItem) {
-        await api.put(`/api/changelog/admin/items/${editingItem.id}`, itemForm);
+        await api.put(`/changelog/admin/items/${editingItem.id}`, itemForm);
       } else {
-        await api.post(`/api/changelog/admin/versions/${selectedVersion.id}/items`, itemForm);
+        await api.post(`/changelog/admin/versions/${selectedVersion.id}/items`, itemForm);
       }
       fetchVersionDetails(selectedVersion.id);
       resetItemForm();
@@ -175,7 +175,7 @@ const ChangelogEditor = () => {
   const handleDeleteItem = async (itemId) => {
     if (!confirm('Delete this item?')) return;
     try {
-      await api.delete(`/api/changelog/admin/items/${itemId}`);
+      await api.delete(`/changelog/admin/items/${itemId}`);
       fetchVersionDetails(selectedVersion.id);
     } catch (error) {
       logger.error('Error deleting item:', error);
@@ -259,7 +259,7 @@ const ChangelogEditor = () => {
           category = 'security';
         }
         
-        await api.post(`/api/changelog/admin/versions/${newVersionId}/items`, {
+        await api.post(`/changelog/admin/versions/${newVersionId}/items`, {
           category,
           title: commit.commit_message,
           description: `By ${commit.author_name} on ${new Date(commit.commit_date).toLocaleDateString()}`

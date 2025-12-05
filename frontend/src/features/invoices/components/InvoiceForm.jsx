@@ -143,7 +143,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
 
   const fetchInvoiceItems = async () => {
     try {
-      const response = await api.get(`/api/invoices/${invoice.id}/items`);
+      const response = await api.get(`/invoices/${invoice.id}/items`);
       setItems(response.data);
     } catch (error) {
       logger.error('Error fetching invoice items:', error);
@@ -286,7 +286,7 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       // Save items
       for (const item of items) {
         if (item.id > 1000000000) { // New item (temporary ID)
-          await api.post(`/api/invoices/${invoiceId}/items`, {
+          await api.post(`/invoices/${invoiceId}/items`, {
             project_id: item.project_id || null,
             task_id: item.task_id || null,
             description: item.description,
