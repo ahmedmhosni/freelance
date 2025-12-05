@@ -1,0 +1,94 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop, staging ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    uses: ./.github/workflows/ci.yml
+    
+  deploy-staging:
+    name: Deploy to Staging Environment
+    needs: test
+    runs-on: ubuntu-latest
+    environment: 
+      name: staging
+      url: ${{ secrets.STAGING_URL }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm ci --omit=dev
+        
+    - name: Create deployment package
+      run: |
+        cd backend
+        tar -czf ../deploy-staging.tar.gz src node_modules package.json
+        
+    - name: Configure SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/staging_key.pem
+        chmod 600 ~/.ssh/staging_key.pem
+        ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: Deploy to Staging
+      env:
+        STAGING_HOST: ${{ secrets.STAGING_HOST }}
+        STAGING_USER: ${{ secrets.STAGING_USER }}
+      run: |
+        scp -i ~/.ssh/staging_key.pem deploy-staging.tar.gz ${STAGING_USER}@${STAGING_HOST}:/tmp/
+        
+        ssh -i ~/.ssh/staging_key.pem ${STAGING_USER}@${STAGING_HOST} << 'ENDSSH'
+          set -e
+          
+          APP_NAME="roastify-staging"
+          APP_DIR="$HOME/roastify-staging/backend"
+          
+          echo "🚀 Deploying to staging..."
+          
+          pm2 stop $APP_NAME 2>/dev/null || true
+          
+          mkdir -p "$APP_DIR"
+          cd "$APP_DIR"
+          tar -xzf /tmp/deploy-staging.tar.gz
+          
+          if [ ! -f .env ]; then
+            echo "❌ ERROR: .env file not found!"
+            exit 1
+          fi
+          
+          pm2 start src/server.js --name $APP_NAME --time
+          pm2 save
+          
+          sleep 10
+          if curl -f http://localhost:5001/health > /dev/null 2>&1; then
+            echo "✅ Staging deployment successful!"
+            rm /tmp/deploy-staging.tar.gz
+          else
+            echo "❌ Health check failed!"
+            exit 1
+          fi
+        ENDSSH
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        rm -f ~/.ssh/staging_key.pem
+        rm -f deploy-staging.tar.gz
