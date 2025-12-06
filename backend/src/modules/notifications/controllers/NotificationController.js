@@ -1,12 +1,14 @@
 const express = require('express');
+const BaseController = require('../../../shared/base/BaseController');
 const { authenticateToken } = require('../../../middleware/auth');
 
 /**
  * Notification Controller
  * Handles HTTP requests for notifications
  */
-class NotificationController {
+class NotificationController extends BaseController {
   constructor(notificationService) {
+    super(notificationService);
     this.notificationService = notificationService;
     this.router = express.Router();
     this.initializeRoutes();

@@ -1,12 +1,14 @@
 const express = require('express');
+const BaseController = require('../../../shared/base/BaseController');
 const { authenticateToken, requireAdmin } = require('../../../middleware/auth');
 
 /**
  * Admin Controller
  * Handles HTTP requests for administrative operations
  */
-class AdminController {
+class AdminController extends BaseController {
   constructor(adminService) {
+    super(adminService);
     this.adminService = adminService;
     this.router = express.Router();
     this.initializeRoutes();

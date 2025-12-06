@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { api, logger } from '../../../shared';
+import { api, logger, Pagination } from '../../../shared';
 import QuotesManager from '../components/QuotesManager';
 import MaintenanceEditor from '../components/MaintenanceEditor';
 import LegalEditor from '../components/LegalEditor';
@@ -21,6 +21,8 @@ const AdminPanel = () => {
   const [inactiveDays, setInactiveDays] = useState(90);
   const [activityStats, setActivityStats] = useState(null);
   const [showInactive, setShowInactive] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   useEffect(() => {
     fetchUsers();
@@ -229,7 +231,9 @@ const AdminPanel = () => {
           </div>
           <div style={{ flex: 1 }}>
             <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL USERS</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.users}</div>
+            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              {typeof stats.users === 'object' ? stats.users?.total || 0 : stats.users || 0}
+            </div>
             <div className="stat-description" style={{ fontSize: '13px' }}>Registered accounts</div>
           </div>
         </div>
@@ -239,7 +243,9 @@ const AdminPanel = () => {
           </div>
           <div style={{ flex: 1 }}>
             <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL PROJECTS</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.projects}</div>
+            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              {typeof stats.projects === 'object' ? stats.projects?.total || 0 : stats.projects || 0}
+            </div>
             <div className="stat-description" style={{ fontSize: '13px' }}>All projects</div>
           </div>
         </div>
@@ -249,7 +255,9 @@ const AdminPanel = () => {
           </div>
           <div style={{ flex: 1 }}>
             <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL INVOICES</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>{stats.invoices}</div>
+            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              {typeof stats.invoices === 'object' ? stats.invoices?.total || 0 : stats.invoices || 0}
+            </div>
             <div className="stat-description" style={{ fontSize: '13px' }}>All invoices</div>
           </div>
         </div>
@@ -259,13 +267,15 @@ const AdminPanel = () => {
           </div>
           <div style={{ flex: 1 }}>
             <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>TOTAL REVENUE</div>
-            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>${stats.revenue}</div>
+            <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
+              ${typeof stats.revenue === 'object' ? stats.revenue?.total || 0 : stats.revenue || 0}
+            </div>
             <div className="stat-description" style={{ fontSize: '13px' }}>System-wide</div>
           </div>
         </div>
 
         {/* System Status Card */}
-        <Link to="/admin/status" style={{ textDecoration: 'none' }}>
+        <Link to="/app/admin/status" style={{ textDecoration: 'none' }}>
           <div className="card" style={{
             display: 'flex',
             alignItems: 'start',
@@ -321,23 +331,39 @@ const AdminPanel = () => {
       {activeTab === 'users' && (
         <>
           {/* Activity Stats */}
-          {activityStats && (
+          {activityStats && activityStats.userStats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
               <div className="card">
                 <div className="stat-label">ACTIVE (7 DAYS)</div>
-                <div className="stat-value">{activityStats.userStats.active_7_days}</div>
+                <div className="stat-value">
+                  {typeof activityStats.userStats.active_7_days === 'object' 
+                    ? activityStats.userStats.active_7_days?.total || 0 
+                    : activityStats.userStats.active_7_days || 0}
+                </div>
               </div>
               <div className="card">
                 <div className="stat-label">ACTIVE (30 DAYS)</div>
-                <div className="stat-value">{activityStats.userStats.active_30_days}</div>
+                <div className="stat-value">
+                  {typeof activityStats.userStats.active_30_days === 'object' 
+                    ? activityStats.userStats.active_30_days?.total || 0 
+                    : activityStats.userStats.active_30_days || 0}
+                </div>
               </div>
               <div className="card">
                 <div className="stat-label">NEVER LOGGED IN</div>
-                <div className="stat-value">{activityStats.userStats.never_logged_in}</div>
+                <div className="stat-value">
+                  {typeof activityStats.userStats.never_logged_in === 'object' 
+                    ? activityStats.userStats.never_logged_in?.total || 0 
+                    : activityStats.userStats.never_logged_in || 0}
+                </div>
               </div>
               <div className="card">
                 <div className="stat-label">INACTIVE (90+ DAYS)</div>
-                <div className="stat-value">{activityStats.userStats.inactive_90_days}</div>
+                <div className="stat-value">
+                  {typeof activityStats.userStats.inactive_90_days === 'object' 
+                    ? activityStats.userStats.inactive_90_days?.total || 0 
+                    : activityStats.userStats.inactive_90_days || 0}
+                </div>
               </div>
             </div>
           )}
@@ -448,7 +474,9 @@ const AdminPanel = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map(user => (
+                  {users
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map(user => (
                     <tr key={user.id} style={{ borderBottom: '1px solid #eee' }}>
                       <td style={{ padding: '10px' }}>{user.name}</td>
                       <td style={{ padding: '10px' }}>{user.email}</td>
@@ -464,13 +492,17 @@ const AdminPanel = () => {
                       </td>
                       <td style={{ padding: '10px' }}>
                         <select
-                          value={user.email_verified ? 'verified' : 'unverified'}
+                          value={
+                            typeof user.email_verified === 'object' 
+                              ? (user.email_verified?.verified ? 'verified' : 'unverified')
+                              : (user.email_verified ? 'verified' : 'unverified')
+                          }
                           onChange={(e) => handleVerificationChange(user.id, e.target.value === 'verified')}
                           style={{
                             padding: '5px',
-                            borderColor: user.email_verified ? '#28a745' : '#ffc107',
-                            color: user.email_verified ? '#28a745' : '#856404',
-                            backgroundColor: user.email_verified ? '#e8f5e9' : '#fff3cd'
+                            borderColor: (typeof user.email_verified === 'object' ? user.email_verified?.verified : user.email_verified) ? '#28a745' : '#ffc107',
+                            color: (typeof user.email_verified === 'object' ? user.email_verified?.verified : user.email_verified) ? '#28a745' : '#856404',
+                            backgroundColor: (typeof user.email_verified === 'object' ? user.email_verified?.verified : user.email_verified) ? '#e8f5e9' : '#fff3cd'
                           }}
                         >
                           <option value="verified">Verified</option>
@@ -500,6 +532,17 @@ const AdminPanel = () => {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(users.length / itemsPerPage)}
+              totalItems={users.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(value) => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
+            />
           </div>
         </>
       )}

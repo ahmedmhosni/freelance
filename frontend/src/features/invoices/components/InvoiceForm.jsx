@@ -42,17 +42,23 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [formData, setFormData] = useState({
-    client_id: invoice?.client_id || '',
-    invoice_number: invoice?.invoice_number || '',
+    client_id: invoice?.clientId || invoice?.client_id || '',
+    invoice_number: invoice?.invoiceNumber || invoice?.invoice_number || '',
     status: invoice?.status || 'draft',
-    issue_date: invoice?.issue_date 
-      ? new Date(invoice.issue_date).toISOString().split('T')[0] 
+    issue_date: invoice?.issueDate || invoice?.issue_date
+      ? new Date(invoice.issueDate || invoice.issue_date).toISOString().split('T')[0] 
       : new Date().toISOString().split('T')[0],
-    due_date: invoice?.due_date ? new Date(invoice.due_date).toISOString().split('T')[0] : '',
-    sent_date: invoice?.sent_date ? new Date(invoice.sent_date).toISOString().split('T')[0] : '',
-    paid_date: invoice?.paid_date ? new Date(invoice.paid_date).toISOString().split('T')[0] : '',
+    due_date: invoice?.dueDate || invoice?.due_date 
+      ? new Date(invoice.dueDate || invoice.due_date).toISOString().split('T')[0] 
+      : '',
+    sent_date: invoice?.sentDate || invoice?.sent_date 
+      ? new Date(invoice.sentDate || invoice.sent_date).toISOString().split('T')[0] 
+      : '',
+    paid_date: invoice?.paidDate || invoice?.paid_date 
+      ? new Date(invoice.paidDate || invoice.paid_date).toISOString().split('T')[0] 
+      : '',
     notes: invoice?.notes || '',
-    tax_rate: invoice?.tax_rate || 0
+    tax_rate: invoice?.taxRate || invoice?.tax_rate || 0
   });
   const [allInvoices, setAllInvoices] = useState([]);
 
@@ -66,14 +72,18 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const fetchAllInvoices = async () => {
     try {
       const response = await fetchInvoices();
-      const invoices = response.data || response;
-      setAllInvoices(invoices);
+      // Handle nested response structure: response.data.data or response.data
+      const invoices = response.data?.data || response.data || response;
+      setAllInvoices(Array.isArray(invoices) ? invoices : []);
       
       // Generate next invoice number
-      const nextNumber = generateNextInvoiceNumber(invoices);
+      const nextNumber = generateNextInvoiceNumber(Array.isArray(invoices) ? invoices : []);
+      logger.log('Generated invoice number:', nextNumber);
       setFormData(prev => ({ ...prev, invoice_number: nextNumber }));
     } catch (error) {
       logger.error('Error fetching invoices:', error);
+      // If fetch fails, still set a default number
+      setFormData(prev => ({ ...prev, invoice_number: 'INV-0001' }));
     }
   };
 
@@ -82,7 +92,9 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
     
     const numbers = invoices
       .map(inv => {
-        const match = inv.invoice_number?.match(/INV-(\d+)/);
+        // API returns camelCase (invoiceNumber), not snake_case (invoice_number)
+        const invoiceNum = inv.invoiceNumber || inv.invoice_number;
+        const match = invoiceNum?.match(/INV-(\d+)/);
         return match ? parseInt(match[1]) : 0;
       })
       .filter(num => num > 0);
@@ -104,6 +116,10 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
     apply_tax: false,
     tax_rate: 0
   });
+  
+  // Filtered lists based on selected client and project
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
 
   useEffect(() => {
     loadClients();
@@ -113,11 +129,63 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       fetchInvoiceItems();
     }
   }, [invoice]);
+  
+  // Filter projects when client changes
+  useEffect(() => {
+    if (formData.client_id) {
+      const clientId = parseInt(formData.client_id);
+      // API returns camelCase (clientId), not snake_case (client_id)
+      const clientProjects = projects.filter(p => p.clientId === clientId);
+      setFilteredProjects(clientProjects);
+    } else {
+      setFilteredProjects([]);
+    }
+  }, [formData.client_id, projects]);
+  
+  // Filter tasks when project changes (in newItem)
+  useEffect(() => {
+    if (newItem.project_id) {
+      const projectId = parseInt(newItem.project_id);
+      // API returns camelCase (projectId), not snake_case (project_id)
+      const projectTasks = tasks.filter(t => t.projectId === projectId);
+      setFilteredTasks(projectTasks);
+    } else {
+      setFilteredTasks([]);
+    }
+  }, [newItem.project_id, tasks]);
+
+  // Fetch time tracking data when task is selected and type is hourly
+  useEffect(() => {
+    if (newItem.type === 'hourly' && newItem.task_id) {
+      fetchTaskTimeTracking(newItem.task_id);
+    }
+  }, [newItem.task_id, newItem.type]);
+
+  const fetchTaskTimeTracking = async (taskId) => {
+    try {
+      const response = await api.get(`/time-tracking/duration/task/${taskId}`);
+      const data = response.data?.data || response.data;
+      
+      if (data && data.minutes) {
+        const hours = parseFloat((data.minutes / 60).toFixed(2));
+        setNewItem(prev => ({
+          ...prev,
+          hours_worked: hours
+        }));
+        toast.success(`Loaded ${hours} hours from time tracking`);
+      }
+    } catch (error) {
+      logger.error('Error fetching task time tracking:', error);
+      // Don't show error toast, just log it
+    }
+  };
 
   const loadClients = async () => {
     try {
       const response = await fetchClients();
-      setClients(response.data || response);
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
+      setClients(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching clients:', error);
     }
@@ -126,7 +194,9 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const loadProjects = async () => {
     try {
       const response = await fetchProjects();
-      setProjects(response.data || response);
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
+      setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching projects:', error);
     }
@@ -135,7 +205,9 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const loadTasks = async () => {
     try {
       const response = await fetchTasks();
-      setTasks(response.data || response);
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
+      setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching tasks:', error);
     }
@@ -144,9 +216,34 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
   const fetchInvoiceItems = async () => {
     try {
       const response = await api.get(`/invoices/${invoice.id}/items`);
-      setItems(response.data);
+      const data = response.data?.data || response.data || response;
+      const itemsArray = Array.isArray(data) ? data : [];
+      
+      // Map API response to form format
+      const mappedItems = itemsArray.map(item => ({
+        id: item.id,
+        project_id: item.project_id || '',
+        task_id: item.task_id || '',
+        description: item.description,
+        quantity: item.quantity || 1,
+        unit_price: item.unit_price || 0,
+        hours_worked: item.hours_worked || 0,
+        rate_per_hour: item.rate_per_hour || 0,
+        amount: item.amount,
+        base_amount: item.amount, // For display
+        tax_amount: 0,
+        apply_tax: false,
+        tax_rate: 0,
+        project_name: item.project_name,
+        task_name: item.task_name,
+        type: item.type || (item.hours_worked ? 'hourly' : 'fixed')
+      }));
+      
+      setItems(mappedItems);
     } catch (error) {
+      // If endpoint doesn't exist yet, just log and continue with empty items
       logger.error('Error fetching invoice items:', error);
+      setItems([]);
     }
   };
 
@@ -247,6 +344,20 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
         return;
       }
       
+      // Check for duplicate invoice number (only for new invoices)
+      if (!invoice?.id) {
+        const existingInvoice = allInvoices.find(inv => {
+          // API returns camelCase (invoiceNumber), not snake_case (invoice_number)
+          const invNum = inv.invoiceNumber || inv.invoice_number;
+          return invNum === formData.invoice_number;
+        });
+        if (existingInvoice) {
+          toast.error(`Invoice number ${formData.invoice_number} already exists. Generating a new number...`);
+          await fetchAllInvoices();
+          return;
+        }
+      }
+      
       const subtotal = calculateSubtotal();
       
       // Create or update invoice
@@ -286,15 +397,41 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       // Save items
       for (const item of items) {
         if (item.id > 1000000000) { // New item (temporary ID)
-          await api.post(`/invoices/${invoiceId}/items`, {
-            project_id: item.project_id || null,
-            task_id: item.task_id || null,
+          const itemData = {
             description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            hours_worked: item.hours_worked || null,
-            rate_per_hour: item.rate_per_hour || null
-          });
+            quantity: parseFloat(item.quantity) || 1,
+            unit_price: parseFloat(item.unit_price) || 0
+          };
+          
+          // Only include hourly fields if they have values (for hourly items)
+          if (item.hours_worked && parseFloat(item.hours_worked) > 0) {
+            itemData.hours_worked = parseFloat(item.hours_worked);
+          }
+          if (item.rate_per_hour && parseFloat(item.rate_per_hour) > 0) {
+            itemData.rate_per_hour = parseFloat(item.rate_per_hour);
+          }
+          
+          // Only include project_id and task_id if they have values
+          if (item.project_id && item.project_id !== '') {
+            itemData.project_id = parseInt(item.project_id);
+          }
+          if (item.task_id && item.task_id !== '') {
+            itemData.task_id = parseInt(item.task_id);
+          }
+          
+          logger.log('Saving item:', itemData);
+          try {
+            await api.post(`/invoices/${invoiceId}/items`, itemData);
+          } catch (itemError) {
+            const errorData = itemError.response?.data;
+            logger.error('Error saving item:', errorData);
+            if (errorData?.errors) {
+              errorData.errors.forEach(err => {
+                logger.error(`  - ${err.path || err.param}: ${err.msg}`);
+              });
+            }
+            throw itemError; // Re-throw to trigger the outer catch
+          }
         }
       }
 
@@ -302,7 +439,18 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
       onClose();
     } catch (error) {
       logger.error('Error saving invoice:', error);
-      toast.error(error.response?.data?.error || 'Failed to save invoice');
+      // Handle error message properly - extract string from error object
+      const errorMessage = error.response?.data?.error?.message 
+        || error.response?.data?.error 
+        || error.response?.data?.message
+        || error.message 
+        || 'Failed to save invoice';
+      toast.error(errorMessage);
+      
+      // If it's a duplicate invoice number, regenerate a new one
+      if (errorMessage.includes('already exists') && !invoice?.id) {
+        await fetchAllInvoices();
+      }
     }
   };
 
@@ -471,7 +619,9 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
                         )}
                       </td>
                       <td style={{ padding: '8px', fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)' }}>
-                        {item.project_name || item.task_name || '-'}
+                        {item.project_name && item.task_name 
+                          ? `${item.project_name} / ${item.task_name}`
+                          : item.project_name || item.task_name || '-'}
                       </td>
                       <td style={{ textAlign: 'right', padding: '8px' }}>
                         {item.hours_worked || item.quantity}
@@ -527,29 +677,38 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
               <div>
                 <select
                   value={newItem.project_id}
-                  onChange={(e) => setNewItem({ ...newItem, project_id: e.target.value })}
+                  onChange={(e) => {
+                    // Clear task when project changes
+                    setNewItem({ ...newItem, project_id: e.target.value, task_id: '' });
+                  }}
+                  disabled={!formData.client_id}
                 >
-                  <option value="">Select Project (Optional)</option>
-                  {projects.map(project => (
+                  <option value="">
+                    {!formData.client_id ? 'Select a client first' : 'Select Project (Optional)'}
+                  </option>
+                  {filteredProjects.map(project => (
                     <option key={project.id} value={project.id}>{project.name}</option>
                   ))}
                 </select>
                 <p style={{ fontSize: '10px', color: 'rgba(55, 53, 47, 0.5)', margin: '2px 0 0 0' }}>
-                  Link to a project
+                  {!formData.client_id ? 'First select a client above' : 'Shows only projects for this client'}
                 </p>
               </div>
               <div>
                 <select
                   value={newItem.task_id}
                   onChange={(e) => setNewItem({ ...newItem, task_id: e.target.value })}
+                  disabled={!newItem.project_id}
                 >
-                  <option value="">Select Task (Optional)</option>
-                  {tasks.map(task => (
+                  <option value="">
+                    {!newItem.project_id ? 'Select a project first' : 'Select Task (Optional)'}
+                  </option>
+                  {filteredTasks.map(task => (
                     <option key={task.id} value={task.id}>{task.title}</option>
                   ))}
                 </select>
                 <p style={{ fontSize: '10px', color: 'rgba(55, 53, 47, 0.5)', margin: '2px 0 0 0' }}>
-                  Link to a specific task
+                  {!newItem.project_id ? 'First select a project' : 'Shows only tasks for this project'}
                 </p>
               </div>
             </div>
@@ -605,15 +764,29 @@ const InvoiceForm = ({ invoice, onClose, onSuccess }) => {
               <div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                   <div>
-                    <input
-                      type="number"
-                      step="0.25"
-                      placeholder="Hours Worked"
-                      value={newItem.hours_worked}
-                      onChange={(e) => setNewItem({ ...newItem, hours_worked: e.target.value })}
-                    />
-                    <p style={{ fontSize: '10px', color: 'rgba(55, 53, 47, 0.5)', margin: '2px 0 0 0' }}>
-                      Time spent
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="number"
+                        step="0.25"
+                        placeholder="Hours Worked"
+                        value={newItem.hours_worked}
+                        onChange={(e) => setNewItem({ ...newItem, hours_worked: e.target.value })}
+                      />
+                      {newItem.task_id && newItem.hours_worked > 0 && (
+                        <div style={{ 
+                          position: 'absolute', 
+                          right: '8px', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          color: '#28a745',
+                          fontSize: '16px'
+                        }}>
+                          <MdAccessTime />
+                        </div>
+                      )}
+                    </div>
+                    <p style={{ fontSize: '10px', color: newItem.task_id && newItem.hours_worked > 0 ? '#28a745' : 'rgba(55, 53, 47, 0.5)', margin: '2px 0 0 0' }}>
+                      {newItem.task_id && newItem.hours_worked > 0 ? 'Loaded from time tracking' : 'Time spent'}
                     </p>
                   </div>
                   <div>

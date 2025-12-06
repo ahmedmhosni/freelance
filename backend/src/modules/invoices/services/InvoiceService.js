@@ -1,5 +1,5 @@
 const BaseService = require('../../../shared/base/BaseService');
-const { ValidationError, NotFoundError } = require('../../../core/errors');
+const { ValidationError, NotFoundError, ConflictError } = require('../../../core/errors');
 
 /**
  * Invoice Service
@@ -77,6 +77,15 @@ class InvoiceService extends BaseService {
    * @returns {Promise<Object>} Created invoice
    */
   async createForUser(data, userId) {
+    // Check if invoice number already exists
+    if (data.invoice_number || data.invoiceNumber) {
+      const invoiceNumber = data.invoice_number || data.invoiceNumber;
+      const existing = await this.repository.findByInvoiceNumber(invoiceNumber);
+      if (existing) {
+        throw new ConflictError(`Invoice number ${invoiceNumber} already exists`);
+      }
+    }
+
     // Add user ID to data
     const invoiceData = {
       ...data,

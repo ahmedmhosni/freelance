@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { UnauthorizedError, ConflictError, ForbiddenError } = require('../../../core/errors');
+const { UnauthorizedError, ConflictError, ForbiddenError, ValidationError } = require('../../../core/errors');
 
 /**
  * Authentication Service
@@ -21,6 +21,20 @@ class AuthService {
    */
   async register(userData) {
     const { name, email, password, role = 'freelancer' } = userData;
+
+    // Validate password strength
+    if (password.length < 8) {
+      throw new ValidationError('Password must be at least 8 characters long');
+    }
+    if (!/[A-Z]/.test(password)) {
+      throw new ValidationError('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      throw new ValidationError('Password must contain at least one lowercase letter');
+    }
+    if (!/[0-9]/.test(password)) {
+      throw new ValidationError('Password must contain at least one number');
+    }
 
     // Check if user exists
     const existingUser = await this.db.queryOne(
@@ -134,7 +148,8 @@ class AuthService {
     );
 
     if (!userData) {
-      throw new UnauthorizedError('User not found');
+      const { NotFoundError } = require('../../../core/errors');
+      throw new NotFoundError('User not found');
     }
 
     return new User(userData);
@@ -148,6 +163,20 @@ class AuthService {
    * @returns {Promise<void>}
    */
   async changePassword(userId, currentPassword, newPassword) {
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      throw new ValidationError('Password must be at least 8 characters long');
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one lowercase letter');
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one number');
+    }
+
     // Get user with password
     const userData = await this.db.queryOne(
       'SELECT * FROM users WHERE id = $1',

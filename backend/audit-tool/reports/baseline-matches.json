@@ -1,0 +1,709 @@
+{
+  "timestamp": "2025-12-06T08:39:34.766Z",
+  "statistics": {
+    "totalFrontend": 248,
+    "totalBackend": 85,
+    "matchedCount": 58,
+    "matchRate": 0.6823529411764706,
+    "improvementFromPrevious": 0
+  },
+  "matchedCount": 58,
+  "matchedPairs": [
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/announcements/featured",
+        "fullPath": "/api/announcements/featured"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/announcements/featured"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/announcements",
+        "fullPath": "/announcements"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/announcements/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/announcements/:editingId",
+        "fullPath": "/announcements/:editingId"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/announcements/:id"
+      },
+      "confidence": "parameter-match"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/announcements",
+        "fullPath": "/announcements"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/announcements/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/announcements/:id",
+        "fullPath": "/announcements/:id"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/announcements/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/api/changelog/current-version",
+        "fullPath": "/api/changelog/current-version"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/current-version"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/profile/upload-picture",
+        "fullPath": "/api/profile/upload-picture"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/profile/upload-picture"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/changelog/admin/version-names?type=minor&unused_only=true",
+        "fullPath": "/api/changelog/admin/version-names?type=minor&unused_only=true"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/admin/version-names"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/changelog/admin/versions",
+        "fullPath": "/api/changelog/admin/versions"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/admin/versions"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/changelog/admin/versions/:versionId",
+        "fullPath": "/api/changelog/admin/versions/:versionId"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/admin/versions/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/changelog/admin/versions/:editingVersionId",
+        "fullPath": "/api/changelog/admin/versions/:editingVersionId"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/changelog/admin/versions/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/changelog/admin/versions",
+        "fullPath": "/api/changelog/admin/versions"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/changelog/admin/versions"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "patch",
+        "path": "/changelog/admin/versions/:id/publish",
+        "fullPath": "/api/changelog/admin/versions/:id/publish"
+      },
+      "backend": {
+        "method": "PATCH",
+        "path": "/api/changelog/admin/versions/:id/publish"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/changelog/admin/versions/:id",
+        "fullPath": "/api/changelog/admin/versions/:id"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/changelog/admin/versions/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/changelog/admin/items/:param",
+        "fullPath": "/api/changelog/admin/items/:param"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/changelog/admin/items/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/changelog/admin/versions/:param/items",
+        "fullPath": "/api/changelog/admin/versions/:param/items"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/changelog/admin/versions/:id/items"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/changelog/admin/items/:itemId",
+        "fullPath": "/api/changelog/admin/items/:itemId"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/changelog/admin/items/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/changelog/admin/mark-commits-processed",
+        "fullPath": "/api/changelog/admin/mark-commits-processed"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/changelog/admin/mark-commits-processed"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/api/gdpr/export",
+        "fullPath": "/api/gdpr/export"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/gdpr/export"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/api/gdpr/delete-account",
+        "fullPath": "/api/gdpr/delete-account"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/gdpr/delete-account"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/api/preferences/email",
+        "fullPath": "/api/preferences/email"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/preferences/email"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/api/preferences/email",
+        "fullPath": "/api/preferences/email"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/preferences/email"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/feedback/:id",
+        "fullPath": "/api/feedback/:id"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/feedback/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/feedback/:id",
+        "fullPath": "/api/feedback/:id"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/feedback/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/feedback",
+        "fullPath": "/api/feedback"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/feedback/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/legal/:activeType",
+        "fullPath": "/api/legal/:activeType"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/legal/terms"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/legal/:activeType",
+        "fullPath": "/api/legal/:activeType"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/legal/:type"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/maintenance",
+        "fullPath": "/api/maintenance"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/maintenance/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/maintenance",
+        "fullPath": "/api/maintenance"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/maintenance/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/changelog/admin/pending-commits",
+        "fullPath": "/api/changelog/admin/pending-commits"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/admin/pending-commits"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/changelog/admin/sync-commits",
+        "fullPath": "/api/changelog/admin/sync-commits"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/changelog/admin/sync-commits"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/quotes?page=:currentPage&limit=:itemsPerPage",
+        "fullPath": "/api/quotes?page=:currentPage&limit=:itemsPerPage"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/quotes/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/quotes/:param",
+        "fullPath": "/api/quotes/:param"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/quotes/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/quotes",
+        "fullPath": "/api/quotes"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/quotes/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/quotes/:id",
+        "fullPath": "/api/quotes/:id"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/quotes/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/changelog/admin/version-names",
+        "fullPath": "/api/changelog/admin/version-names"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/changelog/admin/version-names"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "put",
+        "path": "/changelog/admin/version-names/:id",
+        "fullPath": "/api/changelog/admin/version-names/:id"
+      },
+      "backend": {
+        "method": "PUT",
+        "path": "/api/changelog/admin/version-names/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "delete",
+        "path": "/changelog/admin/version-names/:id",
+        "fullPath": "/api/changelog/admin/version-names/:id"
+      },
+      "backend": {
+        "method": "DELETE",
+        "path": "/api/changelog/admin/version-names/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/login",
+        "fullPath": "/api/auth/login"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/login"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/maintenance/status",
+        "fullPath": "/api/maintenance/status"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/maintenance/status"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/legal/:activeType",
+        "fullPath": "/api/legal/:activeType"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/legal/privacy"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/status",
+        "fullPath": "/api/status"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/status/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/announcements/featured",
+        "fullPath": "/api/announcements/featured"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/announcements/:id"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/forgot-password",
+        "fullPath": "/api/auth/forgot-password"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/forgot-password"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/quotes/daily",
+        "fullPath": "/api/quotes/daily"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/quotes/daily"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/register",
+        "fullPath": "/api/auth/register"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/register"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/resend-verification",
+        "fullPath": "/api/auth/resend-verification"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/resend-verification"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/reset-password",
+        "fullPath": "/api/auth/reset-password"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/reset-password"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/auth/verify-email/:token",
+        "fullPath": "/api/auth/verify-email/:token"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/auth/verify-email/:token"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "post",
+        "path": "/auth/verify-code",
+        "fullPath": "/api/auth/verify-code"
+      },
+      "backend": {
+        "method": "POST",
+        "path": "/api/auth/verify-code"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/api/changelog/public",
+        "fullPath": "/api/changelog/public"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/changelog/public"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/dashboard/stats",
+        "fullPath": "/api/dashboard/stats"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/dashboard/stats"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/dashboard/recent-tasks?limit=5",
+        "fullPath": "/api/dashboard/recent-tasks?limit=5"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/dashboard/recent-tasks"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/dashboard/charts",
+        "fullPath": "/api/dashboard/charts"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/dashboard/charts"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/profile",
+        "fullPath": "/api/profile"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/profile/"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/profile/:username",
+        "fullPath": "/api/profile/:username"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/profile/me"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/api/status/history",
+        "fullPath": "/api/status/history"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/status/history"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/profile/:username",
+        "fullPath": "/api/profile/:username"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/profile/:username"
+      },
+      "confidence": "exact"
+    }
+  ]
+}

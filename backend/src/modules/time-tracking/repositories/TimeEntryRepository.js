@@ -267,6 +267,71 @@ class TimeEntryRepository extends BaseRepository {
   }
 
   /**
+   * Get time entries grouped by task, project, or client
+   * @param {number} userId - User ID
+   * @param {string} groupBy - Group by field (task, project, client)
+   * @param {Date|string} startDate - Start date (optional)
+   * @param {Date|string} endDate - End date (optional)
+   * @returns {Promise<Array>} Array of grouped time tracking data
+   */
+  async getGroupedData(userId, groupBy, startDate = null, endDate = null) {
+    let selectFields = '';
+    let groupFields = '';
+    
+    if (groupBy === 'task') {
+      selectFields = `
+        te.task_id,
+        t.title as task_title,
+        p.name as project_name,
+        c.name as client_name,
+      `;
+      groupFields = 'te.task_id, t.title, p.name, c.name';
+    } else if (groupBy === 'project') {
+      selectFields = `
+        te.project_id,
+        p.name as project_name,
+        c.name as client_name,
+      `;
+      groupFields = 'te.project_id, p.name, c.name';
+    } else if (groupBy === 'client') {
+      selectFields = `
+        c.id as client_id,
+        c.name as client_name,
+      `;
+      groupFields = 'c.id, c.name';
+    } else {
+      throw new Error('group_by must be task, project, or client');
+    }
+    
+    let sql = `
+      SELECT 
+        ${selectFields}
+        COUNT(te.id) as session_count,
+        COALESCE(SUM(te.duration), 0) as total_minutes,
+        ROUND(COALESCE(SUM(te.duration), 0) / 60.0, 2) as total_hours
+      FROM ${this.tableName} te
+      LEFT JOIN tasks t ON te.task_id = t.id
+      LEFT JOIN projects p ON te.project_id = p.id
+      LEFT JOIN clients c ON p.client_id = c.id
+      WHERE te.user_id = $1 AND te.end_time IS NOT NULL
+    `;
+    
+    const params = [userId];
+    let paramIndex = 2;
+
+    if (startDate && endDate) {
+      sql += ` AND te.start_time::date BETWEEN $${paramIndex} AND $${paramIndex + 1}`;
+      params.push(startDate, endDate);
+      paramIndex += 2;
+    }
+
+    sql += ` GROUP BY ${groupFields} ORDER BY total_minutes DESC`;
+    
+    const rows = await this.db.queryMany(sql, params);
+    return rows;
+  }
+
+  /**
    * Create a new time entry
    * @param {Object} data - Time entry data
    * @returns {Promise<TimeEntry>} Created TimeEntry instance
@@ -307,8 +372,7 @@ class TimeEntryRepository extends BaseRepository {
       UPDATE ${this.tableName}
       SET 
         end_time = $1,
-        duration = EXTRACT(EPOCH FROM ($1 - start_time)) / 60,
-        updated_at = $1
+        duration = EXTRACT(EPOCH FROM ($1 - start_time)) / 60
       WHERE id = $2 AND user_id = $3 AND end_time IS NULL
       RETURNING *
     `;

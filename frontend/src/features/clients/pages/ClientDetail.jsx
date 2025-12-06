@@ -27,7 +27,8 @@ const ClientDetail = () => {
         api.get(`/tasks?client_id=${id}`)
       ]);
       
-      setClient(clientRes.data);
+      // Handle response structure: { success: true, data: actualData }
+      setClient(clientRes.data.data || clientRes.data);
       setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : projectsRes.data.data || []);
       setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : tasksRes.data.data || []);
     } catch (error) {
@@ -171,7 +172,7 @@ const ClientDetail = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn-edit" onClick={() => navigate(`/app/clients/edit/${client.id}`)}>
+              <button className="btn-edit" onClick={() => navigate('/app/clients', { state: { editClient: client } })}>
                 <MdEdit size={16} /> Edit
               </button>
             </div>
@@ -275,7 +276,7 @@ const ClientDetail = () => {
               <div className="empty-state">
                 <div className="empty-state-icon"><MdFolder /></div>
                 <p>No projects for this client yet.</p>
-                <button className="btn-primary" onClick={() => navigate('/projects')}>
+                <button className="btn-primary" onClick={() => navigate('/app/projects')}>
                   Create Project
                 </button>
               </div>
@@ -351,7 +352,7 @@ const ClientDetail = () => {
               <div className="empty-state">
                 <div className="empty-state-icon"><MdTask /></div>
                 <p>No tasks for this client yet.</p>
-                <button className="btn-primary" onClick={() => navigate('/tasks')}>
+                <button className="btn-primary" onClick={() => navigate('/app/tasks')}>
                   Create Task
                 </button>
               </div>
@@ -378,7 +379,7 @@ const ClientDetail = () => {
                             color: 'var(--primary-color)',
                             cursor: 'pointer'
                           }}
-                          onClick={() => navigate(`/tasks`)}
+                          onClick={() => navigate(`/app/tasks`)}
                         >
                           {task.title}
                         </h4>
@@ -409,7 +410,7 @@ const ClientDetail = () => {
                           className="btn-edit"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/tasks`);
+                            navigate(`/app/tasks`);
                           }}
                           style={{ fontSize: '12px', padding: '6px 12px' }}
                         >

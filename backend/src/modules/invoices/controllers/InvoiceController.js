@@ -1,6 +1,7 @@
 const express = require('express');
 const BaseController = require('../../../shared/base/BaseController');
 const InvoiceResponseDTO = require('../dto/InvoiceResponseDTO');
+const InvoiceItemResponseDTO = require('../dto/InvoiceItemResponseDTO');
 const logger = require('../../../core/logger');
 
 /**
@@ -8,9 +9,10 @@ const logger = require('../../../core/logger');
  * Handles HTTP requests for invoice operations
  */
 class InvoiceController extends BaseController {
-  constructor(invoiceService) {
+  constructor(invoiceService, invoiceItemService) {
     super(invoiceService);
     this.invoiceService = invoiceService;
+    this.invoiceItemService = invoiceItemService;
     this.router = express.Router();
     this.setupRoutes();
   }
@@ -42,11 +44,18 @@ class InvoiceController extends BaseController {
       deleteInvoiceValidation,
       queryValidation
     } = require('../validators/invoiceValidators');
+    
+    const {
+      createInvoiceItemValidation,
+      updateInvoiceItemValidation,
+      getInvoiceItemValidation,
+      getInvoiceItemsValidation
+    } = require('../validators/invoiceItemValidators');
 
     // Apply authentication to all routes
     this.router.use(authenticateToken);
 
-    // Routes
+    // Invoice routes
     this.router.get('/', queryValidation, this.getAll.bind(this));
     this.router.get('/overdue', this.getOverdue.bind(this));
     this.router.get('/stats', this.getStats.bind(this));
@@ -55,6 +64,12 @@ class InvoiceController extends BaseController {
     this.router.post('/', createInvoiceValidation, this.create.bind(this));
     this.router.put('/:id', updateInvoiceValidation, this.update.bind(this));
     this.router.delete('/:id', deleteInvoiceValidation, this.delete.bind(this));
+    
+    // Invoice items routes
+    this.router.get('/:invoiceId/items', getInvoiceItemsValidation, this.getInvoiceItems.bind(this));
+    this.router.post('/:invoiceId/items', createInvoiceItemValidation, this.createInvoiceItem.bind(this));
+    this.router.put('/:invoiceId/items/:id', updateInvoiceItemValidation, this.updateInvoiceItem.bind(this));
+    this.router.delete('/:invoiceId/items/:id', getInvoiceItemValidation, this.deleteInvoiceItem.bind(this));
   }
 
   /**
@@ -192,6 +207,69 @@ class InvoiceController extends BaseController {
       const responseData = invoices.map(invoice => new InvoiceResponseDTO(invoice));
 
       return res.json(responseData);
+    });
+  }
+
+  /**
+   * Get all items for an invoice
+   * GET /api/v2/invoices/:invoiceId/items
+   */
+  async getInvoiceItems(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const userId = req.user.id;
+      const invoiceId = parseInt(req.params.invoiceId);
+
+      const items = await this.invoiceItemService.getItemsForInvoice(invoiceId, userId);
+      const responseData = items.map(item => new InvoiceItemResponseDTO(item));
+
+      return res.json(responseData);
+    });
+  }
+
+  /**
+   * Create a new invoice item
+   * POST /api/v2/invoices/:invoiceId/items
+   */
+  async createInvoiceItem(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const userId = req.user.id;
+      const invoiceId = parseInt(req.params.invoiceId);
+
+      const item = await this.invoiceItemService.createItem(invoiceId, req.body, userId);
+      const responseData = new InvoiceItemResponseDTO(item);
+
+      return res.status(201).json(responseData);
+    });
+  }
+
+  /**
+   * Update an invoice item
+   * PUT /api/v2/invoices/:invoiceId/items/:id
+   */
+  async updateInvoiceItem(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const userId = req.user.id;
+      const itemId = parseInt(req.params.id);
+
+      const item = await this.invoiceItemService.updateItem(itemId, req.body, userId);
+      const responseData = new InvoiceItemResponseDTO(item);
+
+      return res.json(responseData);
+    });
+  }
+
+  /**
+   * Delete an invoice item
+   * DELETE /api/v2/invoices/:invoiceId/items/:id
+   */
+  async deleteInvoiceItem(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const userId = req.user.id;
+      const itemId = parseInt(req.params.id);
+
+      await this.invoiceItemService.deleteItem(itemId, userId);
+
+      return res.status(204).send();
     });
   }
 }

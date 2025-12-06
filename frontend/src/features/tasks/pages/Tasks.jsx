@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useSocket, ConfirmDialog, logger } from '../../../shared';
+import { useSocket, ConfirmDialog, logger, Pagination } from '../../../shared';
 import Calendar from 'react-calendar';
 import TaskCalendar from '../components/TaskCalendar';
 import TaskViewModal from '../components/TaskViewModal';
@@ -18,11 +18,13 @@ const Tasks = () => {
   const [viewingTask, setViewingTask] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, taskId: null });
   const [formData, setFormData] = useState({
-    title: '', description: '', priority: 'medium', status: 'todo', due_date: '', project_id: ''
+    title: '', description: '', priority: 'medium', status: 'pending', due_date: '', project_id: ''
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dragOverColumn, setDragOverColumn] = useState(null);
-  const { socket } = useSocket();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const { socket} = useSocket();
 
   useEffect(() => {
     loadTasks();
@@ -32,7 +34,8 @@ const Tasks = () => {
   const loadProjects = async () => {
     try {
       const response = await fetchProjects();
-      const data = response.data || response;
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
       setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching projects:', error);
@@ -65,8 +68,16 @@ const Tasks = () => {
   const loadTasks = async () => {
     try {
       const response = await fetchTasks();
-      const data = response.data || response;
-      setTasks(Array.isArray(data) ? data : []);
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
+      
+      // Migrate old status values to new ones for backward compatibility
+      const migratedData = Array.isArray(data) ? data.map(task => ({
+        ...task,
+        status: task.status === 'todo' ? 'pending' : task.status === 'review' ? 'in-progress' : task.status
+      })) : [];
+      
+      setTasks(migratedData);
     } catch (error) {
       logger.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');
@@ -77,19 +88,34 @@ const Tasks = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Prepare data with proper type conversion and field filtering
+      const taskData = {
+        title: formData.title,
+        description: formData.description || '',
+        status: formData.status,
+        priority: formData.priority,
+        due_date: formData.due_date || null,
+        // Convert project_id to integer or null
+        project_id: formData.project_id ? parseInt(formData.project_id, 10) : null
+      };
+
+      // Log the data being sent for debugging
+      logger.info('Submitting task data:', taskData);
+
       if (editingTask) {
-        await updateTask(editingTask.id, formData);
+        await updateTask(editingTask.id, taskData);
         toast.success('Task updated successfully!');
       } else {
-        await createTask(formData);
+        await createTask(taskData);
         toast.success('Task created successfully!');
       }
       setShowForm(false);
       setEditingTask(null);
-      setFormData({ title: '', description: '', priority: 'medium', status: 'todo', due_date: '', project_id: null });
+      setFormData({ title: '', description: '', priority: 'medium', status: 'pending', due_date: '', project_id: '' });
       loadTasks();
     } catch (error) {
       logger.error('Error saving task:', error);
+      logger.error('Task data that failed:', formData);
       toast.error('Failed to save task');
     }
   };
@@ -97,9 +123,13 @@ const Tasks = () => {
   const handleEdit = (task) => {
     setEditingTask(task);
     setFormData({
-      ...task,
+      title: task.title || '',
       description: task.description || '',
-      project_id: task.project_id || ''
+      priority: task.priority || 'medium',
+      status: task.status || 'pending',
+      due_date: task.due_date || task.dueDate || '',
+      // Handle both camelCase (DTO) and snake_case (legacy) field names
+      project_id: task.project_id || task.projectId || ''
     });
     setShowForm(true);
   };
@@ -123,7 +153,19 @@ const Tasks = () => {
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       const task = tasks.find(t => t.id === taskId);
-      await updateTask(taskId, { ...task, status: newStatus });
+      if (!task) return;
+      
+      // Only send the fields that the backend expects
+      const taskData = {
+        title: task.title,
+        description: task.description || '',
+        status: newStatus,
+        priority: task.priority,
+        due_date: task.due_date || task.dueDate || null,
+        project_id: task.project_id || task.projectId || null
+      };
+      
+      await updateTask(taskId, taskData);
       loadTasks();
     } catch (error) {
       logger.error('Error updating task:', error);
@@ -131,10 +173,10 @@ const Tasks = () => {
   };
 
   const columns = {
-    'todo': { title: 'To Do', color: '#6c757d' },
+    'pending': { title: 'To Do', color: '#6c757d' },
     'in-progress': { title: 'In Progress', color: '#007bff' },
-    'review': { title: 'Review', color: '#ffc107' },
-    'done': { title: 'Done', color: '#28a745' }
+    'done': { title: 'Done', color: '#28a745' },
+    'completed': { title: 'Completed', color: '#28a745' }
   };
 
   const priorityColors = {
@@ -143,8 +185,10 @@ const Tasks = () => {
 
   const getTasksForDate = (date) => {
     return tasks.filter(task => {
-      if (!task.due_date) return false;
-      const taskDate = new Date(task.due_date);
+      // Handle both camelCase (DTO) and snake_case (legacy) field names
+      const dueDate = task.due_date || task.dueDate;
+      if (!dueDate) return false;
+      const taskDate = new Date(dueDate);
       return taskDate.toDateString() === date.toDateString();
     });
   };
@@ -255,32 +299,144 @@ const Tasks = () => {
         <div className="card" style={{ marginBottom: '20px', animation: 'slideIn 0.2s ease-out' }}>
           <h3>{editingTask ? 'Edit Task' : 'New Task'}</h3>
           <form onSubmit={handleSubmit}>
-            <input placeholder="Task Title *" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required style={{ marginBottom: '10px' }} />
-            <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} style={{ marginBottom: '10px', minHeight: '60px' }} />
-            <select value={formData.project_id} onChange={(e) => setFormData({...formData, project_id: e.target.value})} style={{ marginBottom: '10px' }}>
-              <option value="">Select Project (Optional)</option>
-              {projects.map(project => (
-                <option key={project.id} value={project.id}>{project.name || project.title}</option>
-              ))}
-            </select>
-            <select value={formData.priority} onChange={(e) => setFormData({...formData, priority: e.target.value})} style={{ marginBottom: '10px' }}>
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
-              <option value="urgent">Urgent</option>
-            </select>
-            <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} style={{ marginBottom: '10px' }}>
-              <option value="todo">To Do</option>
-              <option value="in-progress">In Progress</option>
-              <option value="review">Review</option>
-              <option value="done">Done</option>
-            </select>
-            <input type="date" value={formData.due_date} onChange={(e) => setFormData({...formData, due_date: e.target.value})} style={{ marginBottom: '10px' }} />
-            <div>
-              <button type="submit" className="btn-primary" style={{ marginRight: '10px' }}>
-                {editingTask ? 'Update' : 'Create'}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontSize: '14px', 
+                fontWeight: '500',
+                color: 'rgba(55, 53, 47, 0.85)'
+              }}>
+                Task Title *
+              </label>
+              <input 
+                placeholder="Enter task title" 
+                value={formData.title} 
+                onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                required 
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontSize: '14px', 
+                fontWeight: '500',
+                color: 'rgba(55, 53, 47, 0.85)'
+              }}>
+                Description
+              </label>
+              <textarea 
+                placeholder="Enter task description" 
+                value={formData.description} 
+                onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                style={{ minHeight: '80px' }} 
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontSize: '14px', 
+                fontWeight: '500',
+                color: 'rgba(55, 53, 47, 0.85)'
+              }}>
+                Project
+              </label>
+              <select 
+                value={formData.project_id} 
+                onChange={(e) => setFormData({...formData, project_id: e.target.value})}
+              >
+                <option value="">No Project</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name || project.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : '1fr 1fr', 
+              gap: '16px',
+              marginBottom: '16px'
+            }}>
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '6px', 
+                  fontSize: '14px', 
+                  fontWeight: '500',
+                  color: 'rgba(55, 53, 47, 0.85)'
+                }}>
+                  Priority
+                </label>
+                <select 
+                  value={formData.priority} 
+                  onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '6px', 
+                  fontSize: '14px', 
+                  fontWeight: '500',
+                  color: 'rgba(55, 53, 47, 0.85)'
+                }}>
+                  Status
+                </label>
+                <select 
+                  value={formData.status} 
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                >
+                  <option value="pending">To Do</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="done">Done</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontSize: '14px', 
+                fontWeight: '500',
+                color: 'rgba(55, 53, 47, 0.85)'
+              }}>
+                Due Date
+              </label>
+              <input 
+                type="date" 
+                value={formData.due_date} 
+                onChange={(e) => setFormData({...formData, due_date: e.target.value})} 
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button type="submit" className="btn-primary">
+                {editingTask ? 'Update Task' : 'Create Task'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingTask(null); setFormData({ title: '', description: '', priority: 'medium', status: 'todo', due_date: '', project_id: '' }); }}>
+              <button 
+                type="button" 
+                onClick={() => { 
+                  setShowForm(false); 
+                  setEditingTask(null); 
+                  setFormData({ title: '', description: '', priority: 'medium', status: 'pending', due_date: '', project_id: '' }); 
+                }}
+              >
                 Cancel
               </button>
             </div>
@@ -368,17 +524,17 @@ const Tasks = () => {
                         </p>
                       )}
                       
-                      {task.due_date && (
+                      {(task.due_date || task.dueDate) && (
                         <p style={{ 
                           fontSize: '11px', 
-                          color: new Date(task.due_date) < new Date() ? '#eb5757' : 'rgba(55, 53, 47, 0.5)', 
+                          color: new Date(task.due_date || task.dueDate) < new Date() ? '#eb5757' : 'rgba(55, 53, 47, 0.5)', 
                           marginBottom: '8px',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '4px'
                         }}>
-                          {new Date(task.due_date).toLocaleDateString()}
-                          {new Date(task.due_date) < new Date() && <span style={{ color: '#eb5757', fontWeight: 'bold' }}> • Overdue</span>}
+                          {new Date(task.due_date || task.dueDate).toLocaleDateString()}
+                          {new Date(task.due_date || task.dueDate) < new Date() && <span style={{ color: '#eb5757', fontWeight: 'bold' }}> • Overdue</span>}
                         </p>
                       )}
                       
@@ -427,7 +583,9 @@ const Tasks = () => {
                 </tr>
               </thead>
               <tbody>
-                {tasks.map(task => (
+                {tasks
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map(task => (
                   <tr 
                     key={task.id} 
                     style={{ 
@@ -444,7 +602,9 @@ const Tasks = () => {
                       <span className={`status-badge priority-${task.priority}`}>{task.priority}</span>
                     </td>
                     <td style={{ padding: '12px' }}>{columns[task.status]?.title}</td>
-                    <td style={{ padding: '12px' }}>{task.due_date ? new Date(task.due_date).toLocaleDateString() : '-'}</td>
+                    <td style={{ padding: '12px' }}>
+                      {(task.due_date || task.dueDate) ? new Date(task.due_date || task.dueDate).toLocaleDateString() : '-'}
+                    </td>
                     <td style={{ padding: '12px', textAlign: 'right' }}>
                       <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                         <button 
@@ -474,6 +634,17 @@ const Tasks = () => {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(tasks.length / itemsPerPage)}
+            totalItems={tasks.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(value) => {
+              setItemsPerPage(value);
+              setCurrentPage(1);
+            }}
+          />
         </div>
       )}
 

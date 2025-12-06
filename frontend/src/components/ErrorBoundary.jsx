@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component {
   };
 
   handleGoHome = () => {
-    window.location.href = '/dashboard';
+    window.location.href = '/app/dashboard';
   };
 
   render() {

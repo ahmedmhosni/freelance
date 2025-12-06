@@ -45,7 +45,7 @@ const changelogRoutes = require('./routes/changelog');
 const announcementsRoutes = require('./routes/announcements');
 
 const { apiLimiter } = require('./middleware/rateLimiter');
-const { errorHandler } = require('./middleware/errorHandler');
+const { errorHandler } = require('./shared/middleware/errorHandler');
 const logger = require('./utils/logger');
 const { swaggerUi, specs } = require('./swagger');
 

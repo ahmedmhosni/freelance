@@ -50,6 +50,7 @@ class TimeEntryController extends BaseController {
     this.router.get('/', validateQueryParams, this.getAll.bind(this));
     this.router.get('/running', this.getRunningTimers.bind(this));
     this.router.get('/summary', validateQueryParams, this.getSummary.bind(this));
+    this.router.get('/grouped', validateQueryParams, this.getGroupedData.bind(this));
     this.router.get('/duration/total', validateQueryParams, this.getTotalDuration.bind(this));
     this.router.get('/duration/by-date', validateQueryParams, this.getDurationByDate.bind(this));
     this.router.get('/duration/task/:taskId', this.getDurationByTask.bind(this));
@@ -163,8 +164,18 @@ class TimeEntryController extends BaseController {
       // Get total duration
       const totalDuration = await this.timeEntryService.getTotalDuration(userId, start_date, end_date);
 
-      // Get duration by date
-      const durationByDate = await this.timeEntryService.getDurationByDate(userId, start_date, end_date);
+      // Get total entry count
+      const filters = {};
+      if (start_date) filters.startDate = start_date;
+      if (end_date) filters.endDate = end_date;
+      const allEntries = await this.timeEntryService.getAllForUser(userId, filters);
+      const completedEntries = allEntries.filter(entry => !entry.isRunning());
+
+      // Get duration by date (only if dates are provided)
+      let durationByDate = [];
+      if (start_date && end_date) {
+        durationByDate = await this.timeEntryService.getDurationByDate(userId, start_date, end_date);
+      }
 
       // Get running timers
       const runningTimers = await this.timeEntryService.getRunningTimers(userId);
@@ -179,6 +190,8 @@ class TimeEntryController extends BaseController {
       res.json({
         success: true,
         data: {
+          total_hours: totalDuration.minutes,
+          total_entries: completedEntries.length,
           totalDuration,
           durationByDate,
           runningTimers: runningTimers.map(entry => new TimeEntryResponseDTO(entry))
@@ -502,6 +515,40 @@ class TimeEntryController extends BaseController {
       res.json({
         success: true,
         data: durationByDate
+      });
+    });
+  }
+
+  /**
+   * Get grouped time tracking data
+   * GET /api/time-tracking/grouped
+   */
+  async getGroupedData(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const correlationId = req.correlationId;
+      const userId = req.user.id;
+      const { group_by, start_date, end_date } = req.query;
+
+      logger.info('Fetching grouped time tracking data', {
+        correlationId,
+        userId,
+        groupBy: group_by,
+        startDate: start_date,
+        endDate: end_date
+      });
+
+      const groupedData = await this.timeEntryService.getGroupedData(userId, group_by, start_date, end_date);
+
+      logger.info('Grouped data fetched successfully', {
+        correlationId,
+        userId,
+        groupBy: group_by,
+        count: groupedData.length
+      });
+
+      res.json({
+        success: true,
+        data: groupedData
       });
     });
   }

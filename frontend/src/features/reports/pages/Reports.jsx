@@ -1,5 +1,37 @@
 import { useState, useEffect } from 'react';
 import { api, logger } from '../../../shared';
+import { 
+  BarChart, Bar, PieChart, Pie, LineChart, Line, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
+  ResponsiveContainer, Cell 
+} from 'recharts';
+
+// Chart colors
+const COLORS = {
+  primary: '#2eaadc',
+  success: '#28a745',
+  warning: '#ffc107',
+  danger: '#dc3545',
+  info: '#17a2b8',
+  secondary: '#6c757d',
+  purple: '#6f42c1',
+  orange: '#fd7e14'
+};
+
+const STATUS_COLORS = {
+  draft: COLORS.secondary,
+  sent: COLORS.info,
+  paid: COLORS.success,
+  overdue: COLORS.danger,
+  cancelled: COLORS.secondary,
+  active: COLORS.success,
+  completed: COLORS.primary,
+  'on-hold': COLORS.warning,
+  todo: COLORS.secondary,
+  'in-progress': COLORS.info,
+  review: COLORS.warning,
+  done: COLORS.success
+};
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('financial');
@@ -137,6 +169,62 @@ const Reports = () => {
             </div>
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div className="card">
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Invoice Status Distribution</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={Object.entries(financialReport.byStatus).map(([status, count]) => ({
+                      name: status.charAt(0).toUpperCase() + status.slice(1),
+                      value: count
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {Object.keys(financialReport.byStatus).map((status, index) => (
+                      <Cell key={`cell-${index}`} fill={STATUS_COLORS[status] || COLORS.secondary} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="card">
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Revenue Overview</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={[
+                    { name: 'Paid', amount: financialReport.totalRevenue, color: COLORS.success },
+                    { name: 'Pending', amount: financialReport.pendingAmount, color: COLORS.info },
+                    { name: 'Overdue', amount: financialReport.overdueAmount, color: COLORS.danger }
+                  ]}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                  <Bar dataKey="amount" fill={COLORS.primary}>
+                    {[
+                      { name: 'Paid', amount: financialReport.totalRevenue },
+                      { name: 'Pending', amount: financialReport.pendingAmount },
+                      { name: 'Overdue', amount: financialReport.overdueAmount }
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? COLORS.success : index === 1 ? COLORS.info : COLORS.danger} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
           <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Invoice Breakdown</h2>
@@ -161,30 +249,62 @@ const Reports = () => {
 
       {activeTab === 'projects' && projectReport && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '32px' }}>
-            <div className="card" style={{ padding: '20px' }}>
-              <h2 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Projects Overview</h2>
-              <p style={{ fontSize: '48px', fontWeight: '600', color: '#37352f', margin: '20px 0' }}>{projectReport.totalProjects}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginTop: '20px' }}>
-                {Object.entries(projectReport.byStatus).map(([status, count]) => (
-                  <div key={status} style={{ padding: '12px', background: 'rgba(55, 53, 47, 0.03)', borderRadius: '3px', border: '1px solid rgba(55, 53, 47, 0.09)' }}>
-                    <p style={{ fontSize: '20px', fontWeight: '600', color: '#37352f' }}>{count}</p>
-                    <p style={{ fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)', textTransform: 'capitalize' }}>{status}</p>
-                  </div>
-                ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '20px' }}>
+            <div className="card">
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Projects by Status</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={Object.entries(projectReport.byStatus).map(([status, count]) => ({
+                      name: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '),
+                      value: count
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => percent > 0 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {Object.keys(projectReport.byStatus).map((status, index) => (
+                      <Cell key={`cell-${index}`} fill={STATUS_COLORS[status] || COLORS.secondary} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <p style={{ fontSize: '32px', fontWeight: '600', color: '#37352f' }}>{projectReport.totalProjects}</p>
+                <p style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>Total Projects</p>
               </div>
             </div>
 
-            <div className="card" style={{ padding: '20px' }}>
-              <h2 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Tasks Overview</h2>
-              <p style={{ fontSize: '48px', fontWeight: '600', color: '#37352f', margin: '20px 0' }}>{projectReport.totalTasks}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginTop: '20px' }}>
-                {Object.entries(projectReport.tasksByStatus).map(([status, count]) => (
-                  <div key={status} style={{ padding: '12px', background: 'rgba(55, 53, 47, 0.03)', borderRadius: '3px', border: '1px solid rgba(55, 53, 47, 0.09)' }}>
-                    <p style={{ fontSize: '20px', fontWeight: '600', color: '#37352f' }}>{count}</p>
-                    <p style={{ fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)', textTransform: 'capitalize' }}>{status.replace('-', ' ')}</p>
-                  </div>
-                ))}
+            <div className="card">
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Tasks by Status</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={Object.entries(projectReport.tasksByStatus).map(([status, count]) => ({
+                    name: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '),
+                    count: count,
+                    status: status
+                  }))}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill={COLORS.primary}>
+                    {Object.keys(projectReport.tasksByStatus).map((status, index) => (
+                      <Cell key={`cell-${index}`} fill={STATUS_COLORS[status] || COLORS.secondary} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <p style={{ fontSize: '32px', fontWeight: '600', color: '#37352f' }}>{projectReport.totalTasks}</p>
+                <p style={{ fontSize: '13px', color: 'rgba(55, 53, 47, 0.65)' }}>Total Tasks</p>
               </div>
             </div>
           </div>
@@ -202,38 +322,74 @@ const Reports = () => {
       )}
 
       {activeTab === 'clients' && clientReport && (
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>Client Performance</h2>
-            <button
-              onClick={() => exportToCSV(clientReport, 'clients-report.csv')}
-              className="btn-primary"
-            >
-              Export CSV
-            </button>
-          </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #ddd' }}>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Client</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Company</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Projects</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Invoices</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Total Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clientReport.map(client => (
-                <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '10px' }}><strong>{client.name}</strong></td>
-                  <td style={{ padding: '10px' }}>{client.company || '-'}</td>
-                  <td style={{ padding: '10px' }}>{client.projectCount}</td>
-                  <td style={{ padding: '10px' }}>{client.invoiceCount}</td>
-                  <td style={{ padding: '10px', fontWeight: '600' }}>${client.totalRevenue.toFixed(2)}</td>
+        <div>
+          {clientReport.length > 0 && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Top Clients by Revenue</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={clientReport
+                    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                    .slice(0, 10)
+                    .map(client => ({
+                      name: client.name.length > 15 ? client.name.substring(0, 15) + '...' : client.name,
+                      revenue: client.totalRevenue,
+                      projects: client.projectCount,
+                      invoices: client.invoiceCount
+                    }))}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      if (name === 'revenue') return [`$${value.toFixed(2)}`, 'Revenue'];
+                      if (name === 'projects') return [value, 'Projects'];
+                      if (name === 'invoices') return [value, 'Invoices'];
+                      return value;
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="revenue" fill={COLORS.success} name="Revenue" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Client Performance</h2>
+              <button
+                onClick={() => exportToCSV(clientReport, 'clients-report.csv')}
+                className="btn-primary"
+              >
+                Export CSV
+              </button>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Client</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Company</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Projects</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Invoices</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Total Revenue</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {clientReport.map(client => (
+                  <tr key={client.id} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '10px' }}><strong>{client.name}</strong></td>
+                    <td style={{ padding: '10px' }}>{client.company || '-'}</td>
+                    <td style={{ padding: '10px' }}>{client.projectCount}</td>
+                    <td style={{ padding: '10px' }}>{client.invoiceCount}</td>
+                    <td style={{ padding: '10px', fontWeight: '600' }}>${client.totalRevenue.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -274,6 +430,92 @@ const Reports = () => {
               </div>
             </div>
           </div>
+
+          {/* Time Tracking Charts */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            {timeTrackingTasks.length > 0 && (
+              <div className="card">
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Top 10 Tasks by Hours</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={timeTrackingTasks
+                      .sort((a, b) => parseFloat(b.total_hours) - parseFloat(a.total_hours))
+                      .slice(0, 10)
+                      .map(task => ({
+                        name: (task.task_title || 'No Task').length > 20 
+                          ? (task.task_title || 'No Task').substring(0, 20) + '...' 
+                          : (task.task_title || 'No Task'),
+                        hours: parseFloat(task.total_hours || 0)
+                      }))}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`${value}h`, 'Hours']} />
+                    <Bar dataKey="hours" fill={COLORS.primary} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {timeTrackingProjects.length > 0 && (
+              <div className="card">
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Top 10 Projects by Hours</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={timeTrackingProjects
+                      .sort((a, b) => parseFloat(b.total_hours) - parseFloat(a.total_hours))
+                      .slice(0, 10)
+                      .map(project => ({
+                        name: (project.project_name || 'No Project').length > 20 
+                          ? (project.project_name || 'No Project').substring(0, 20) + '...' 
+                          : (project.project_name || 'No Project'),
+                        hours: parseFloat(project.total_hours || 0)
+                      }))}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`${value}h`, 'Hours']} />
+                    <Bar dataKey="hours" fill={COLORS.success} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {timeTrackingClients.length > 0 && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Time Distribution by Client</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={timeTrackingClients
+                      .sort((a, b) => parseFloat(b.total_hours) - parseFloat(a.total_hours))
+                      .slice(0, 8)
+                      .map(client => ({
+                        name: client.client_name || 'No Client',
+                        value: parseFloat(client.total_hours || 0)
+                      }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => percent > 0.05 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {timeTrackingClients.slice(0, 8).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % Object.values(COLORS).length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${value}h`, 'Hours']} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
 
           <div className="card" style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>

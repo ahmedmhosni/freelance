@@ -16,6 +16,20 @@ class BaseRepository {
   }
 
   /**
+   * Convert camelCase to snake_case
+   * @param {string} str - camelCase string
+   * @returns {string} snake_case string
+   */
+  toSnakeCase(str) {
+    // If already in snake_case (no uppercase letters), return as is
+    if (!/[A-Z]/.test(str)) {
+      return str;
+    }
+    // Convert camelCase to snake_case
+    return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+  }
+
+  /**
    * Find a record by ID
    * @param {number|string} id - Record ID
    * @returns {Promise<Object|null>} Record or null if not found
@@ -76,8 +90,18 @@ class BaseRepository {
    * @returns {Promise<Object>} Created record
    */
   async create(data) {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
+    // Convert all keys to snake_case and deduplicate
+    const snakeCaseData = {};
+    for (const [key, value] of Object.entries(data)) {
+      const snakeKey = this.toSnakeCase(key);
+      // Only set if not already set (prefer first occurrence)
+      if (!(snakeKey in snakeCaseData)) {
+        snakeCaseData[snakeKey] = value;
+      }
+    }
+    
+    const keys = Object.keys(snakeCaseData);
+    const values = Object.values(snakeCaseData);
     
     const columns = keys.join(', ');
     const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
@@ -98,8 +122,18 @@ class BaseRepository {
    * @returns {Promise<Object|null>} Updated record or null if not found
    */
   async update(id, data) {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
+    // Convert all keys to snake_case and deduplicate
+    const snakeCaseData = {};
+    for (const [key, value] of Object.entries(data)) {
+      const snakeKey = this.toSnakeCase(key);
+      // Only set if not already set (prefer first occurrence)
+      if (!(snakeKey in snakeCaseData)) {
+        snakeCaseData[snakeKey] = value;
+      }
+    }
+    
+    const keys = Object.keys(snakeCaseData);
+    const values = Object.values(snakeCaseData);
     
     const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
     

@@ -16,7 +16,8 @@ const TimerWidget = () => {
     fetchActiveTimer();
     fetchTasks();
     fetchProjects();
-    const interval = setInterval(fetchActiveTimer, 5000);
+    // Poll for active timer every 10 seconds to catch changes from other tabs/devices
+    const interval = setInterval(fetchActiveTimer, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -52,12 +53,17 @@ const TimerWidget = () => {
 
   const fetchActiveTimer = async () => {
     try {
-      const response = await api.get('/time-tracking');
+      const response = await api.get('/time-tracking/running');
       const entries = response.data.data || response.data;
-      const running = entries.find(e => e.is_running === 1);
-      setActiveEntry(running || null);
+      // The /running endpoint returns only running timers
+      if (Array.isArray(entries) && entries.length > 0) {
+        setActiveEntry(entries[0]);
+      } else {
+        setActiveEntry(null);
+      }
     } catch (error) {
       logger.error('Error fetching timer:', error);
+      setActiveEntry(null);
     }
   };
 
@@ -100,7 +106,7 @@ const TimerWidget = () => {
   const stopTimer = async () => {
     if (!activeEntry) return;
     try {
-      await api.post(`/time-tracking/stop/${activeEntry.id}`);
+      await api.post(`/time-tracking/${activeEntry.id}/stop`);
       await fetchActiveTimer();
       setElapsedTime(0);
     } catch (error) {

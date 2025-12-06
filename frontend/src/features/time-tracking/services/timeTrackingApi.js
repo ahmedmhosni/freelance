@@ -50,7 +50,7 @@ export const startTimer = async (entryData) => {
  * @returns {Promise<Object>} Updated time entry data
  */
 export const stopTimer = async (id) => {
-  const response = await api.post(`/time-tracking/stop/${id}`);
+  const response = await api.post(`/time-tracking/${id}/stop`);
   return response.data;
 };
 

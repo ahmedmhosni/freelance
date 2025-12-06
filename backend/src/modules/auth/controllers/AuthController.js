@@ -1,12 +1,14 @@
 const express = require('express');
+const BaseController = require('../../../shared/base/BaseController');
 const { authenticateToken } = require('../../../middleware/auth');
 
 /**
  * Authentication Controller
  * Handles HTTP requests for authentication
  */
-class AuthController {
+class AuthController extends BaseController {
   constructor(authService) {
+    super(authService);
     this.authService = authService;
     this.router = express.Router();
     this.initializeRoutes();
@@ -32,11 +34,34 @@ class AuthController {
     try {
       const { name, email, password, role } = req.body;
 
-      // Basic validation
-      if (!name || !email || !password) {
+      // Validation - check for presence and non-whitespace
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'Name, email, and password are required'
+          error: 'Valid name is required'
+        });
+      }
+
+      if (!email || typeof email !== 'string' || email.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid email is required'
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email format'
+        });
+      }
+
+      if (!password || typeof password !== 'string' || password.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid password is required'
         });
       }
 
@@ -70,11 +95,18 @@ class AuthController {
     try {
       const { email, password } = req.body;
 
-      // Basic validation
-      if (!email || !password) {
+      // Validation - check for presence and non-whitespace
+      if (!email || typeof email !== 'string' || email.trim().length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'Email and password are required'
+          error: 'Valid email is required'
+        });
+      }
+
+      if (!password || typeof password !== 'string' || password.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid password is required'
         });
       }
 

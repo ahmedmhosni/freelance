@@ -275,27 +275,65 @@ class TimeEntryService extends BaseService {
   /**
    * Get duration grouped by date
    * @param {number} userId - User ID
-   * @param {Date|string} startDate - Start date
-   * @param {Date|string} endDate - End date
+   * @param {Date|string} startDate - Start date (optional)
+   * @param {Date|string} endDate - End date (optional)
    * @returns {Promise<Array>} Array of objects with date and duration
    */
-  async getDurationByDate(userId, startDate, endDate) {
+  async getDurationByDate(userId, startDate = null, endDate = null) {
+    // If dates are provided, validate them
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new ValidationError('Invalid date format');
+      }
+
+      if (end < start) {
+        throw new ValidationError('End date must be after start date');
+      }
+    }
+
+    // If no dates provided, use a default range (e.g., last 30 days)
     if (!startDate || !endDate) {
-      throw new ValidationError('Start date and end date are required');
-    }
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      throw new ValidationError('Invalid date format');
-    }
-
-    if (end < start) {
-      throw new ValidationError('End date must be after start date');
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - 30);
+      startDate = start.toISOString().split('T')[0];
+      endDate = end.toISOString().split('T')[0];
     }
 
     return await this.repository.getDurationByDate(userId, startDate, endDate);
+  }
+
+  /**
+   * Get time entries grouped by task, project, or client
+   * @param {number} userId - User ID
+   * @param {string} groupBy - Group by field (task, project, client)
+   * @param {Date|string} startDate - Start date (optional)
+   * @param {Date|string} endDate - End date (optional)
+   * @returns {Promise<Array>} Array of grouped time tracking data
+   */
+  async getGroupedData(userId, groupBy, startDate = null, endDate = null) {
+    if (!['task', 'project', 'client'].includes(groupBy)) {
+      throw new ValidationError('group_by must be task, project, or client');
+    }
+
+    // Validate dates if provided
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new ValidationError('Invalid date format');
+      }
+
+      if (end < start) {
+        throw new ValidationError('End date must be after start date');
+      }
+    }
+
+    return await this.repository.getGroupedData(userId, groupBy, startDate, endDate);
   }
 
   /**

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Pagination, ConfirmDialog, LoadingSkeleton } from '../../../shared';
 import { exportClientsCSV, logger } from '../../../shared';
@@ -6,6 +7,7 @@ import { MdPeople, MdFileDownload } from 'react-icons/md';
 import { fetchClients, createClient, updateClient, deleteClient } from '../services/clientApi';
 
 const Clients = () => {
+  const location = useLocation();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +22,15 @@ const Clients = () => {
   useEffect(() => {
     loadClients();
   }, [pagination.page, searchTerm]);
+
+  // Handle edit from navigation state
+  useEffect(() => {
+    if (location.state?.editClient) {
+      handleEdit(location.state.editClient);
+      // Clear the state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const loadClients = async () => {
     setLoading(true);
@@ -64,7 +75,14 @@ const Clients = () => {
 
   const handleEdit = (client) => {
     setEditingClient(client);
-    setFormData(client);
+    setFormData({
+      name: client.name || '',
+      email: client.email || '',
+      phone: client.phone || '',
+      company: client.company || '',
+      notes: client.notes || '',
+      tags: client.tags || ''
+    });
     setShowForm(true);
   };
 

@@ -44,9 +44,9 @@ const Changelog = lazy(() => import('./features/changelog').then(m => ({ default
 const Announcements = lazy(() => import('./features/announcements').then(m => ({ default: m.Announcements })));
 const AnnouncementDetail = lazy(() => import('./features/announcements').then(m => ({ default: m.AnnouncementDetail })));
 
-// Pages not yet moved to features (keep direct imports for now)
-import ComingSoon from './pages/ComingSoon';
-import LoaderTest from './pages/LoaderTest';
+// Utility pages (moved to shared)
+import ComingSoon from './shared/pages/ComingSoon';
+import LoaderTest from './shared/pages/LoaderTest';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();

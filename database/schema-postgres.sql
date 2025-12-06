@@ -166,18 +166,27 @@ CREATE INDEX idx_invoices_invoice_number ON invoices(invoice_number);
 CREATE TABLE invoice_items (
     id SERIAL PRIMARY KEY,
     invoice_id INTEGER NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+    project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+    task_id INTEGER REFERENCES tasks(id) ON DELETE SET NULL,
     description TEXT NOT NULL,
-    item_type VARCHAR(20) DEFAULT 'fixed',
-    quantity DECIMAL(10, 2) DEFAULT 1,
-    rate DECIMAL(10, 2) NOT NULL,
+    
+    -- Fixed price fields
+    quantity DECIMAL(10, 2) NOT NULL DEFAULT 1,
+    unit_price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    
+    -- Hourly billing fields
+    hours_worked DECIMAL(10, 2),
+    rate_per_hour DECIMAL(10, 2),
+    
+    -- Calculated amount
     amount DECIMAL(10, 2) NOT NULL,
-    tax_rate DECIMAL(5, 2) DEFAULT 0,
-    tax_amount DECIMAL(10, 2) DEFAULT 0,
-    total DECIMAL(10, 2) NOT NULL,
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_invoice_items_invoice_id ON invoice_items(invoice_id);
+CREATE INDEX idx_invoice_items_project_id ON invoice_items(project_id);
+CREATE INDEX idx_invoice_items_task_id ON invoice_items(task_id);
 
 -- ============================================
 -- NOTIFICATIONS TABLE

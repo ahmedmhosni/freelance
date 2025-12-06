@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { ConfirmDialog, LoadingSkeleton, exportInvoicesCSV, generateInvoiceNumber, logger } from '../../../shared';
+import { ConfirmDialog, LoadingSkeleton, exportInvoicesCSV, generateInvoiceNumber, logger, Pagination } from '../../../shared';
 import InvoiceForm from '../components/InvoiceForm';
 import { MdReceipt, MdAttachMoney, MdFileDownload } from 'react-icons/md';
 import { fetchInvoices, deleteInvoice, downloadInvoicePDF } from '../services/invoiceApi';
@@ -13,6 +13,8 @@ const Invoices = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, invoiceId: null });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   useEffect(() => {
     loadInvoices();
@@ -23,7 +25,8 @@ const Invoices = () => {
     setLoading(true);
     try {
       const response = await fetchInvoices();
-      const data = response.data || response;
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
       setInvoices(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching invoices:', error);
@@ -36,7 +39,8 @@ const Invoices = () => {
   const loadClients = async () => {
     try {
       const response = await fetchClients();
-      const data = response.data || response;
+      // Handle nested response structure: response.data.data or response.data
+      const data = response.data?.data || response.data || response;
       setClients(Array.isArray(data) ? data : []);
     } catch (error) {
       logger.error('Error fetching clients:', error);
@@ -256,16 +260,18 @@ const Invoices = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map(invoice => (
+                  {invoices
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map(invoice => (
                     <tr key={invoice.id} style={{ borderBottom: '1px solid #eee' }}>
                       <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px' }}>
-                        <strong style={{ fontFamily: 'inherit' }}>{invoice.invoice_number}</strong>
+                        <strong style={{ fontFamily: 'inherit' }}>{invoice.invoice_number || invoice.invoiceNumber || '-'}</strong>
                       </td>
                       <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
-                        {invoice.client_name || '-'}
+                        {invoice.client_name || invoice.clientName || '-'}
                       </td>
                       <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '12px', color: 'rgba(55, 53, 47, 0.65)' }}>
-                        {invoice.item_count || 0} {invoice.item_count === 1 ? 'item' : 'items'}
+                        {(invoice.item_count || invoice.itemCount || 0)} {(invoice.item_count || invoice.itemCount) === 1 ? 'item' : 'items'}
                       </td>
                       <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', textAlign: 'right', fontWeight: '500' }}>
                         ${parseFloat(invoice.total || invoice.amount || 0).toFixed(2)}
@@ -276,7 +282,7 @@ const Invoices = () => {
                         </span>
                       </td>
                       <td style={{ padding: '12px', fontFamily: 'inherit', fontSize: '13px', color: 'rgba(55, 53, 47, 0.9)' }}>
-                        {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}
+                        {(invoice.due_date || invoice.dueDate) ? new Date(invoice.due_date || invoice.dueDate).toLocaleDateString() : '-'}
                       </td>
                       <td style={{ padding: '12px', textAlign: 'right' }}>
                         <div className="table-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
@@ -308,6 +314,20 @@ const Invoices = () => {
                 </tbody>
               </table>
             </div>
+          )}
+
+          {invoices.length > 0 && Math.ceil(invoices.length / itemsPerPage) > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(invoices.length / itemsPerPage)}
+              totalItems={invoices.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(value) => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
+            />
           )}
         </div>
       )}

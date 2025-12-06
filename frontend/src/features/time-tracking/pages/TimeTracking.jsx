@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { logger } from '../../../shared';
+import { logger, api, Pagination } from '../../../shared';
 import { 
   fetchTimeEntries, 
   startTimer, 
@@ -19,15 +19,33 @@ const TimeTracking = () => {
   const [summary, setSummary] = useState({ total_hours: 0, total_entries: 0 });
   const [viewMode, setViewMode] = useState('entries'); // 'entries', 'tasks', 'projects', 'clients'
   const [groupedData, setGroupedData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [formData, setFormData] = useState({
     task_id: '', project_id: '', description: ''
   });
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {
     loadEntries();
     loadTasks();
     loadProjects();
     loadSummary();
+    
+    // Update current time every second for live timer display
+    const timeInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    
+    // Refresh active timer every 30 seconds to catch changes
+    const timerInterval = setInterval(() => {
+      loadActiveTimer();
+    }, 30000);
+    
+    return () => {
+      clearInterval(timeInterval);
+      clearInterval(timerInterval);
+    };
   }, []);
 
   const loadEntries = async () => {
@@ -37,12 +55,24 @@ const TimeTracking = () => {
       const entriesData = Array.isArray(data) ? data : [];
       setEntries(entriesData);
       
-      // Check for active timer
-      const running = entriesData.find(e => e.is_running === 1);
-      setActiveEntry(running || null);
+      // Check for active timer using the dedicated endpoint
+      await loadActiveTimer();
     } catch (error) {
       logger.error('Error fetching entries:', error);
       setEntries([]);
+      setActiveEntry(null);
+    }
+  };
+
+  const loadActiveTimer = async () => {
+    try {
+      const response = await fetchTimeEntries();
+      const data = response.data || response;
+      const entriesData = Array.isArray(data) ? data : [];
+      const running = entriesData.find(e => e.is_running === 1 || e.is_running === true);
+      setActiveEntry(running || null);
+    } catch (error) {
+      logger.error('Error fetching active timer:', error);
       setActiveEntry(null);
     }
   };
@@ -98,7 +128,39 @@ const TimeTracking = () => {
     } else if (viewMode === 'clients') {
       loadGroupedData('client');
     }
+    // Reset to page 1 when changing views
+    setCurrentPage(1);
   }, [viewMode]);
+
+  // State to track existing time for selected task
+  const [taskExistingTime, setTaskExistingTime] = useState(null);
+
+  // Fetch existing time when task is selected
+  useEffect(() => {
+    if (formData.task_id) {
+      fetchTaskExistingTime(formData.task_id);
+    } else {
+      setTaskExistingTime(null);
+    }
+  }, [formData.task_id]);
+
+  const fetchTaskExistingTime = async (taskId) => {
+    try {
+      const response = await api.get(`/time-tracking/duration/task/${taskId}`);
+      const data = response.data?.data || response.data;
+      if (data && data.minutes) {
+        setTaskExistingTime({
+          minutes: data.minutes,
+          hours: (data.minutes / 60).toFixed(2)
+        });
+      } else {
+        setTaskExistingTime(null);
+      }
+    } catch (error) {
+      logger.error('Error fetching task time:', error);
+      setTaskExistingTime(null);
+    }
+  };
 
 
 
@@ -147,6 +209,20 @@ const TimeTracking = () => {
     const h = Math.floor(minutes / 60);
     const m = Math.round(minutes % 60);
     return `${h}h ${m}m`;
+  };
+
+  const calculateElapsedTime = (startTime) => {
+    if (!startTime) return 0;
+    const start = new Date(startTime).getTime();
+    const elapsed = Math.floor((currentTime - start) / 1000); // seconds
+    return elapsed > 0 ? elapsed : 0;
+  };
+
+  const formatElapsedTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const formatDate = (dateString) => {
@@ -203,13 +279,19 @@ const TimeTracking = () => {
         </div>
         <div className="card" style={{ padding: '16px' }}>
           <div className="stat-label" style={{ fontSize: '12px', marginBottom: '8px', fontWeight: '500' }}>
-            STATUS
+            {activeEntry ? 'CURRENT TIMER' : 'STATUS'}
           </div>
-          <div className="stat-value" style={{ fontSize: '28px', fontWeight: '600', marginBottom: '4px' }}>
-            {activeEntry ? 'Running' : 'Stopped'}
+          <div className="stat-value" style={{ 
+            fontSize: '28px', 
+            fontWeight: '600', 
+            marginBottom: '4px',
+            color: activeEntry ? '#28a745' : undefined,
+            fontVariantNumeric: 'tabular-nums'
+          }}>
+            {activeEntry ? formatElapsedTime(calculateElapsedTime(activeEntry.start_time)) : 'Stopped'}
           </div>
           <div className="stat-description" style={{ fontSize: '13px' }}>
-            {activeEntry ? 'Timer active' : 'No active timer'}
+            {activeEntry ? (activeEntry.description || 'Timer running') : 'No active timer'}
           </div>
         </div>
       </div>
@@ -242,6 +324,27 @@ const TimeTracking = () => {
             {activeEntry ? 'Stop' : 'Start'}
           </button>
         </div>
+        {taskExistingTime && formData.task_id && (
+          <div style={{ 
+            marginTop: '12px', 
+            padding: '10px 12px', 
+            background: 'rgba(40, 167, 69, 0.1)', 
+            borderRadius: '4px',
+            border: '1px solid rgba(40, 167, 69, 0.2)',
+            fontSize: '13px',
+            color: '#28a745',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <span style={{ fontWeight: '600' }}>⏱️ Existing time on this task:</span>
+            <span style={{ fontWeight: '700' }}>{taskExistingTime.hours} hours</span>
+            <span style={{ color: 'rgba(40, 167, 69, 0.7)' }}>({taskExistingTime.minutes} minutes)</span>
+            <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'rgba(40, 167, 69, 0.8)' }}>
+              New timer will add to this total
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="card">
@@ -280,20 +383,21 @@ const TimeTracking = () => {
         </div>
 
         {viewMode === 'entries' ? (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #ddd' }}>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Date</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Description</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Start</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>End</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Duration</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Status</th>
-                <th style={{ textAlign: 'right', padding: '10px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map(entry => (
+          <>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Date</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Description</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Start</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>End</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Duration</th>
+                  <th style={{ textAlign: 'left', padding: '10px' }}>Status</th>
+                  <th style={{ textAlign: 'right', padding: '10px' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(entry => (
                 <tr key={entry.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '10px' }}>{formatDate(entry.start_time)}</td>
                   <td style={{ padding: '10px' }}>
@@ -312,7 +416,15 @@ const TimeTracking = () => {
                   </td>
                   <td style={{ padding: '10px' }}>{formatTime(entry.start_time)}</td>
                   <td style={{ padding: '10px' }}>{formatTime(entry.end_time)}</td>
-                  <td style={{ padding: '10px', fontWeight: '600' }}>{formatDuration(entry.duration)}</td>
+                  <td style={{ padding: '10px', fontWeight: '600' }}>
+                    {entry.is_running ? (
+                      <span style={{ color: '#28a745', fontVariantNumeric: 'tabular-nums' }}>
+                        {formatElapsedTime(calculateElapsedTime(entry.start_time))}
+                      </span>
+                    ) : (
+                      formatDuration(entry.duration)
+                    )}
+                  </td>
                   <td style={{ padding: '10px' }}>
                     {entry.is_running ? (
                       <span className="status-badge status-active">Running</span>
@@ -339,9 +451,24 @@ const TimeTracking = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+
+            {Math.ceil(entries.length / itemsPerPage) > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(entries.length / itemsPerPage)}
+                totalItems={entries.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(value) => {
+                  setItemsPerPage(value);
+                  setCurrentPage(1);
+                }}
+              />
+            )}
+          </>
         ) : viewMode === 'tasks' ? (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>

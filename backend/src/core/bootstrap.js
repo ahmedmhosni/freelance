@@ -18,7 +18,7 @@ const { authenticateToken } = require('../middleware/auth');
 const { registerClientsModule } = require('../modules/clients');
 const { registerProjectsModule } = require('../modules/projects');
 const { registerTasksModule } = require('../modules/tasks');
-const { InvoiceController, InvoiceService, InvoiceRepository } = require('../modules/invoices');
+const { registerInvoicesModule } = require('../modules/invoices');
 const { registerTimeTrackingModule } = require('../modules/time-tracking');
 const { registerReportsModule } = require('../modules/reports');
 const { registerNotificationsModule } = require('../modules/notifications');
@@ -194,22 +194,7 @@ function registerModules(container) {
   logger.info('Tasks module registered');
 
   // Register invoices module
-  container.registerSingleton('invoiceRepository', (c) => 
-    new InvoiceRepository(c.resolve('database'))
-  );
-  container.registerSingleton('clientRepository', (c) => {
-    const { ClientRepository } = require('../modules/clients');
-    return new ClientRepository(c.resolve('database'));
-  });
-  container.registerTransient('invoiceService', (c) => 
-    new InvoiceService(
-      c.resolve('invoiceRepository'),
-      c.resolve('clientRepository')
-    )
-  );
-  container.registerSingleton('invoiceController', (c) => 
-    new InvoiceController(c.resolve('invoiceService'))
-  );
+  registerInvoicesModule(container);
   logger.info('Invoices module registered');
 
   // Register time tracking module

@@ -42,15 +42,18 @@ const TaskCalendar = ({ onTaskClick, onDateSelect }) => {
 
   const events = useMemo(() => {
     return tasks
-      .filter(task => task.due_date)
-      .map(task => ({
-        id: task.id,
-        title: task.title,
-        start: new Date(task.due_date),
-        end: new Date(task.due_date),
-        resource: task,
-        allDay: true,
-      }));
+      .filter(task => task.due_date || task.dueDate)
+      .map(task => {
+        const dueDate = task.due_date || task.dueDate;
+        return {
+          id: task.id,
+          title: task.title,
+          start: new Date(dueDate),
+          end: new Date(dueDate),
+          resource: task,
+          allDay: true,
+        };
+      });
   }, [tasks]);
 
   const eventStyleGetter = (event) => {

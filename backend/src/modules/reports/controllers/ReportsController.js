@@ -1,11 +1,13 @@
 const express = require('express');
+const BaseController = require('../../../shared/base/BaseController');
 const { authenticateToken } = require('../../../middleware/auth');
 
 /**
  * Reports Controller - Handles HTTP requests for reports
  */
-class ReportsController {
+class ReportsController extends BaseController {
   constructor(reportsService) {
+    super(reportsService);
     this.reportsService = reportsService;
     this.router = express.Router();
     this.initializeRoutes();

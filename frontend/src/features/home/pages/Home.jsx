@@ -174,7 +174,7 @@ const Home = () => {
             
             {isLoggedIn ? (
               <Link
-                to="/dashboard"
+                to="/app/dashboard"
                 className="header-btn-primary"
                 style={{
                   padding: '8px 16px',

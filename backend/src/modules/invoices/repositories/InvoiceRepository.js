@@ -161,6 +161,22 @@ class InvoiceRepository extends BaseRepository {
   }
 
   /**
+   * Find invoice by invoice number
+   * @param {string} invoiceNumber - Invoice number
+   * @returns {Promise<Invoice|null>} Invoice instance or null
+   */
+  async findByInvoiceNumber(invoiceNumber) {
+    const sql = `
+      SELECT * FROM ${this.tableName}
+      WHERE invoice_number = $1
+      LIMIT 1
+    `;
+    
+    const row = await this.db.queryOne(sql, [invoiceNumber]);
+    return row ? new Invoice(row) : null;
+  }
+
+  /**
    * Create a new invoice
    * @param {Object} data - Invoice data
    * @returns {Promise<Invoice>} Created Invoice instance

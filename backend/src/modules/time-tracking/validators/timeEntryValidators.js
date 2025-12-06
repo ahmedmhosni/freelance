@@ -189,6 +189,11 @@ const validateQueryParams = [
     .isInt({ min: 1, max: 100 })
     .withMessage('Limit must be between 1 and 100')
     .toInt(),
+  
+  query('group_by')
+    .optional()
+    .isIn(['task', 'project', 'client'])
+    .withMessage('group_by must be one of: task, project, client'),
 
   handleValidationErrors
 ];

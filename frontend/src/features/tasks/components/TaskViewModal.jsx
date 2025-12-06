@@ -14,10 +14,11 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
   };
 
   const statusLabels = {
-    todo: 'To Do',
+    pending: 'To Do',
     'in-progress': 'In Progress',
-    review: 'Review',
-    completed: 'Completed'
+    done: 'Done',
+    completed: 'Completed',
+    cancelled: 'Cancelled'
   };
 
   return (
@@ -147,7 +148,7 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
           background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(55, 53, 47, 0.03)',
           borderRadius: '4px'
         }}>
-          {task.due_date && (
+          {(task.due_date || task.dueDate) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MdAccessTime size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
               <div>
@@ -159,7 +160,7 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
                   Due Date
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date(task.due_date).toLocaleDateString('en-US', { 
+                  {new Date(task.due_date || task.dueDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
                     day: 'numeric' 
@@ -169,7 +170,7 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
             </div>
           )}
 
-          {task.project_name && (
+          {(task.project_name || task.projectName) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MdFolder size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
               <div>
@@ -181,13 +182,13 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
                   Project
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {task.project_name}
+                  {task.project_name || task.projectName}
                 </div>
               </div>
             </div>
           )}
 
-          {task.created_at && (
+          {(task.created_at || task.createdAt) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MdAccessTime size={18} style={{ color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(55, 53, 47, 0.4)' }} />
               <div>
@@ -199,7 +200,7 @@ const TaskViewModal = ({ task, onClose, onEdit, onDelete }) => {
                   Created
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date(task.created_at).toLocaleDateString('en-US', { 
+                  {new Date(task.created_at || task.createdAt).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 
                     day: 'numeric' 

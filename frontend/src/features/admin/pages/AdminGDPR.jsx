@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '../../../shared';
+import { useTheme, Pagination } from '../../../shared';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { MdDownload, MdDelete, MdRestore, MdEmail, MdPeople } from 'react-icons/md';
@@ -22,9 +22,14 @@ const AdminGDPR = () => {
   
   // Deletion reasons
   const [deletionReasons, setDeletionReasons] = useState([]);
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   useEffect(() => {
     fetchData();
+    setCurrentPage(1); // Reset to page 1 when changing tabs
   }, [activeTab]);
 
   const fetchData = async () => {
@@ -156,7 +161,7 @@ const AdminGDPR = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {exportRequests.map(request => (
+                      {exportRequests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(request => (
                         <tr key={request.id} style={{
                           borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
                         }}>
@@ -203,6 +208,20 @@ const AdminGDPR = () => {
                     </tbody>
                   </table>
                 </div>
+                
+                {Math.ceil(exportRequests.length / itemsPerPage) > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(exportRequests.length / itemsPerPage)}
+                    totalItems={exportRequests.length}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={(value) => {
+                      setItemsPerPage(value);
+                      setCurrentPage(1);
+                    }}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -248,7 +267,7 @@ const AdminGDPR = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {deletedAccounts.map(account => (
+                      {deletedAccounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(account => (
                         <tr key={account.id} style={{
                           borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
                         }}>
@@ -287,6 +306,20 @@ const AdminGDPR = () => {
                     </tbody>
                   </table>
                 </div>
+                
+                {Math.ceil(deletedAccounts.length / itemsPerPage) > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(deletedAccounts.length / itemsPerPage)}
+                    totalItems={deletedAccounts.length}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={(value) => {
+                      setItemsPerPage(value);
+                      setCurrentPage(1);
+                    }}
+                  />
+                )}
               </div>
             </div>
           )}
