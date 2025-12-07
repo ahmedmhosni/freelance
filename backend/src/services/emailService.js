@@ -37,7 +37,15 @@ class EmailService {
         },
         recipients: {
           to: [{ address: to }]
-        }
+        },
+        headers: {
+          'X-Mailer': emailConfig.azure.senderName || 'Roastify'
+        },
+        replyTo: [
+          {
+            address: emailConfig.templates.supportEmail || emailConfig.azure.senderEmail
+          }
+        ]
       };
 
       const poller = await this.client.beginSend(message);
@@ -141,7 +149,7 @@ class EmailService {
 
     return this.sendEmail({
       to: user.email,
-      subject: `Verify your ${emailConfig.templates.appName} account`,
+      subject: `✉️ Verify Your Email Address - ${emailConfig.templates.appName}`,
       html,
       text
     });
@@ -217,7 +225,7 @@ class EmailService {
 
     return this.sendEmail({
       to: user.email,
-      subject: `Reset your ${emailConfig.templates.appName} password`,
+      subject: `🔐 Password Reset Request - ${emailConfig.templates.appName}`,
       html,
       text
     });
@@ -294,7 +302,7 @@ class EmailService {
 
     return this.sendEmail({
       to: user.email,
-      subject: `Welcome to ${emailConfig.templates.appName}! 🎉`,
+      subject: `🎉 Welcome to ${emailConfig.templates.appName} - Your Account is Ready!`,
       html,
       text
     });
@@ -305,8 +313,8 @@ class EmailService {
    */
   async sendInvoiceEmail(user, invoice, type = 'sent') {
     const subject = type === 'sent' 
-      ? `Invoice ${invoice.invoice_number} has been sent`
-      : `Invoice ${invoice.invoice_number} has been paid`;
+      ? `📄 Invoice ${invoice.invoice_number} Sent Successfully`
+      : `✅ Invoice ${invoice.invoice_number} Payment Received`;
 
     const html = `
       <!DOCTYPE html>
@@ -407,7 +415,7 @@ class EmailService {
 
     return this.sendEmail({
       to: user.email,
-      subject: `⏰ Task Reminder: ${task.title}`,
+      subject: `⏰ Task Due Soon: ${task.title} - ${emailConfig.templates.appName}`,
       html,
       text: `Task Reminder: ${task.title}\nDue: ${new Date(task.due_date).toLocaleDateString()}\nPriority: ${task.priority}`
     });

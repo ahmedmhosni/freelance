@@ -7,7 +7,8 @@ module.exports = {
   // Azure Communication Services
   azure: {
     connectionString: process.env.AZURE_COMMUNICATION_CONNECTION_STRING,
-    senderEmail: process.env.EMAIL_FROM || 'noreply@yourdomain.com'
+    senderEmail: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
+    senderName: process.env.EMAIL_FROM_NAME || 'Roastify'
   },
 
   // Email Templates Configuration
