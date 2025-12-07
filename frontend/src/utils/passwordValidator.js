@@ -25,9 +25,8 @@ export const validatePassword = (password) => {
     errors.push('Password must contain at least one number');
   }
 
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
-  }
+  // Note: Special character requirement removed to match backend validation
+  // Backend only requires: length >= 8, uppercase, lowercase, and number
 
   return {
     isValid: errors.length === 0,
@@ -72,7 +71,7 @@ export const getPasswordRequirements = (password) => {
     minLength: password.length >= 8,
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    hasNumber: /\d/.test(password)
+    // hasSpecialChar removed to match backend requirements
   };
 };
