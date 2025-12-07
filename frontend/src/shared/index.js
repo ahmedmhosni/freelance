@@ -23,6 +23,10 @@ export { default as SecurityInfo } from './components/SecurityInfo';
 // Layouts
 export { default as Layout } from './layouts/Layout';
 
+// Pages
+export { default as NotFound } from './pages/NotFound';
+export { default as ServerError } from './pages/ServerError';
+
 // Context
 export { AuthProvider, useAuth } from './context/AuthContext';
 export { ThemeProvider, useTheme } from './context/ThemeContext';
