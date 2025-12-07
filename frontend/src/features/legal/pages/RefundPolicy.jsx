@@ -73,7 +73,7 @@ const RefundPolicy = () => {
             color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
             marginBottom: '48px'
           }}>
-            Last updated: November 10, 2024
+            Last updated: November 10, 2025
           </p>
 
           <div style={{
