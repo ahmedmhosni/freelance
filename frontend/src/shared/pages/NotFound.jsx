@@ -78,15 +78,13 @@ const NotFound = () => {
           {isDark ? <MdLightMode size={24} color="#fff" /> : <MdDarkMode size={24} color="#000" />}
         </button>
 
-        <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '700px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* 404 Number */}
-          <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '24px' }}>
             <h1 style={{
-              fontSize: '140px',
+              fontSize: '100px',
               fontWeight: '700',
-              background: isDark
-                ? 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)'
-                : 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -99,39 +97,33 @@ const NotFound = () => {
           </div>
 
           {/* Error Message */}
-          <div style={{ marginBottom: '48px' }}>
+          <div style={{ marginBottom: '32px' }}>
             <h2 style={{
-              fontSize: '32px',
+              fontSize: '28px',
               fontWeight: '600',
-              color: isDark ? '#ffffff' : '#0a0a0a',
-              marginBottom: '16px',
+              color: isDark ? '#ffffff' : '#37352f',
+              marginBottom: '12px',
               letterSpacing: '-0.01em'
             }}>
               Page Not Found
             </h2>
             <p style={{
-              fontSize: '18px',
-              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-              marginBottom: '8px',
-              lineHeight: '1.6'
+              fontSize: '16px',
+              color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.65)',
+              lineHeight: '1.6',
+              maxWidth: '480px',
+              margin: '0 auto'
             }}>
-              Oops! The page you're looking for doesn't exist.
-            </p>
-            <p style={{
-              fontSize: '14px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)',
-              lineHeight: '1.6'
-            }}>
-              It might have been moved or deleted, or you may have mistyped the URL.
+              The page you're looking for doesn't exist. It might have been moved or deleted.
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Homepage Style */}
           <div style={{
             display: 'flex',
-            gap: '16px',
+            gap: '12px',
             justifyContent: 'center',
-            marginBottom: '48px',
+            marginBottom: '32px',
             flexWrap: 'wrap'
           }}>
             <Link
@@ -140,34 +132,27 @@ const NotFound = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '500',
-                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
                 color: '#ffffff',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                 border: 'none',
-                cursor: 'pointer',
-                boxShadow: isDark
-                  ? '0 4px 20px rgba(99, 102, 241, 0.3)'
-                  : '0 4px 20px rgba(99, 102, 241, 0.25)'
+                borderRadius: '3px',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = isDark
-                  ? '0 6px 25px rgba(99, 102, 241, 0.4)'
-                  : '0 6px 25px rgba(99, 102, 241, 0.35)';
+                e.target.style.opacity = '0.9';
+                e.target.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
+                e.target.style.opacity = '1';
                 e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = isDark
-                  ? '0 4px 20px rgba(99, 102, 241, 0.3)'
-                  : '0 4px 20px rgba(99, 102, 241, 0.25)';
               }}
             >
-              <MdHome size={20} />
+              <MdHome size={18} />
               Go to Homepage
             </Link>
 
@@ -177,53 +162,50 @@ const NotFound = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '500',
-                background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                color: isDark ? '#ffffff' : '#0a0a0a',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                background: 'transparent',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                borderRadius: '3px',
                 textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                border: 'none',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)'
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.03)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
-                e.target.style.transform = 'translateY(0)';
+                e.target.style.background = 'transparent';
               }}
             >
-              <MdArrowBack size={20} />
+              <MdArrowBack size={18} />
               Go Back
             </button>
           </div>
 
-          {/* Quick Links Card */}
+          {/* Quick Links Card - Compact */}
           <div style={{
-            background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-            borderRadius: '16px',
-            padding: '32px',
+            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+            borderRadius: '8px',
+            padding: '24px',
             backdropFilter: 'blur(20px)',
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.05)',
-            marginBottom: '32px'
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
+            marginBottom: '20px'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
-              marginBottom: '24px'
+              gap: '6px',
+              marginBottom: '16px'
             }}>
-              <MdSearch size={20} color={isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.5)'} />
+              <MdSearch size={16} color={isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'} />
               <h3 style={{
-                fontSize: '16px',
+                fontSize: '14px',
                 fontWeight: '600',
-                color: isDark ? '#ffffff' : '#0a0a0a',
+                color: isDark ? '#ffffff' : '#37352f',
                 margin: 0
               }}>
                 Looking for something?
@@ -232,8 +214,8 @@ const NotFound = () => {
             
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-              gap: '12px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+              gap: '8px'
             }}>
               {[
                 { to: '/app/dashboard', label: 'Dashboard' },
@@ -245,23 +227,24 @@ const NotFound = () => {
                   key={link.to}
                   to={link.to}
                   style={{
-                    padding: '12px 16px',
-                    borderRadius: '10px',
-                    fontSize: '14px',
+                    padding: '8px 12px',
+                    borderRadius: '3px',
+                    fontSize: '13px',
                     fontWeight: '500',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)',
                     textDecoration: 'none',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.15s ease',
                     background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(55, 53, 47, 0.05)'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
-                    e.target.style.color = isDark ? '#ffffff' : '#0a0a0a';
+                    e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.05)';
+                    e.target.style.color = isDark ? '#ffffff' : '#37352f';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
-                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)';
+                    e.target.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.7)';
                   }}
                 >
                   {link.label}
@@ -273,8 +256,8 @@ const NotFound = () => {
           {/* Support Link */}
           <div>
             <p style={{
-              fontSize: '14px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)'
+              fontSize: '13px',
+              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
             }}>
               Need help?{' '}
               <Link

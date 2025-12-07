@@ -82,15 +82,13 @@ const ServerError = () => {
           {isDark ? <MdLightMode size={24} color="#fff" /> : <MdDarkMode size={24} color="#000" />}
         </button>
 
-        <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '700px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* 500 Number */}
-          <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '24px' }}>
             <h1 style={{
-              fontSize: '140px',
+              fontSize: '100px',
               fontWeight: '700',
-              background: isDark
-                ? 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)'
-                : 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
+              background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -103,39 +101,33 @@ const ServerError = () => {
           </div>
 
           {/* Error Message */}
-          <div style={{ marginBottom: '48px' }}>
+          <div style={{ marginBottom: '32px' }}>
             <h2 style={{
-              fontSize: '32px',
+              fontSize: '28px',
               fontWeight: '600',
-              color: isDark ? '#ffffff' : '#0a0a0a',
-              marginBottom: '16px',
+              color: isDark ? '#ffffff' : '#37352f',
+              marginBottom: '12px',
               letterSpacing: '-0.01em'
             }}>
               Server Error
             </h2>
             <p style={{
-              fontSize: '18px',
-              color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-              marginBottom: '8px',
-              lineHeight: '1.6'
+              fontSize: '16px',
+              color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.65)',
+              lineHeight: '1.6',
+              maxWidth: '480px',
+              margin: '0 auto'
             }}>
-              Oops! Something went wrong on our end.
-            </p>
-            <p style={{
-              fontSize: '14px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)',
-              lineHeight: '1.6'
-            }}>
-              We're working to fix the issue. Please try again in a few moments.
+              Something went wrong on our end. We're working to fix the issue. Please try again in a few moments.
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Homepage Style */}
           <div style={{
             display: 'flex',
-            gap: '16px',
+            gap: '12px',
             justifyContent: 'center',
-            marginBottom: '48px',
+            marginBottom: '32px',
             flexWrap: 'wrap'
           }}>
             <button
@@ -144,34 +136,27 @@ const ServerError = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '500',
-                background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
                 color: '#ffffff',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
+                background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
                 border: 'none',
-                cursor: 'pointer',
-                boxShadow: isDark
-                  ? '0 4px 20px rgba(239, 68, 68, 0.3)'
-                  : '0 4px 20px rgba(239, 68, 68, 0.25)'
+                borderRadius: '3px',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = isDark
-                  ? '0 6px 25px rgba(239, 68, 68, 0.4)'
-                  : '0 6px 25px rgba(239, 68, 68, 0.35)';
+                e.target.style.opacity = '0.9';
+                e.target.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
+                e.target.style.opacity = '1';
                 e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = isDark
-                  ? '0 4px 20px rgba(239, 68, 68, 0.3)'
-                  : '0 4px 20px rgba(239, 68, 68, 0.25)';
               }}
             >
-              <MdRefresh size={20} />
+              <MdRefresh size={18} />
               Try Again
             </button>
 
@@ -181,61 +166,58 @@ const ServerError = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '500',
-                background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                color: isDark ? '#ffffff' : '#0a0a0a',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                background: 'transparent',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
+                borderRadius: '3px',
                 textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                border: 'none',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)'
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.03)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
-                e.target.style.transform = 'translateY(0)';
+                e.target.style.background = 'transparent';
               }}
             >
-              <MdHome size={20} />
+              <MdHome size={18} />
               Go to Homepage
             </Link>
           </div>
 
-          {/* Support Card */}
+          {/* Support Card - Compact */}
           <div style={{
-            background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-            borderRadius: '16px',
-            padding: '32px',
+            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+            borderRadius: '8px',
+            padding: '24px',
             backdropFilter: 'blur(20px)',
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.05)'
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
-              marginBottom: '16px'
+              gap: '6px',
+              marginBottom: '12px'
             }}>
-              <MdBugReport size={20} color={isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.5)'} />
+              <MdBugReport size={16} color={isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)'} />
               <h3 style={{
-                fontSize: '16px',
+                fontSize: '14px',
                 fontWeight: '600',
-                color: isDark ? '#ffffff' : '#0a0a0a',
+                color: isDark ? '#ffffff' : '#37352f',
                 margin: 0
               }}>
                 Error persists?
               </h3>
             </div>
             <p style={{
-              fontSize: '14px',
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.5)',
-              marginBottom: '20px',
+              fontSize: '13px',
+              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+              marginBottom: '16px',
               lineHeight: '1.6'
             }}>
               If this error continues, please contact our support team.
@@ -243,21 +225,24 @@ const ServerError = () => {
             <Link
               to="/contact"
               style={{
-                display: 'inline-block',
-                padding: '12px 24px',
-                borderRadius: '10px',
-                fontSize: '14px',
-                fontWeight: '500',
-                background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-                color: isDark ? '#ffffff' : '#0a0a0a',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '3px',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
+                background: 'transparent',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
                 textDecoration: 'none',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
+                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(55, 53, 47, 0.03)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+                e.target.style.background = 'transparent';
               }}
             >
               Contact Support
