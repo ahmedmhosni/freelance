@@ -245,17 +245,20 @@ class AuthController extends BaseController {
   }
 
   /**
-   * Reset password with token
+   * Reset password with token or code
    * POST /api/v2/auth/reset-password
    */
   async resetPassword(req, res, next) {
     try {
-      const { token, newPassword } = req.body;
+      const { token, code, newPassword } = req.body;
+      
+      // Accept either token or code
+      const tokenOrCode = token || code;
 
-      if (!token || typeof token !== 'string' || token.trim().length === 0) {
+      if (!tokenOrCode || typeof tokenOrCode !== 'string' || tokenOrCode.trim().length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'Valid reset token is required'
+          error: 'Valid reset token or code is required'
         });
       }
 
@@ -266,7 +269,7 @@ class AuthController extends BaseController {
         });
       }
 
-      await this.authService.resetPassword(token, newPassword);
+      await this.authService.resetPassword(tokenOrCode, newPassword);
 
       res.json({
         success: true,

@@ -156,9 +156,9 @@ class EmailService {
   }
 
   /**
-   * Send password reset email (link only, no code)
+   * Send password reset email (with both link and code)
    */
-  async sendPasswordResetEmail(user, token) {
+  async sendPasswordResetEmail(user, token, code) {
     const resetUrl = `${emailConfig.templates.appUrl}/reset-password?token=${token}`;
     
     const html = `
@@ -173,6 +173,9 @@ class EmailService {
           .content { padding: 30px 0; }
           .button { display: inline-block; padding: 10px 30px; background: #37352f; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 20px 0; font-weight: 600; font-size: 14px; transition: background 0.15s ease; }
           .button:hover { background: #2f2e2a; }
+          .code-box { background: #f8f9fa; border: 2px dashed #37352f; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
+          .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #37352f; font-family: 'Courier New', monospace; }
+          .divider { text-align: center; margin: 30px 0; color: #999; font-size: 14px; }
           .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px; }
           .footer { text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #666; font-size: 12px; margin-top: 40px; }
           .footer a { color: #37352f; text-decoration: none; }
@@ -187,16 +190,26 @@ class EmailService {
           <div class="content">
             <h2>Password Reset Request</h2>
             <p>Hi ${user.name},</p>
-            <p>We received a request to reset your password. Click the button below to create a new password:</p>
+            <p>We received a request to reset your password. You can reset it using either of these methods:</p>
             
+            <h3>Option 1: Click the button</h3>
             <a href="${resetUrl}" class="button">Reset Password</a>
             
+            <div class="divider">── OR ──</div>
+            
+            <h3>Option 2: Enter this code</h3>
+            <div class="code-box">
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Your password reset code:</p>
+              <div class="code">${code}</div>
+              <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">Enter this code on the reset password page</p>
+            </div>
+            
             <p style="font-size: 13px; color: #666; margin-top: 30px;">
-              <strong>Can't click the button?</strong> Copy and paste this link into your browser:<br>
+              <strong>Can't click the button?</strong> Copy and paste this link:<br>
               <span style="word-break: break-all; color: #999;">${resetUrl}</span>
             </p>
             
-            <p><strong>This link will expire in ${emailConfig.templates.passwordResetExpiry}.</strong></p>
+            <p><strong>This code and link will expire in ${emailConfig.templates.passwordResetExpiry}.</strong></p>
             <div class="warning">
               <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email. Your password will remain unchanged.
             </div>
@@ -215,10 +228,15 @@ class EmailService {
       
       Hi ${user.name},
       
-      We received a request to reset your password. Click this link to reset it:
+      We received a request to reset your password. You can reset it using either method:
+      
+      OPTION 1: Click this link
       ${resetUrl}
       
-      This link will expire in ${emailConfig.templates.passwordResetExpiry}.
+      OPTION 2: Enter this code on the website
+      ${code}
+      
+      This code and link will expire in ${emailConfig.templates.passwordResetExpiry}.
       
       If you didn't request a password reset, please ignore this email.
     `;

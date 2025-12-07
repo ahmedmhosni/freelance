@@ -228,7 +228,7 @@ class AuthService {
   }
 
   /**
-   * Forgot password - Generate reset token and send email
+   * Forgot password - Generate reset token and code, send email
    * @param {string} email - User email
    * @returns {Promise<void>}
    */
@@ -247,32 +247,38 @@ class AuthService {
       return;
     }
 
-    // Generate reset token
+    // Generate reset token (for link)
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    
+    // Generate 6-digit code (for manual entry)
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const resetCodeHash = crypto.createHash('sha256').update(resetCode).digest('hex');
+    
     const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    // Save reset token to database
+    // Save both token and code to database
     await this.db.execute(
       `UPDATE users 
        SET password_reset_token = $1, 
-           password_reset_expires = $2 
-       WHERE id = $3`,
-      [resetTokenHash, resetTokenExpires, userData.id]
+           password_reset_code = $2,
+           password_reset_expires = $3 
+       WHERE id = $4`,
+      [resetTokenHash, resetCodeHash, resetTokenExpires, userData.id]
     );
 
-    // Send reset email
+    // Send reset email with both link and code
     const user = new User(userData);
-    await emailService.sendPasswordResetEmail(user, resetToken);
+    await emailService.sendPasswordResetEmail(user, resetToken, resetCode);
   }
 
   /**
-   * Reset password with token
-   * @param {string} token - Reset token
+   * Reset password with token or code
+   * @param {string} tokenOrCode - Reset token (long) or code (6 digits)
    * @param {string} newPassword - New password
    * @returns {Promise<void>}
    */
-  async resetPassword(token, newPassword) {
+  async resetPassword(tokenOrCode, newPassword) {
     const crypto = require('crypto');
 
     // Validate password strength
@@ -292,29 +298,30 @@ class AuthService {
       throw new ValidationError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
     }
 
-    // Hash the token to compare with database
-    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    // Hash the token/code to compare with database
+    const hash = crypto.createHash('sha256').update(tokenOrCode).digest('hex');
 
-    // Find user with valid reset token
+    // Find user with valid reset token OR code
     const userData = await this.db.queryOne(
       `SELECT * FROM users 
-       WHERE password_reset_token = $1 
+       WHERE (password_reset_token = $1 OR password_reset_code = $1)
        AND password_reset_expires > NOW()`,
-      [resetTokenHash]
+      [hash]
     );
 
     if (!userData) {
-      throw new UnauthorizedError('Invalid or expired reset token');
+      throw new UnauthorizedError('Invalid or expired reset token/code');
     }
 
     // Hash new password
     const passwordHash = await bcrypt.hash(newPassword, 12);
 
-    // Update password and clear reset token
+    // Update password and clear reset token and code
     await this.db.execute(
       `UPDATE users 
        SET password = $1, 
-           password_reset_token = NULL, 
+           password_reset_token = NULL,
+           password_reset_code = NULL,
            password_reset_expires = NULL 
        WHERE id = $2`,
       [passwordHash, userData.id]
