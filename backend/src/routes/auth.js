@@ -2,7 +2,12 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { query, getOne } = require('../db/postgresql');
-const { authLimiter } = require('../middleware/rateLimiter');
+const { 
+  loginLimiter, 
+  registerLimiter, 
+  passwordResetLimiter,
+  authLimiter // Keep for backward compatibility
+} = require('../middleware/rateLimiter');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 const validators = require('../utils/validators');
 const logger = require('../utils/logger');
@@ -68,7 +73,7 @@ const router = express.Router();
  */
 // Register
 router.post('/register', 
-  authLimiter,
+  registerLimiter,
   validators.register,
   asyncHandler(async (req, res) => {
     const { name, email, password, role = 'freelancer' } = req.body;
@@ -120,7 +125,7 @@ router.post('/register',
 
 // Login
 router.post('/login',
-  authLimiter,
+  loginLimiter,
   validators.login,
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
@@ -343,7 +348,7 @@ router.post('/resend-verification',
 
 // Forgot Password
 router.post('/forgot-password',
-  authLimiter,
+  passwordResetLimiter,
   asyncHandler(async (req, res) => {
     const { email } = req.body;
 
@@ -391,7 +396,7 @@ router.post('/forgot-password',
 
 // Reset Password
 router.post('/reset-password',
-  authLimiter,
+  passwordResetLimiter,
   asyncHandler(async (req, res) => {
     const { token, password } = req.body;
 
