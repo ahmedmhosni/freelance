@@ -17,6 +17,8 @@ export { default as MaintenanceBanner } from './components/MaintenanceBanner';
 export { default as MobileBlocker } from './components/MobileBlocker';
 export { default as FeedbackWidget } from './components/FeedbackWidget';
 export { default as LoaderExamples } from './components/LoaderExamples';
+export { default as SecurityNotice } from './components/SecurityNotice';
+export { default as SecurityInfo } from './components/SecurityInfo';
 
 // Layouts
 export { default as Layout } from './layouts/Layout';

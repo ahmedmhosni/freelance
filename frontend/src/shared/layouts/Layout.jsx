@@ -8,6 +8,7 @@ import MaintenanceBanner from '../components/MaintenanceBanner';
 import FeedbackWidget from '../components/FeedbackWidget';
 import MobileBlocker from '../components/MobileBlocker';
 import AppFooter from '../components/AppFooter';
+import SecurityNotice from '../components/SecurityNotice';
 import { TimerWidget } from '../../features/time-tracking';
 import axios from 'axios';
 import { logger } from '../utils/logger';
@@ -68,6 +69,7 @@ const Layout = () => {
   return (
     <>
       <MobileBlocker />
+      <SecurityNotice />
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         {/* Show maintenance banner for admins */}
         {isMaintenanceMode && user?.role === 'admin' && <MaintenanceBanner />}
