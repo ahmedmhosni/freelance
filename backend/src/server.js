@@ -36,6 +36,7 @@ const userPreferencesRoutes = require('./routes/userPreferences');
 const legalRoutes = require('./routes/legal');
 const healthRoutes = require('./routes/health');
 const feedbackRoutes = require('./routes/feedback');
+const mediaRoutes = require('./routes/media');
 const preferencesRoutes = require('./routes/preferences');
 const gdprRoutes = require('./routes/gdpr');
 const adminGdprRoutes = require('./routes/admin-gdpr');
@@ -221,6 +222,7 @@ bootstrap({ createApp: false }).then(({ container }) => {
   app.use('/api/legal', legalRoutes);
   app.use('/api/files', fileRoutes);
   app.use('/api/feedback', feedbackRoutes);
+  app.use('/api/media', mediaRoutes);
   app.use('/api/preferences', preferencesRoutes);
   app.use('/api/gdpr', gdprRoutes);
   app.use('/api/admin/gdpr', adminGdprRoutes);

@@ -98,7 +98,9 @@ router.post('/', authenticateToken, upload.single('screenshot'), asyncHandler(as
           }
         });
 
-        screenshotUrl = blockBlobClient.url;
+        // Use proxied URL through our domain instead of direct blob URL
+        const appUrl = process.env.APP_URL || 'http://localhost:5000';
+        screenshotUrl = `${appUrl}/api/media/feedback/${blobName}`;
       }
     } catch (error) {
       console.error('Error uploading screenshot:', error);
