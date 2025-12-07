@@ -14,9 +14,14 @@ const config = {
   ssl: process.env.PG_SSL === 'true' ? {
     rejectUnauthorized: false
   } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  // Connection pool settings (optimized for production)
+  max: 20, // Maximum number of clients in the pool
+  min: 2, // Minimum number of clients in the pool
+  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  connectionTimeoutMillis: 10000, // Return error after 10 seconds if connection not established
+  // Retry logic
+  maxUses: 7500, // Close connection after 7500 uses (prevents memory leaks)
+  allowExitOnIdle: false, // Keep pool alive even if all clients are idle
 };
 
 console.log('🐘 Connecting to PostgreSQL:', {
@@ -36,6 +41,21 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('PostgreSQL pool error:', err);
+  // Don't exit the process, just log the error
+  // The pool will attempt to reconnect automatically
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, closing database pool...');
+  await closePool();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, closing database pool...');
+  await closePool();
+  process.exit(0);
 });
 
 // Helper function to execute queries

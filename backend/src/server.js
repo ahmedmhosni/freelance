@@ -20,6 +20,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const compression = require('compression');
 const http = require('http');
 const socketIo = require('socket.io');
 const fs = require('fs');
@@ -140,6 +141,17 @@ app.use(morgan('combined', {
   stream: {
     write: (message) => logger.info(message.trim())
   }
+}));
+
+// Compression middleware - compress all responses
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6 // Compression level (0-9, 6 is default and good balance)
 }));
 
 app.use(express.json({ limit: '10mb' }));
