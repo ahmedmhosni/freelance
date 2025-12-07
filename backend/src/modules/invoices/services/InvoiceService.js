@@ -338,6 +338,49 @@ class InvoiceService extends BaseService {
     // and prevent deletion or cascade delete
     // For now, we'll allow deletion
   }
+
+  /**
+   * Generate PDF for an invoice
+   * @param {number} id - Invoice ID
+   * @param {number} userId - User ID
+   * @returns {Promise<Buffer>} PDF buffer
+   * @throws {NotFoundError} If invoice not found or doesn't belong to user
+   */
+  async generatePDF(id, userId) {
+    const pdfService = require('../../../services/pdfService');
+    
+    // Get invoice
+    const invoice = await this.getByIdForUser(id, userId);
+    
+    // Get client information
+    let client = { name: 'N/A', email: '', phone: '', address: '' };
+    if (invoice.client_id && this.clientRepository) {
+      try {
+        const clientData = await this.clientRepository.findById(invoice.client_id);
+        if (clientData) {
+          client = clientData;
+        }
+      } catch (error) {
+        // If client not found, use default
+      }
+    }
+    
+    // Get invoice items if available
+    let items = [];
+    try {
+      const db = this.repository.db;
+      const itemsResult = await db.query(
+        'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY id',
+        [id]
+      );
+      items = itemsResult.rows || [];
+    } catch (error) {
+      // If items table doesn't exist or query fails, continue without items
+    }
+    
+    // Generate PDF
+    return await pdfService.generateInvoicePDF(invoice, client, items);
+  }
 }
 
 module.exports = InvoiceService;

@@ -60,6 +60,7 @@ class InvoiceController extends BaseController {
     this.router.get('/overdue', this.getOverdue.bind(this));
     this.router.get('/stats', this.getStats.bind(this));
     this.router.get('/search', queryValidation, this.search.bind(this));
+    this.router.get('/:id/pdf', getInvoiceValidation, this.downloadPDF.bind(this));
     this.router.get('/:id', getInvoiceValidation, this.getById.bind(this));
     this.router.post('/', createInvoiceValidation, this.create.bind(this));
     this.router.put('/:id', updateInvoiceValidation, this.update.bind(this));
@@ -270,6 +271,25 @@ class InvoiceController extends BaseController {
       await this.invoiceItemService.deleteItem(itemId, userId);
 
       return res.status(204).send();
+    });
+  }
+
+  /**
+   * Download invoice as PDF
+   * GET /api/v2/invoices/:id/pdf
+   */
+  async downloadPDF(req, res, next) {
+    await this.handleRequest(req, res, next, async () => {
+      const userId = req.user.id;
+      const invoiceId = parseInt(req.params.id);
+
+      const pdfBuffer = await this.invoiceService.generatePDF(invoiceId, userId);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoiceId}.pdf`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+
+      return res.send(pdfBuffer);
     });
   }
 }
