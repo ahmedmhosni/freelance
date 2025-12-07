@@ -49,6 +49,8 @@ const AnnouncementDetail = lazy(() => import('./features/announcements').then(m 
 // Utility pages (moved to shared)
 import ComingSoon from './shared/pages/ComingSoon';
 import LoaderTest from './shared/pages/LoaderTest';
+import NotFound from './shared/pages/NotFound';
+import ServerError from './shared/pages/ServerError';
 
 const PrivateRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
@@ -144,6 +146,10 @@ function App() {
               <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
               <Route path="/status" element={<Navigate to="/public-status" replace />} />
               <Route path="/admin/status" element={<Navigate to="/app/admin/status" replace />} />
+              
+              {/* Error Pages */}
+              <Route path="/500" element={<ServerError />} />
+              <Route path="*" element={<NotFound />} /> {/* 404 - Must be last! */}
             </Routes>
             </Suspense>
               </PageTransition>
