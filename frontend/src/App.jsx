@@ -40,6 +40,8 @@ const Profile = lazy(() => import('./features/profile').then(m => ({ default: m.
 const PublicProfile = lazy(() => import('./features/profile').then(m => ({ default: m.PublicProfile })));
 const Terms = lazy(() => import('./features/legal').then(m => ({ default: m.Terms })));
 const Privacy = lazy(() => import('./features/legal').then(m => ({ default: m.Privacy })));
+const RefundPolicy = lazy(() => import('./features/legal').then(m => ({ default: m.RefundPolicy })));
+const Contact = lazy(() => import('./features/legal').then(m => ({ default: m.Contact })));
 const Changelog = lazy(() => import('./features/changelog').then(m => ({ default: m.Changelog })));
 const Announcements = lazy(() => import('./features/announcements').then(m => ({ default: m.Announcements })));
 const AnnouncementDetail = lazy(() => import('./features/announcements').then(m => ({ default: m.AnnouncementDetail })));
@@ -112,6 +114,8 @@ function App() {
               <Route path="/public-status" element={<PublicStatus />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/changelog" element={<Changelog />} />
               <Route path="/announcements" element={<Announcements />} />
               <Route path="/announcements/:id" element={<AnnouncementDetail />} />

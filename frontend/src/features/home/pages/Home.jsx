@@ -809,6 +809,32 @@ const Home = () => {
             </Link>
             <span style={{ opacity: 0.3 }}>•</span>
             <Link 
+              to="/refund-policy" 
+              style={{ 
+                color: isDark ? '#ffffff' : '#000000',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Refund Policy
+            </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <Link 
+              to="/contact" 
+              style={{ 
+                color: isDark ? '#ffffff' : '#000000',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Contact
+            </Link>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <Link 
               to="/public-status" 
               style={{ 
                 color: isDark ? '#ffffff' : '#000000',
