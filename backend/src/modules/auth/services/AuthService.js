@@ -35,6 +35,9 @@ class AuthService {
     if (!/[0-9]/.test(password)) {
       throw new ValidationError('Password must contain at least one number');
     }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      throw new ValidationError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
+    }
 
     // Check if user exists
     const existingUser = await this.db.queryOne(
@@ -176,6 +179,9 @@ class AuthService {
     if (!/[0-9]/.test(newPassword)) {
       throw new ValidationError('Password must contain at least one number');
     }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
+    }
 
     // Get user with password
     const userData = await this.db.queryOne(
@@ -284,6 +290,9 @@ module.exports = AuthService;
     }
     if (!/[0-9]/.test(newPassword)) {
       throw new ValidationError('Password must contain at least one number');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
     }
 
     // Hash the token to compare with database
