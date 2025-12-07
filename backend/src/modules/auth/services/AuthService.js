@@ -226,9 +226,6 @@ class AuthService {
 
     return newToken;
   }
-}
-
-module.exports = AuthService;
 
   /**
    * Forgot password - Generate reset token and send email
