@@ -5,6 +5,7 @@ import { AnnouncementBanner } from '../../announcements';
 import { MdLightMode, MdDarkMode, MdArrowForward } from 'react-icons/md';
 import FeatureSlider from '../components/home/FeatureSlider';
 import axios from 'axios';
+import { logger } from '../../../shared/utils/logger';
 
 const Home = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -24,7 +25,7 @@ const Home = () => {
       const response = await axios.get(`${apiUrl}/changelog/current-version`);
       setVersion(response.data);
     } catch (error) {
-      console.error('Failed to fetch version:', error);
+      logger.error('Failed to fetch version:', error);
       setVersion({ version: '1.0.0' });
     }
   };

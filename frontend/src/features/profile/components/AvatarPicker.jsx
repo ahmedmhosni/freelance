@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { MdClose, MdCloudUpload, MdImage } from 'react-icons/md';
 import { api } from '../../../shared';
 import toast from 'react-hot-toast';
+import { logger } from '../../../shared/utils/logger';
 
 // Character avatar library using DiceBear API (free, no upload needed)
 const AVATAR_STYLES = [
@@ -88,7 +89,7 @@ const AvatarPicker = ({ currentAvatar, onSelect, onClose }) => {
       onSelect(uploadedUrl);
       onClose();
     } catch (error) {
-      console.error('Error uploading picture:', error);
+      logger.error('Error uploading picture:', error);
       toast.error(error.response?.data?.error || 'Failed to upload picture');
       setUploadPreview(null);
     } finally {

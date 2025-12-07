@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useTheme, PublicHeader, PublicFooter, SEO } from '../../../shared';
+import { logger } from '../../../shared/utils/logger';
 
 const AnnouncementDetail = () => {
   const { id } = useParams();
@@ -24,7 +25,7 @@ const AnnouncementDetail = () => {
       const response = await axios.get(`/api/announcements/${id}`);
       setAnnouncement(response.data);
     } catch (error) {
-      console.error('Error fetching announcement:', error);
+      logger.error('Error fetching announcement:', error);
       setError('Announcement not found');
     } finally {
       setLoading(false);
@@ -37,7 +38,7 @@ const AnnouncementDetail = () => {
       const response = await axios.get(`${apiUrl}/changelog/current-version`);
       setVersion(response.data);
     } catch (error) {
-      console.error('Failed to fetch version:', error);
+      logger.error('Failed to fetch version:', error);
       setVersion({ version: '1.0.0' });
     }
   };

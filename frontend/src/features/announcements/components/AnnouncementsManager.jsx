@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MdAdd, MdEdit, MdDelete, MdStar, MdImage, MdVideoLibrary } from 'react-icons/md';
+import { logger } from '../../../shared/utils/logger';
 
 const AnnouncementsManager = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -27,7 +28,7 @@ const AnnouncementsManager = () => {
       const data = Array.isArray(response.data) ? response.data : [];
       setAnnouncements(data);
     } catch (error) {
-      console.error('Error fetching announcements:', error);
+      logger.error('Error fetching announcements:', error);
       setAnnouncements([]); // Set empty array on error
     }
   };
@@ -66,7 +67,7 @@ const AnnouncementsManager = () => {
       setEditingId(null);
       fetchAnnouncements();
     } catch (error) {
-      console.error('Error saving announcement:', error);
+      logger.error('Error saving announcement:', error);
       alert('Failed to save announcement');
     } finally {
       setLoading(false);
@@ -93,7 +94,7 @@ const AnnouncementsManager = () => {
       });
       fetchAnnouncements();
     } catch (error) {
-      console.error('Error deleting announcement:', error);
+      logger.error('Error deleting announcement:', error);
       alert('Failed to delete announcement');
     }
   };

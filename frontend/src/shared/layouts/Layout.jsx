@@ -10,6 +10,7 @@ import MobileBlocker from '../components/MobileBlocker';
 import AppFooter from '../components/AppFooter';
 import { TimerWidget } from '../../features/time-tracking';
 import axios from 'axios';
+import { logger } from '../utils/logger';
 import { 
   MdDashboard, 
   MdPeople, 
@@ -45,7 +46,7 @@ const Layout = () => {
       const response = await axios.get(`${apiUrl}/changelog/current-version`);
       setVersion(response.data);
     } catch (error) {
-      console.error('Failed to fetch version:', error);
+      logger.error('Failed to fetch version:', error);
       setVersion({ version: '1.0.0' });
     }
   };

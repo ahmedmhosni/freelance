@@ -3,6 +3,7 @@ import { useTheme, Pagination } from '../../../shared';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { MdDownload, MdDelete, MdRestore, MdEmail, MdPeople } from 'react-icons/md';
+import { logger } from '../../../shared/utils/logger';
 
 const AdminGDPR = () => {
   const { isDark } = useTheme();
@@ -55,7 +56,7 @@ const AdminGDPR = () => {
         setDeletionReasons(response.data.reasons);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      logger.error('Failed to fetch data:', error);
       toast.error('Failed to load data');
     } finally {
       setLoading(false);
@@ -80,7 +81,7 @@ const AdminGDPR = () => {
       toast.success('Account restored successfully');
       fetchData();
     } catch (error) {
-      console.error('Failed to restore account:', error);
+      logger.error('Failed to restore account:', error);
       toast.error('Failed to restore account');
     }
   };

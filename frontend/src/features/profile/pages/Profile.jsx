@@ -7,6 +7,7 @@ import DataPrivacy from '../components/DataPrivacy';
 import { 
   MdPerson, MdEmail, MdLock, MdWork, MdLocationOn, MdLanguage
 } from 'react-icons/md';
+import { logger } from '../../../shared/utils/logger';
 import { 
   FaLinkedin, FaBehance, FaInstagram, FaFacebook, FaTwitter, FaGithub, FaDribbble
 } from 'react-icons/fa';
@@ -45,7 +46,7 @@ const Profile = () => {
       const response = await api.get('/profile');
       setProfile(response.data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
     } finally {
       setLoading(false);
@@ -64,7 +65,7 @@ const Profile = () => {
       await api.put('/profile', profile);
       toast.success('Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);

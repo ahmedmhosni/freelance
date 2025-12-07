@@ -2,15 +2,14 @@
  * Production-Safe Logger
  * 
  * - Disables all console logs in production
- * - Sanitizes sensitive data before logging
+ * - Sanitizes sensitive data
  * - Can integrate with error tracking services (Sentry, etc.)
- * - Prevents exposure of sensitive information in browser console
  */
 
 const isDevelopment = import.meta.env.MODE === 'development';
 const isProduction = import.meta.env.MODE === 'production';
 
-// Sensitive keys that should NEVER be logged
+// Sensitive keys that should never be logged
 const SENSITIVE_KEYS = [
   'password',
   'token',
@@ -28,9 +27,7 @@ const SENSITIVE_KEYS = [
   'credit_card',
   'creditCard',
   'cvv',
-  'pin',
-  'connectionString',
-  'connection_string'
+  'pin'
 ];
 
 /**
@@ -38,16 +35,6 @@ const SENSITIVE_KEYS = [
  */
 const sanitize = (data) => {
   if (!data) return data;
-
-  // Handle Error objects
-  if (data instanceof Error) {
-    return {
-      name: data.name,
-      message: data.message,
-      // Don't include stack trace in production
-      ...(isDevelopment && { stack: data.stack })
-    };
-  }
 
   // Handle arrays
   if (Array.isArray(data)) {
@@ -65,7 +52,7 @@ const sanitize = (data) => {
 
       if (isSensitive) {
         sanitized[key] = '[REDACTED]';
-      } else if (typeof value === 'object' && value !== null) {
+      } else if (typeof value === 'object') {
         sanitized[key] = sanitize(value);
       } else {
         sanitized[key] = value;
@@ -89,39 +76,20 @@ const sendToMonitoring = (level, message, data) => {
   //     extra: sanitize(data)
   //   });
   // }
-  
-  // For now, store critical errors in sessionStorage for debugging
-  if (level === 'error' && typeof window !== 'undefined') {
-    try {
-      const errors = JSON.parse(sessionStorage.getItem('app_errors') || '[]');
-      errors.push({
-        timestamp: new Date().toISOString(),
-        level,
-        message,
-        data: sanitize(data)
-      });
-      // Keep only last 50 errors
-      if (errors.length > 50) errors.shift();
-      sessionStorage.setItem('app_errors', JSON.stringify(errors));
-    } catch (e) {
-      // Ignore storage errors
-    }
-  }
 };
 
-export const logger = {
+const logger = {
   /**
    * Log general information (development only)
    */
   log: (...args) => {
     if (isDevelopment) {
-      const sanitizedArgs = args.map(arg => sanitize(arg));
-      console.log(...sanitizedArgs);
+      console.log(...args);
     }
   },
 
   /**
-   * Log errors (sanitized, sent to monitoring in production)
+   * Log errors (always logged, sent to monitoring in production)
    */
   error: (message, ...args) => {
     const sanitizedArgs = args.map(arg => sanitize(arg));
@@ -156,8 +124,7 @@ export const logger = {
    */
   debug: (...args) => {
     if (isDevelopment) {
-      const sanitizedArgs = args.map(arg => sanitize(arg));
-      console.debug(...sanitizedArgs);
+      console.debug(...args);
     }
   },
 
@@ -166,8 +133,7 @@ export const logger = {
    */
   info: (...args) => {
     if (isDevelopment) {
-      const sanitizedArgs = args.map(arg => sanitize(arg));
-      console.info(...sanitizedArgs);
+      console.info(...args);
     }
   },
 
@@ -192,13 +158,12 @@ export const logger = {
   }
 };
 
-// Disable console in production to prevent any accidental logging
+// Disable console in production
 if (isProduction) {
-  const noop = () => {};
-  console.log = noop;
-  console.debug = noop;
-  console.info = noop;
-  // Keep console.error and console.warn but they'll be rare
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+  // Keep console.error and console.warn for critical issues
 }
 
 export default logger;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { logger } from '../../../shared/utils/logger';
 
 const Changelog = () => {
   const [changelog, setChangelog] = useState(null);
@@ -16,7 +17,7 @@ const Changelog = () => {
       const response = await axios.get(`${apiUrl}/changelog/public`);
       setChangelog(response.data);
     } catch (error) {
-      console.error('Failed to fetch changelog:', error);
+      logger.error('Failed to fetch changelog:', error);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared';
+import { logger } from '../../../shared/utils/logger';
 import { 
   MdCheckCircle, 
   MdError, 
@@ -67,12 +68,12 @@ const AdminStatus = () => {
           setHistory(historyData.history || {});
         }
       } catch (histError) {
-        console.log('History not available:', histError);
+        logger.log('History not available:', histError);
       }
       
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Failed to fetch status:', error);
+      logger.error('Failed to fetch status:', error);
       setStatus({ status: 'error', services: {}, error: error.message });
     } finally {
       setLoading(false);

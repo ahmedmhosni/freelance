@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../shared/utils/api';
+import { logger } from '../shared/utils/logger';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -27,7 +28,7 @@ const AnnouncementBanner = () => {
       const data = Array.isArray(response.data) ? response.data : [];
       setAnnouncements(data);
     } catch (error) {
-      console.error('Error fetching featured announcements:', error);
+      logger.error('Error fetching featured announcements:', error);
       setAnnouncements([]); // Set empty array on error
     }
   };

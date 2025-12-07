@@ -4,6 +4,7 @@ import { useTheme, api, LogoLoader, SEO } from '../../../shared';
 import { 
   MdWork, MdLocationOn, MdLanguage, MdArrowBack
 } from 'react-icons/md';
+import { logger } from '../../../shared/utils/logger';
 import { 
   FaLinkedin, FaBehance, FaInstagram, FaFacebook, FaTwitter, FaGithub, FaDribbble
 } from 'react-icons/fa';
@@ -27,7 +28,7 @@ const PublicProfile = () => {
       const response = await api.get(`/profile/${username}`);
       setProfile(response.data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error);
       setError(error.response?.data?.message || 'Profile not found');
     } finally {
       setLoading(false);

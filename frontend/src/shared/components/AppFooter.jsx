@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
+import { logger } from '../utils/logger';
 
 const AppFooter = () => {
   const { isDark } = useTheme();
@@ -17,7 +18,7 @@ const AppFooter = () => {
       const response = await axios.get(`${apiUrl}/changelog/current-version`);
       setVersion(response.data);
     } catch (error) {
-      console.error('Failed to fetch version:', error);
+      logger.error('Failed to fetch version:', error);
       setVersion({ version: '1.0.0' });
     }
   };

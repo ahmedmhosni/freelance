@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { toast } from 'react-hot-toast';
 import { MdDelete, MdCheckCircle, MdError, MdFilterList, MdImage, MdOpenInNew } from 'react-icons/md';
+import { logger } from '../shared/utils/logger';
 
 const FeedbackManager = () => {
     const [feedback, setFeedback] = useState([]);
@@ -24,7 +25,7 @@ const FeedbackManager = () => {
             const response = await api.get(url);
             setFeedback(response.data.feedback);
         } catch (error) {
-            console.error('Error fetching feedback:', error);
+            logger.error('Error fetching feedback:', error);
             toast.error('Failed to load feedback');
         } finally {
             setLoading(false);
@@ -40,7 +41,7 @@ const FeedbackManager = () => {
                 setSelectedFeedback(prev => ({ ...prev, status: newStatus }));
             }
         } catch (error) {
-            console.error('Error updating status:', error);
+            logger.error('Error updating status:', error);
             toast.error('Failed to update status');
         }
     };
@@ -54,7 +55,7 @@ const FeedbackManager = () => {
                 setSelectedFeedback(prev => ({ ...prev, admin_notes: adminNotes }));
             }
         } catch (error) {
-            console.error('Error updating notes:', error);
+            logger.error('Error updating notes:', error);
             toast.error('Failed to update notes');
         }
     };
@@ -70,7 +71,7 @@ const FeedbackManager = () => {
                 setSelectedFeedback(null);
             }
         } catch (error) {
-            console.error('Error deleting feedback:', error);
+            logger.error('Error deleting feedback:', error);
             toast.error('Failed to delete feedback');
         }
     };

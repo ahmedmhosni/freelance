@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { logger } from '../../../shared/utils/logger';
 
 const EmailPreferences = () => {
   const [preferences, setPreferences] = useState({
@@ -26,7 +27,7 @@ const EmailPreferences = () => {
       
       setPreferences(response.data.preferences);
     } catch (error) {
-      console.error('Failed to fetch preferences:', error);
+      logger.error('Failed to fetch preferences:', error);
       toast.error('Failed to load email preferences');
     } finally {
       setLoading(false);
@@ -53,7 +54,7 @@ const EmailPreferences = () => {
       setPreferences(newPreferences);
       toast.success('Preferences updated');
     } catch (error) {
-      console.error('Failed to update preferences:', error);
+      logger.error('Failed to update preferences:', error);
       toast.error('Failed to update preferences');
     } finally {
       setSaving(false);
