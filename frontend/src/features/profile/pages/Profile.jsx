@@ -43,8 +43,28 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await api.get('/profile');
-      setProfile(response.data);
+      const response = await api.get('/profile/me');
+      if (response.data) {
+        // Ensure all fields have default values
+        setProfile({
+          name: response.data.name || '',
+          username: response.data.username || '',
+          job_title: response.data.job_title || '',
+          bio: response.data.bio || '',
+          profile_picture: response.data.profile_picture || '',
+          location: response.data.location || '',
+          website: response.data.website || '',
+          linkedin: response.data.linkedin || '',
+          behance: response.data.behance || '',
+          instagram: response.data.instagram || '',
+          facebook: response.data.facebook || '',
+          twitter: response.data.twitter || '',
+          github: response.data.github || '',
+          dribbble: response.data.dribbble || '',
+          portfolio: response.data.portfolio || '',
+          profile_visibility: response.data.profile_visibility || 'public'
+        });
+      }
     } catch (error) {
       logger.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
@@ -62,11 +82,18 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put('/profile', profile);
+      const response = await api.put('/profile/me', profile);
+      if (response.data.profile) {
+        setProfile({
+          ...profile,
+          ...response.data.profile
+        });
+      }
       toast.success('Profile updated successfully');
     } catch (error) {
       logger.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      const errorMessage = error.response?.data?.error || 'Failed to update profile';
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }

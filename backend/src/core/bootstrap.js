@@ -24,6 +24,8 @@ const { registerReportsModule } = require('../modules/reports');
 const { registerNotificationsModule } = require('../modules/notifications');
 const { registerAuthModule } = require('../modules/auth');
 const { registerAdminModule } = require('../modules/admin');
+const { registerUserPreferencesModule } = require('../modules/user-preferences');
+const { registerGDPRModule } = require('../modules/gdpr');
 
 /**
  * Bootstrap the application
@@ -83,6 +85,8 @@ function createExpressApp(container) {
   const notificationController = container.resolve('notificationController');
   const authController = container.resolve('authController');
   const adminController = container.resolve('adminController');
+  const userPreferencesController = container.resolve('userPreferencesController');
+  const gdprController = container.resolve('gdprController');
 
   // API Documentation
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -108,6 +112,8 @@ function createExpressApp(container) {
   app.use('/api/v2/reports', authenticateToken, reportsController.router);
   app.use('/api/v2/notifications', authenticateToken, notificationController.router);
   app.use('/api/v2/admin', authenticateToken, adminController.router);
+  app.use('/api/user', authenticateToken, userPreferencesController.router);
+  app.use('/api/gdpr', authenticateToken, gdprController.router);
 
   // Dashboard endpoint
   app.get('/api/v2/dashboard', authenticateToken, async (req, res, next) => {
@@ -216,6 +222,14 @@ function registerModules(container) {
   // Register admin module
   registerAdminModule(container);
   logger.info('Admin module registered');
+
+  // Register user preferences module
+  registerUserPreferencesModule(container);
+  logger.info('User preferences module registered');
+
+  // Register GDPR module
+  registerGDPRModule(container);
+  logger.info('GDPR module registered');
 
   // Additional modules will be registered here as they are migrated
 }

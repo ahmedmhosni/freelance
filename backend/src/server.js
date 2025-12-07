@@ -236,19 +236,25 @@ bootstrap({ createApp: false }).then(({ container }) => {
   const adminController = container.resolve('adminController');
   app.use('/api/admin', adminController.router);
 
+  // User Preferences module (new architecture)
+  const userPreferencesController = container.resolve('userPreferencesController');
+  app.use('/api/user', userPreferencesController.router);
+
+  // GDPR module (new architecture)
+  const gdprController = container.resolve('gdprController');
+  app.use('/api/gdpr', gdprController.router);
+
   // Additional routes that don't have new architecture equivalents yet
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/quotes', quotesRoutes);
   app.use('/api/maintenance', maintenanceRoutes);
   app.use('/api/status', statusRoutes);
   app.use('/api/profile', profileRoutes);
-  app.use('/api/user', userPreferencesRoutes);
   app.use('/api/legal', legalRoutes);
   app.use('/api/files', fileRoutes);
   app.use('/api/feedback', feedbackRoutes);
   app.use('/api/media', mediaRoutes);
   app.use('/api/preferences', preferencesRoutes);
-  app.use('/api/gdpr', gdprRoutes);
   app.use('/api/admin/gdpr', adminGdprRoutes);
   app.use('/api/admin/activity', adminActivityRoutes);
   app.use('/api/version', versionRoutes);

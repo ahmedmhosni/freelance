@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../shared';
+import { useAuth, api } from '../../../shared';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { MdDownload, MdDelete, MdWarning } from 'react-icons/md';
+import { logger } from '../../../shared/utils/logger';
 
 const DataPrivacy = () => {
   const { logout } = useAuth();
@@ -17,19 +17,14 @@ const DataPrivacy = () => {
   const handleExportData = async () => {
     setExportLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const token = localStorage.getItem('token');
-      
-      const response = await axios.post(
-        `${apiUrl}/gdpr/export`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      toast.success(response.data.message);
+      const response = await api.post('/gdpr/export', {});
+      toast.success(response.data.message || 'Data export requested successfully');
     } catch (error) {
+      logger.error('Failed to export data:', error);
       if (error.response?.status === 429) {
-        toast.error(error.response.data.message);
+        toast.error(error.response.data.message || 'Too many requests. Please try again later.');
+      } else if (error.response?.status === 404) {
+        toast.info('Data export feature will be available soon');
       } else {
         toast.error('Failed to request data export');
       }
@@ -46,14 +41,10 @@ const DataPrivacy = () => {
 
     setDeleteLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const token = localStorage.getItem('token');
-      
-      await axios.post(
-        `${apiUrl}/gdpr/delete-account`,
-        { password: deletePassword, reason: deleteReason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post('/gdpr/delete-account', { 
+        password: deletePassword, 
+        reason: deleteReason 
+      });
       
       toast.success('Account deleted successfully');
       setTimeout(() => {
@@ -61,8 +52,12 @@ const DataPrivacy = () => {
         navigate('/');
       }, 2000);
     } catch (error) {
+      logger.error('Failed to delete account:', error);
       if (error.response?.status === 401) {
         toast.error('Invalid password');
+      } else if (error.response?.status === 404) {
+        toast.info('Account deletion feature will be available soon');
+        setShowDeleteModal(false);
       } else {
         toast.error('Failed to delete account');
       }

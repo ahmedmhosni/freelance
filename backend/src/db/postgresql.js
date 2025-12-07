@@ -1,35 +1,69 @@
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
 
-// Load environment variables from .env.local if it exists
-require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
+// Load environment variables - try .env.local first, then .env
+const envLocalPath = path.join(__dirname, '../../.env.local');
+const envPath = path.join(__dirname, '../../.env');
+
+if (fs.existsSync(envLocalPath)) {
+  require('dotenv').config({ path: envLocalPath });
+} else if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+}
+
+// Determine environment
+const isProduction = process.env.NODE_ENV === 'production';
+const isAzure = process.env.WEBSITE_INSTANCE_ID !== undefined; // Azure App Service indicator
 
 // PostgreSQL connection configuration
-const config = {
-  host: process.env.PG_HOST || 'localhost',
-  port: parseInt(process.env.PG_PORT || '5432'),
-  database: process.env.PG_DATABASE || 'roastify',
-  user: process.env.PG_USER || 'postgres',
-  password: process.env.PG_PASSWORD || 'postgres',
-  ssl: process.env.PG_SSL === 'true' ? {
-    rejectUnauthorized: false
-  } : false,
-  // Connection pool settings (optimized for production)
-  max: 20, // Maximum number of clients in the pool
-  min: 2, // Minimum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 10000, // Return error after 10 seconds if connection not established
-  // Retry logic
-  maxUses: 7500, // Close connection after 7500 uses (prevents memory leaks)
-  allowExitOnIdle: false, // Keep pool alive even if all clients are idle
-};
+let config;
+
+if (isProduction || isAzure) {
+  // Production: Use Azure PostgreSQL
+  console.log('🌐 Environment: PRODUCTION (Azure PostgreSQL)');
+  config = {
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    ssl: {
+      rejectUnauthorized: false // Required for Azure PostgreSQL
+    },
+    // Production pool settings
+    max: 20,
+    min: 2,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    maxUses: 7500,
+    allowExitOnIdle: false,
+  };
+} else {
+  // Development: Use local PostgreSQL
+  console.log('💻 Environment: DEVELOPMENT (Local PostgreSQL)');
+  config = {
+    host: process.env.PG_HOST || 'localhost',
+    port: parseInt(process.env.PG_PORT || '5432'),
+    database: process.env.PG_DATABASE || 'roastify',
+    user: process.env.PG_USER || 'postgres',
+    password: process.env.PG_PASSWORD || 'postgres',
+    ssl: false, // No SSL for local development
+    // Development pool settings (smaller pool)
+    max: 10,
+    min: 1,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  };
+}
 
 console.log('🐘 Connecting to PostgreSQL:', {
   host: config.host,
   port: config.port,
   database: config.database,
   user: config.user,
-  ssl: !!config.ssl
+  ssl: !!config.ssl,
+  environment: isProduction || isAzure ? 'production' : 'development'
 });
 
 // Create connection pool

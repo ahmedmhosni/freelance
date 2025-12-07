@@ -7,23 +7,45 @@ const logger = require('../logger');
  */
 class Database {
   constructor(config = {}) {
-    this.config = {
-      host: config.host || process.env.PG_HOST || 'localhost',
-      port: parseInt(config.port || process.env.PG_PORT || '5432'),
-      database: config.database || process.env.PG_DATABASE || 'freelancer_db',
-      user: config.user || process.env.PG_USER || 'postgres',
-      password: config.password || process.env.PG_PASSWORD || 'postgres',
-      ssl: config.ssl || (process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false),
-      max: config.max || parseInt(process.env.PG_POOL_MAX || '20'),
-      idleTimeoutMillis: config.idleTimeoutMillis || 30000,
-      connectionTimeoutMillis: config.connectionTimeoutMillis || 10000,
-    };
+    // Determine environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isAzure = process.env.WEBSITE_INSTANCE_ID !== undefined;
+    
+    // Use production (DB_*) or development (PG_*) variables
+    if (isProduction || isAzure) {
+      // Production: Use Azure PostgreSQL (DB_* variables)
+      this.config = {
+        host: config.host || process.env.DB_HOST,
+        port: parseInt(config.port || process.env.DB_PORT || '5432'),
+        database: config.database || process.env.DB_NAME,
+        user: config.user || process.env.DB_USER,
+        password: config.password || process.env.DB_PASSWORD,
+        ssl: config.ssl || { rejectUnauthorized: false },
+        max: config.max || parseInt(process.env.PG_POOL_MAX || '20'),
+        idleTimeoutMillis: config.idleTimeoutMillis || 30000,
+        connectionTimeoutMillis: config.connectionTimeoutMillis || 10000,
+      };
+    } else {
+      // Development: Use local PostgreSQL (PG_* variables)
+      this.config = {
+        host: config.host || process.env.PG_HOST || 'localhost',
+        port: parseInt(config.port || process.env.PG_PORT || '5432'),
+        database: config.database || process.env.PG_DATABASE || 'roastify',
+        user: config.user || process.env.PG_USER || 'postgres',
+        password: config.password || process.env.PG_PASSWORD || 'postgres',
+        ssl: config.ssl || (process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false),
+        max: config.max || parseInt(process.env.PG_POOL_MAX || '10'),
+        idleTimeoutMillis: config.idleTimeoutMillis || 30000,
+        connectionTimeoutMillis: config.connectionTimeoutMillis || 5000,
+      };
+    }
 
     this.pool = null;
     this.isConnected = false;
     this.retryAttempts = config.retryAttempts || 3;
     this.retryDelay = config.retryDelay || 1000;
     this.logQueries = config.logQueries !== undefined ? config.logQueries : (process.env.NODE_ENV === 'development');
+    this.environment = isProduction || isAzure ? 'production' : 'development';
   }
 
   /**
@@ -50,10 +72,12 @@ class Database {
         });
 
         logger.info('Connected to PostgreSQL database', {
+          environment: this.environment,
           host: this.config.host,
           port: this.config.port,
           database: this.config.database,
-          user: this.config.user
+          user: this.config.user,
+          ssl: !!this.config.ssl
         });
 
         return;

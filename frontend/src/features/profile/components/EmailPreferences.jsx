@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { api } from '../../../shared';
 import { logger } from '../../../shared/utils/logger';
 
 const EmailPreferences = () => {
@@ -18,17 +18,16 @@ const EmailPreferences = () => {
 
   const fetchPreferences = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const token = localStorage.getItem('token');
-      
-      const response = await axios.get(`${apiUrl}/preferences/email`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setPreferences(response.data.preferences);
+      const response = await api.get('/user/preferences/email');
+      setPreferences(response.data.preferences || response.data);
     } catch (error) {
       logger.error('Failed to fetch preferences:', error);
-      toast.error('Failed to load email preferences');
+      // If endpoint doesn't exist yet, use default values
+      if (error.response?.status === 404) {
+        logger.info('Email preferences endpoint not found, using defaults');
+      } else {
+        toast.error('Failed to load email preferences');
+      }
     } finally {
       setLoading(false);
     }
@@ -42,20 +41,18 @@ const EmailPreferences = () => {
 
     setSaving(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const token = localStorage.getItem('token');
-      
-      await axios.put(
-        `${apiUrl}/preferences/email`,
-        newPreferences,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
+      await api.put('/user/preferences/email', newPreferences);
       setPreferences(newPreferences);
       toast.success('Preferences updated');
     } catch (error) {
       logger.error('Failed to update preferences:', error);
-      toast.error('Failed to update preferences');
+      // If endpoint doesn't exist yet, just update locally
+      if (error.response?.status === 404) {
+        setPreferences(newPreferences);
+        toast.success('Preferences updated (locally)');
+      } else {
+        toast.error('Failed to update preferences');
+      }
     } finally {
       setSaving(false);
     }
