@@ -223,3 +223,97 @@ class AuthService {
 }
 
 module.exports = AuthService;
+
+  /**
+   * Forgot password - Generate reset token and send email
+   * @param {string} email - User email
+   * @returns {Promise<void>}
+   */
+  async forgotPassword(email) {
+    const crypto = require('crypto');
+    const emailService = require('../../../services/emailService');
+
+    // Get user by email
+    const userData = await this.db.queryOne(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (!userData) {
+      // Don't reveal if email exists
+      return;
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Save reset token to database
+    await this.db.execute(
+      `UPDATE users 
+       SET password_reset_token = $1, 
+           password_reset_expires = $2 
+       WHERE id = $3`,
+      [resetTokenHash, resetTokenExpires, userData.id]
+    );
+
+    // Send reset email
+    const user = new User(userData);
+    await emailService.sendPasswordResetEmail(user, resetToken);
+  }
+
+  /**
+   * Reset password with token
+   * @param {string} token - Reset token
+   * @param {string} newPassword - New password
+   * @returns {Promise<void>}
+   */
+  async resetPassword(token, newPassword) {
+    const crypto = require('crypto');
+
+    // Validate password strength
+    if (newPassword.length < 8) {
+      throw new ValidationError('Password must be at least 8 characters long');
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one lowercase letter');
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      throw new ValidationError('Password must contain at least one number');
+    }
+
+    // Hash the token to compare with database
+    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid reset token
+    const userData = await this.db.queryOne(
+      `SELECT * FROM users 
+       WHERE password_reset_token = $1 
+       AND password_reset_expires > NOW()`,
+      [resetTokenHash]
+    );
+
+    if (!userData) {
+      throw new UnauthorizedError('Invalid or expired reset token');
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    // Update password and clear reset token
+    await this.db.execute(
+      `UPDATE users 
+       SET password = $1, 
+           password_reset_token = NULL, 
+           password_reset_expires = NULL 
+       WHERE id = $2`,
+      [passwordHash, userData.id]
+    );
+  }
+}
+
+module.exports = AuthService;

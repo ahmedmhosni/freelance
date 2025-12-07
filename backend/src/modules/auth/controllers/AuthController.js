@@ -19,6 +19,8 @@ class AuthController extends BaseController {
     this.router.post('/register', this.register.bind(this));
     this.router.post('/login', this.login.bind(this));
     this.router.post('/refresh', this.refreshToken.bind(this));
+    this.router.post('/forgot-password', this.forgotPassword.bind(this));
+    this.router.post('/reset-password', this.resetPassword.bind(this));
 
     // Protected routes
     this.router.get('/me', authenticateToken, this.getCurrentUser.bind(this));
@@ -205,6 +207,70 @@ class AuthController extends BaseController {
       res.json({
         success: true,
         message: 'Logged out successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Forgot password - Send reset email
+   * POST /api/v2/auth/forgot-password
+   */
+  async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      if (!email || typeof email !== 'string' || email.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid email is required'
+        });
+      }
+
+      await this.authService.forgotPassword(email);
+
+      // Always return success to prevent email enumeration
+      res.json({
+        success: true,
+        message: 'If an account exists with this email, a password reset link has been sent.'
+      });
+    } catch (error) {
+      // Don't expose if email exists or not
+      res.json({
+        success: true,
+        message: 'If an account exists with this email, a password reset link has been sent.'
+      });
+    }
+  }
+
+  /**
+   * Reset password with token
+   * POST /api/v2/auth/reset-password
+   */
+  async resetPassword(req, res, next) {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || typeof token !== 'string' || token.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid reset token is required'
+        });
+      }
+
+      if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid new password is required'
+        });
+      }
+
+      await this.authService.resetPassword(token, newPassword);
+
+      res.json({
+        success: true,
+        message: 'Password has been reset successfully. You can now login with your new password.'
       });
     } catch (error) {
       next(error);
