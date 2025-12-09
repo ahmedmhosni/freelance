@@ -303,6 +303,18 @@ bootstrap({ createApp: false }).then(({ container }) => {
   // Global error handler (must be last)
   app.use(errorHandler);
 
+  // Initialize AI Service
+  const aiService = require('./services/AIService');
+  aiService.initialize().then(() => {
+    if (aiService.isEnabled()) {
+      logger.info('✅ AI Assistant initialized and enabled');
+    } else {
+      logger.info('ℹ️  AI Assistant disabled or not configured');
+    }
+  }).catch(error => {
+    logger.warn('AI Assistant initialization failed:', error.message);
+  });
+
   // Start server after all routes are registered
   server.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`);
