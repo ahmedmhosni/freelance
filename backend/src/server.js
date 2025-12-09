@@ -45,6 +45,8 @@ const adminActivityRoutes = require('./routes/admin-activity');
 const versionRoutes = require('./routes/version');
 const changelogRoutes = require('./routes/changelog');
 const announcementsRoutes = require('./routes/announcements');
+const aiRoutes = require('./routes/ai');
+const adminAiRoutes = require('./routes/admin-ai');
 
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./shared/middleware/errorHandler');
@@ -257,6 +259,8 @@ bootstrap({ createApp: false }).then(({ container }) => {
   app.use('/api/preferences', preferencesRoutes);
   app.use('/api/admin/gdpr', adminGdprRoutes);
   app.use('/api/admin/activity', adminActivityRoutes);
+  app.use('/api/admin/ai', adminAiRoutes);
+  app.use('/api/ai', aiRoutes);
   app.use('/api/version', versionRoutes);
   app.use('/api/changelog', changelogRoutes);
   app.use('/api/announcements', announcementsRoutes);

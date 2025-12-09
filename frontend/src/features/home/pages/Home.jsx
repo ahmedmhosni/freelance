@@ -132,14 +132,19 @@ const Home = () => {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: isDark ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)'
+        background: isDark ? 'rgba(10, 10, 10, 0.90)' : 'rgba(255, 255, 255, 0.90)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
+        boxShadow: isDark 
+          ? '0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15)'
+          : '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+        transition: 'all 0.3s ease'
       }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '16px 40px',
+          padding: '20px 40px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
@@ -148,29 +153,43 @@ const Home = () => {
             src="/Asset 7.svg" 
             alt="Roastify" 
             style={{ 
-              height: '32px',
-              filter: isDark ? 'brightness(0) invert(1)' : 'none'
-            }} 
+              height: '36px',
+              filter: isDark ? 'brightness(0) invert(1)' : 'none',
+              transition: 'transform 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               onClick={toggleTheme}
               style={{
-                width: '36px',
-                height: '36px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '50%',
                 border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-                color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)',
+                background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.9)',
+                color: isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(55, 53, 47, 0.8)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: isDark 
+                  ? '0 2px 8px rgba(0, 0, 0, 0.2)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.08)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.9)';
               }}
             >
-              {isDark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
+              {isDark ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
             </button>
             
             {isLoggedIn ? (
@@ -198,16 +217,24 @@ const Home = () => {
                   to="/login"
                   className="header-btn-secondary"
                   style={{
-                    padding: '8px 16px',
+                    padding: '10px 20px',
                     fontSize: '14px',
                     fontWeight: '600',
                     color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
                     background: 'transparent',
                     border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-                    borderRadius: '3px',
+                    borderRadius: '6px',
                     textDecoration: 'none',
-                    transition: 'all 0.15s ease',
+                    transition: 'all 0.2s ease',
                     display: 'inline-block'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.05)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   Sign in
@@ -217,16 +244,31 @@ const Home = () => {
                   to="/register"
                   className="header-btn-primary"
                   style={{
-                    padding: '8px 16px',
+                    padding: '10px 20px',
                     fontSize: '14px',
                     fontWeight: '600',
                     color: isDark ? '#191919' : '#ffffff',
                     background: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
                     border: 'none',
-                    borderRadius: '3px',
+                    borderRadius: '6px',
                     textDecoration: 'none',
-                    transition: 'all 0.15s ease',
-                    display: 'inline-block'
+                    transition: 'all 0.2s ease',
+                    display: 'inline-block',
+                    boxShadow: isDark 
+                      ? '0 2px 8px rgba(255, 255, 255, 0.15)'
+                      : '0 2px 8px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = isDark 
+                      ? '0 4px 12px rgba(255, 255, 255, 0.2)'
+                      : '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = isDark 
+                      ? '0 2px 8px rgba(255, 255, 255, 0.15)'
+                      : '0 2px 8px rgba(0, 0, 0, 0.1)';
                   }}
                 >
                   Get started
@@ -244,7 +286,7 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '80px 40px 80px',
+        padding: '160px 40px 120px',
         textAlign: 'center',
         position: 'relative',
         zIndex: 1,
@@ -256,106 +298,155 @@ const Home = () => {
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '8px',
-          padding: '6px 14px',
-          background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.1)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
-          borderRadius: '20px',
+          gap: '10px',
+          padding: '10px 24px',
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)'
+            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
+          border: '1px solid rgba(99, 102, 241, 0.4)',
+          borderRadius: '30px',
           fontSize: '13px',
-          fontWeight: '500',
+          fontWeight: '600',
           color: '#6366f1',
-          marginBottom: '32px',
+          marginBottom: '56px',
           width: 'fit-content',
-          margin: '0 auto 32px'
-        }}>
+          margin: '0 auto 56px',
+          boxShadow: isDark 
+            ? '0 4px 16px rgba(99, 102, 241, 0.2)'
+            : '0 4px 16px rgba(99, 102, 241, 0.15)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = isDark 
+            ? '0 6px 20px rgba(99, 102, 241, 0.3)'
+            : '0 6px 20px rgba(99, 102, 241, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = isDark 
+            ? '0 4px 16px rgba(99, 102, 241, 0.2)'
+            : '0 4px 16px rgba(99, 102, 241, 0.15)';
+        }}
+        >
           <span style={{
-            width: '6px',
-            height: '6px',
+            width: '8px',
+            height: '8px',
             borderRadius: '50%',
-            background: '#6366f1',
-            animation: 'pulse 2s ease-in-out infinite'
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            animation: 'pulse 2s ease-in-out infinite',
+            boxShadow: '0 0 12px rgba(99, 102, 241, 0.6)'
           }} />
           Early Access • Limited spots available
         </div>
 
         <h1 style={{
-          fontSize: window.innerWidth <= 768 ? '42px' : '60px',
+          fontSize: window.innerWidth <= 768 ? '48px' : '72px',
           fontWeight: '700',
           color: isDark ? '#ffffff' : '#37352f',
-          marginBottom: '24px',
-          lineHeight: '1.15',
-          letterSpacing: '-0.03em'
+          marginBottom: '36px',
+          lineHeight: '1.1',
+          letterSpacing: '-0.04em',
+          textShadow: isDark 
+            ? '0 2px 20px rgba(99, 102, 241, 0.3)'
+            : '0 2px 20px rgba(99, 102, 241, 0.1)'
         }}>
           Every brilliant idea{' '}
           <span style={{
             background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            backgroundSize: '200% 200%',
+            animation: 'gradientShift 8s ease infinite'
           }}>
             needs to be roasted
           </span>
         </h1>
 
         <p style={{
-          fontSize: '20px',
+          fontSize: '24px',
           fontWeight: '500',
-          color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.75)',
-          maxWidth: '580px',
-          margin: '0 auto 16px',
-          lineHeight: '1.4'
+          color: isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(55, 53, 47, 0.8)',
+          maxWidth: '640px',
+          margin: '0 auto 28px',
+          lineHeight: '1.5'
         }}>
           Everything you need. Nothing you don't.
         </p>
         
         <p style={{
-          fontSize: '16px',
+          fontSize: '18px',
           fontWeight: '400',
-          color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(55, 53, 47, 0.6)',
-          maxWidth: '540px',
-          margin: '0 auto 36px',
-          lineHeight: '1.6'
+          color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(55, 53, 47, 0.65)',
+          maxWidth: '600px',
+          margin: '0 auto 56px',
+          lineHeight: '1.7'
         }}>
           Manage clients, track time, get paid. Simple tools for freelancers.
         </p>
 
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '56px' }}>
           <Link
             to="/register"
             className="hero-btn-primary"
             style={{
-              padding: '16px 32px',
-              fontSize: '15px',
+              padding: '18px 40px',
+              fontSize: '16px',
               fontWeight: '600',
               color: '#ffffff',
               background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               border: 'none',
-              borderRadius: '3px',
+              borderRadius: '8px',
               textDecoration: 'none',
-              transition: 'all 0.15s ease',
+              transition: 'all 0.3s ease',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '10px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = '0 8px 30px rgba(99, 102, 241, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(99, 102, 241, 0.4)';
             }}
           >
             Join the early access
-            <MdArrowForward size={20} />
+            <MdArrowForward size={22} />
           </Link>
           
           <Link
             to="/login"
             className="hero-btn-secondary"
             style={{
-              padding: '16px 32px',
-              fontSize: '15px',
+              padding: '18px 40px',
+              fontSize: '16px',
               fontWeight: '600',
               color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#37352f',
-              background: 'transparent',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
-              borderRadius: '3px',
+              background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.05)',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(55, 53, 47, 0.2)',
+              borderRadius: '8px',
               textDecoration: 'none',
-              transition: 'all 0.15s ease',
-              display: 'inline-block'
+              transition: 'all 0.3s ease',
+              display: 'inline-block',
+              backdropFilter: 'blur(10px)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(55, 53, 47, 0.08)';
+              e.currentTarget.style.boxShadow = isDark 
+                ? '0 8px 30px rgba(255, 255, 255, 0.1)'
+                : '0 8px 30px rgba(0, 0, 0, 0.08)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(55, 53, 47, 0.05)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             Sign in
@@ -366,19 +457,47 @@ const Home = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '24px',
+          gap: '32px',
           flexWrap: 'wrap',
-          fontSize: '13px',
-          color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)'
+          fontSize: '14px',
+          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+          fontWeight: '500'
         }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '16px' }}>🔥</span> Early access
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(55, 53, 47, 0.9)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>🔥</span> Early access
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '16px' }}>✨</span> Free registration
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(55, 53, 47, 0.9)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>✨</span> Free registration
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '16px' }}>⚡</span> Limited spots
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(55, 53, 47, 0.9)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>⚡</span> Limited spots
           </span>
         </div>
       </div>
@@ -392,11 +511,12 @@ const Home = () => {
         borderBottom: isDark ? '1px solid rgba(168, 85, 247, 0.1)' : '1px solid rgba(168, 85, 247, 0.08)',
         position: 'relative',
         zIndex: 1,
-        marginTop: '60px',
+        marginTop: '100px',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        padding: '80px 0'
       }}>
         <FeatureSlider isDark={isDark} />
       </div>
@@ -405,13 +525,13 @@ const Home = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '100px 40px',
+        padding: '120px 40px',
         position: 'relative',
         zIndex: 1
       }}>
         <div style={{
           textAlign: 'center',
-          marginBottom: '56px'
+          marginBottom: '80px'
         }}>
           <h2 style={{
             fontSize: window.innerWidth <= 768 ? '36px' : '48px',
@@ -643,7 +763,7 @@ const Home = () => {
         <div style={{
           maxWidth: '900px',
           margin: '0 auto',
-          padding: '100px 40px',
+          padding: '120px 40px',
           textAlign: 'center'
       }}>
         <div style={{
@@ -764,24 +884,98 @@ const Home = () => {
       {/* Footer */}
       <footer style={{
         borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(55, 53, 47, 0.08)',
-        padding: '40px',
+        padding: '60px 40px',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        background: isDark 
+          ? 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.5) 100%)'
+          : 'linear-gradient(180deg, transparent 0%, rgba(247, 246, 243, 0.5) 100%)'
       }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
           textAlign: 'center'
         }}>
+          {/* Security Badges - Integrated in Footer */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '16px',
-            fontSize: '13px',
-            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-            marginBottom: '12px'
+            gap: '24px',
+            marginBottom: '32px',
+            paddingBottom: '32px',
+            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(55, 53, 47, 0.06)'
+          }}>
+            {[
+              { 
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                ),
+                label: '256-bit SSL'
+              },
+              { 
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                ),
+                label: 'GDPR Compliant'
+              },
+              { 
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                ),
+                label: '99.9% Uptime'
+              },
+              { 
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M1 12h6m6 0h6m-13.2 5.2l4.2-4.2m0-6l-4.2-4.2"/>
+                  </svg>
+                ),
+                label: 'Data Privacy'
+              }
+            ].map((item, i) => (
+              <div 
+                key={i} 
+                style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(55, 53, 47, 0.8)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)';
+                }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '20px',
+            fontSize: '14px',
+            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.6)',
+            marginBottom: '20px',
+            fontWeight: '500'
           }}>
             <Link 
               to="/terms" 
@@ -907,9 +1101,10 @@ const Home = () => {
           </div>
           
           <div style={{
-            fontSize: '13px',
+            fontSize: '14px',
             color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-            marginBottom: '12px'
+            marginBottom: '16px',
+            marginTop: '24px'
           }}>
             © {new Date().getFullYear()} Roastify. All rights reserved.
           </div>
@@ -969,10 +1164,48 @@ const Home = () => {
           }
         }
 
-        /* Minimal hover effects for all buttons */
-        a[href="/register"]:hover,
-        a[href="/login"]:hover {
-          opacity: 0.85;
+        @keyframes gradientShift {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        /* Smooth scroll behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+
+        /* Enhanced button hover effects */
+        .hero-btn-primary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .hero-btn-primary:hover::before {
+          opacity: 1;
+        }
+
+        /* Responsive font sizes */
+        @media (max-width: 768px) {
+          h1 {
+            font-size: 42px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          h1 {
+            font-size: 36px !important;
+          }
         }
       `}</style>
       </div>

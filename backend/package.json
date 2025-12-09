@@ -19,6 +19,7 @@
     "@azure/storage-blob": "^12.29.1",
     "@babel/parser": "^7.28.5",
     "@babel/traverse": "^7.28.5",
+    "@google/generative-ai": "^0.24.1",
     "applicationinsights": "^3.12.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",

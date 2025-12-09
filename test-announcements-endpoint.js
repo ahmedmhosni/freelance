@@ -1,4 +1,4 @@
-// Test Announcements Endpoint
+is // Test Announcements Endpoint
 const https = require('https');
 
 console.log('Testing announcements endpoint...\n');

@@ -9,6 +9,7 @@ import FeedbackWidget from '../components/FeedbackWidget';
 import MobileBlocker from '../components/MobileBlocker';
 import AppFooter from '../components/AppFooter';
 import SecurityNotice from '../components/SecurityNotice';
+import AIAssistant from '../components/AIAssistant';
 import { TimerWidget } from '../../features/time-tracking';
 import axios from 'axios';
 import { logger } from '../utils/logger';
@@ -75,7 +76,8 @@ const Layout = () => {
         {isMaintenanceMode && user?.role === 'admin' && <MaintenanceBanner />}
       
       <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{
-        marginTop: isMaintenanceMode && user?.role === 'admin' ? '48px' : '0'
+        marginTop: isMaintenanceMode && user?.role === 'admin' ? '48px' : '0',
+        padding: isCollapsed ? '32px 8px' : '32px 16px'
       }}>
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -109,7 +111,7 @@ const Layout = () => {
           {isCollapsed ? <MdChevronRight size={16} /> : <MdChevronLeft size={16} />}
         </button>
 
-        <div className="sidebar-header">
+        <div className="sidebar-header" style={{ marginBottom: '32px' }}>
           {!isCollapsed ? (
             <>
               <img 
@@ -117,7 +119,7 @@ const Layout = () => {
                 alt="Logo" 
                 style={{ 
                   height: '28px', 
-                  marginBottom: '12px',
+                  marginBottom: '20px',
                   filter: isDark ? 'brightness(0) invert(1)' : 'none',
                   display: 'block'
                 }} 
@@ -125,7 +127,7 @@ const Layout = () => {
               <div style={{
                 fontSize: '13px',
                 color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(55, 53, 47, 0.5)',
-                marginBottom: '4px',
+                marginBottom: '6px',
                 fontWeight: '400'
               }}>
                 {(() => {
@@ -170,7 +172,7 @@ const Layout = () => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
               return (
-                <li key={item.path} style={{ marginBottom: '2px' }}>
+                <li key={item.path} style={{ marginBottom: '4px' }}>
                   <Link 
                     to={item.path} 
                     title={isCollapsed ? item.label : ''}
@@ -181,7 +183,7 @@ const Layout = () => {
                       textDecoration: 'none', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      padding: '6px 12px', 
+                      padding: '10px 12px', 
                       borderRadius: '3px',
                       background: isActive 
                         ? (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(55, 53, 47, 0.08)')
@@ -226,8 +228,8 @@ const Layout = () => {
 
         <div style={{ 
           borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
-          paddingTop: '12px',
-          marginTop: '12px'
+          paddingTop: '20px',
+          marginTop: '20px'
         }}>
           <button
             onClick={toggleTheme}
@@ -236,7 +238,7 @@ const Layout = () => {
               width: '100%',
               background: 'transparent',
               color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-              padding: '6px 12px',
+              padding: '10px 12px',
               marginBottom: '8px',
               borderRadius: '3px',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
@@ -270,7 +272,7 @@ const Layout = () => {
               width: '100%',
               background: 'transparent',
               color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(55, 53, 47, 0.65)',
-              padding: '6px 12px',
+              padding: '10px 12px',
               marginBottom: '8px',
               borderRadius: '3px',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(55, 53, 47, 0.16)',
@@ -314,8 +316,8 @@ const Layout = () => {
           {/* Footer Links & Version - Compact */}
           {!isCollapsed && (
             <div style={{
-              marginTop: '12px',
-              paddingTop: '12px',
+              marginTop: '20px',
+              paddingTop: '20px',
               borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)'
             }}>
               <div style={{
@@ -432,8 +434,8 @@ const Layout = () => {
               to="/changelog"
               title={`Version ${version.version}${version.version_name ? ` - ${version.version_name}` : ''}`}
               style={{
-                marginTop: '12px',
-                paddingTop: '12px',
+                marginTop: '20px',
+                paddingTop: '20px',
                 borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(55, 53, 47, 0.09)',
                 textAlign: 'center',
                 fontSize: '9px',
@@ -480,6 +482,9 @@ const Layout = () => {
       
         {/* Feedback Widget - appears on all pages */}
         <FeedbackWidget />
+        
+        {/* AI Assistant - appears on all pages */}
+        <AIAssistant />
       </div>
     </>
   );
