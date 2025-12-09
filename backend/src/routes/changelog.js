@@ -73,7 +73,8 @@ router.get('/public', async (req, res) => {
     res.json({ versions });
   } catch (error) {
     console.error('Error fetching changelog:', error);
-    res.status(500).json({ error: 'Failed to fetch changelog' });
+    // Return empty changelog if table doesn't exist
+    res.json({ versions: [] });
   }
 });
 

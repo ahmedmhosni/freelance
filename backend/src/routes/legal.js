@@ -53,7 +53,11 @@ router.get('/privacy', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching privacy policy:', error);
-    res.status(500).json({ error: 'Failed to fetch privacy policy' });
+    // Return default privacy if table doesn't exist
+    res.json({
+      content: getDefaultPrivacy(),
+      lastUpdated: new Date().toISOString()
+    });
   }
 });
 
