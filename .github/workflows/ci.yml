@@ -2,9 +2,9 @@ name: CI - Test and Build
 
 on:
   push:
-    branches: [ main, kiro, develop ]
+    branches: [ disabled ]  # Temporarily disabled - no tests yet
   pull_request:
-    branches: [ main, kiro ]
+    branches: [ disabled ]
 
 jobs:
   test-backend:

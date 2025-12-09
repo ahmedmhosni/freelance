@@ -2,7 +2,7 @@ name: CD - Deploy to AWS
 
 on:
   push:
-    branches: [ kiro ]  # Currently deploying from kiro branch for testing
+    branches: [ disabled ]  # Disabled - using Azure instead of AWS
   workflow_dispatch:
     inputs:
       environment:
