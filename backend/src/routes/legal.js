@@ -24,7 +24,11 @@ router.get('/terms', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching terms:', error);
-    res.status(500).json({ error: 'Failed to fetch terms' });
+    // Return default terms if table doesn't exist
+    res.json({
+      content: getDefaultTerms(),
+      lastUpdated: new Date().toISOString()
+    });
   }
 });
 

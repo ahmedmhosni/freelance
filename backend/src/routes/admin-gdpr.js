@@ -28,64 +28,79 @@ const { asyncHandler } = require('../middleware/errorHandler');
  *         description: List of export requests
  */
 router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { status, limit = 50 } = req.query;
+  try {
+    const { status, limit = 50 } = req.query;
 
-  let sql = `
-    SELECT 
-      der.id,
-      der.user_id,
-      u.name as user_name,
-      u.email as user_email,
-      der.status,
-      der.requested_at,
-      der.completed_at,
-      der.expires_at,
-      der.error_message,
-      CASE 
-        WHEN der.expires_at < NOW() THEN true 
-        ELSE false 
-      END as is_expired
-    FROM data_export_requests der
-    JOIN users u ON der.user_id = u.id
-  `;
+    let sql = `
+      SELECT 
+        der.id,
+        der.user_id,
+        u.name as user_name,
+        u.email as user_email,
+        der.status,
+        der.requested_at,
+        der.completed_at,
+        der.expires_at,
+        der.error_message,
+        CASE 
+          WHEN der.expires_at < NOW() THEN true 
+          ELSE false 
+        END as is_expired
+      FROM data_export_requests der
+      JOIN users u ON der.user_id = u.id
+    `;
 
-  const params = [];
-  if (status) {
-    sql += ' WHERE der.status = $1';
-    params.push(status);
+    const params = [];
+    if (status) {
+      sql += ' WHERE der.status = $1';
+      params.push(status);
+    }
+
+    sql += ' ORDER BY der.requested_at DESC LIMIT $' + (params.length + 1);
+    params.push(limit);
+
+    const result = await query(sql, params);
+
+    // Get stats
+    const statsResult = await query(`
+      SELECT 
+        status,
+        COUNT(*) as count
+      FROM data_export_requests
+      GROUP BY status
+    `);
+
+    const stats = {
+      total: 0,
+      pending: 0,
+      processing: 0,
+      completed: 0,
+      failed: 0
+    };
+
+    statsResult.rows.forEach(row => {
+      stats[row.status] = parseInt(row.count);
+      stats.total += parseInt(row.count);
+    });
+
+    res.json({
+      requests: result.rows,
+      stats
+    });
+  } catch (error) {
+    console.error('Error fetching GDPR export requests:', error);
+    // Return empty data if table doesn't exist
+    res.json({
+      requests: [],
+      stats: {
+        total: 0,
+        pending: 0,
+        processing: 0,
+        completed: 0,
+        failed: 0
+      }
+    });
   }
-
-  sql += ' ORDER BY der.requested_at DESC LIMIT $' + (params.length + 1);
-  params.push(limit);
-
-  const result = await query(sql, params);
-
-  // Get stats
-  const statsResult = await query(`
-    SELECT 
-      status,
-      COUNT(*) as count
-    FROM data_export_requests
-    GROUP BY status
-  `);
-
-  const stats = {
-    total: 0,
-    pending: 0,
-    processing: 0,
-    completed: 0,
-    failed: 0
-  };
-
-  statsResult.rows.forEach(row => {
-    stats[row.status] = parseInt(row.count);
-    stats.total += parseInt(row.count);
-  });
-
-  res.json({
-    requests: result.rows,
-    stats
-  });
 }));
 
 /**

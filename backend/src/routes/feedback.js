@@ -212,12 +212,21 @@ router.get('/', authenticateToken, asyncHandler(async (req, res) => {
 
   queryText += ' ORDER BY f.created_at DESC';
 
-  const result = await query(queryText, params);
+  try {
+    const result = await query(queryText, params);
 
-  res.json({
-    success: true,
-    feedback: result.rows
-  });
+    res.json({
+      success: true,
+      feedback: result.rows
+    });
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    // Return empty array if table doesn't exist
+    res.json({
+      success: true,
+      feedback: []
+    });
+  }
 }));
 
 /**

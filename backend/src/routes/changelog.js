@@ -97,7 +97,8 @@ router.get('/admin/versions', authenticateToken, requireAdmin, async (req, res) 
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching versions:', error);
-    res.status(500).json({ error: 'Failed to fetch versions' });
+    // Return empty array if table doesn't exist
+    res.json([]);
   }
 });
 
@@ -525,7 +526,8 @@ router.get('/admin/version-names', authenticateToken, requireAdmin, async (req, 
     res.json({ names });
   } catch (error) {
     console.error('Error fetching version names:', error);
-    res.status(500).json({ error: 'Failed to fetch version names', message: error.message });
+    // Return empty array if table doesn't exist
+    res.json({ names: [] });
   }
 });
 

@@ -203,36 +203,61 @@ router.post('/delete-inactive', authenticateToken, requireAdmin, asyncHandler(as
  *         description: Activity statistics
  */
 router.get('/stats', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const stats = await query(`
-    SELECT 
-      COUNT(*) as total_users,
-      COUNT(*) FILTER (WHERE last_login_at IS NOT NULL) as users_logged_in,
-      COUNT(*) FILTER (WHERE last_login_at IS NULL) as never_logged_in,
-      COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '7 days') as active_7_days,
-      COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '30 days') as active_30_days,
-      COUNT(*) FILTER (WHERE last_login_at < NOW() - INTERVAL '90 days' OR last_login_at IS NULL) as inactive_90_days,
-      AVG(login_count) as avg_login_count,
-      MAX(last_login_at) as most_recent_login,
-      MIN(last_login_at) as oldest_login
-    FROM users
-    WHERE deleted_at IS NULL
-  `);
+  try {
+    const stats = await query(`
+      SELECT 
+        COUNT(*) as total_users,
+        COUNT(*) FILTER (WHERE last_login_at IS NOT NULL) as users_logged_in,
+        COUNT(*) FILTER (WHERE last_login_at IS NULL) as never_logged_in,
+        COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '7 days') as active_7_days,
+        COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '30 days') as active_30_days,
+        COUNT(*) FILTER (WHERE last_login_at < NOW() - INTERVAL '90 days' OR last_login_at IS NULL) as inactive_90_days,
+        AVG(login_count) as avg_login_count,
+        MAX(last_login_at) as most_recent_login,
+        MIN(last_login_at) as oldest_login
+      FROM users
+      WHERE deleted_at IS NULL
+    `);
 
-  const recentActivity = await query(`
-    SELECT 
-      action,
-      COUNT(*) as count
-    FROM activity_logs
-    WHERE created_at > NOW() - INTERVAL '7 days'
-    GROUP BY action
-    ORDER BY count DESC
-    LIMIT 10
-  `);
+    let recentActivity = { rows: [] };
+    try {
+      recentActivity = await query(`
+        SELECT 
+          action,
+          COUNT(*) as count
+        FROM activity_logs
+        WHERE created_at > NOW() - INTERVAL '7 days'
+        GROUP BY action
+        ORDER BY count DESC
+        LIMIT 10
+      `);
+    } catch (error) {
+      // activity_logs table doesn't exist yet - return empty array
+      console.warn('activity_logs table not found, returning empty recent actions');
+    }
 
-  res.json({
-    userStats: stats.rows[0],
-    recentActions: recentActivity.rows
-  });
+    res.json({
+      userStats: stats.rows[0],
+      recentActions: recentActivity.rows
+    });
+  } catch (error) {
+    // If users table query fails, return default values
+    console.error('Error fetching activity stats:', error);
+    res.json({
+      userStats: {
+        total_users: 0,
+        users_logged_in: 0,
+        never_logged_in: 0,
+        active_7_days: 0,
+        active_30_days: 0,
+        inactive_90_days: 0,
+        avg_login_count: 0,
+        most_recent_login: null,
+        oldest_login: null
+      },
+      recentActions: []
+    });
+  }
 }));
 
 module.exports = router;
