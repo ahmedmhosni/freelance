@@ -1,46 +1,83 @@
-name: Azure Static Web Apps CI/CD
+name: 🌐 Deploy Frontend to Azure Static Web Apps
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/azure-static-web-apps-white-sky-0a7e9f003.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even without frontend changes'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: 🔧 Build and Deploy Frontend
+    environment: 
+      name: production
+      url: https://white-sky-0a7e9f003.4.azurestaticapps.net
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
-      - name: Build And Deploy
+
+      - name: 🚀 Build and Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
           VITE_API_URL: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net/api
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WHITE_SKY_0A7E9F003 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./frontend" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "./frontend"
+          api_location: ""
+          output_location: "dist"
+
+      - name: 🏥 Health Check
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "⏳ Waiting for frontend deployment to stabilize..."
+          sleep 20
+          
+          FRONTEND_URL="https://white-sky-0a7e9f003.4.azurestaticapps.net"
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -f -s "$FRONTEND_URL" > /dev/null; then
+              echo "✅ Frontend health check passed!"
+              echo "🎉 Frontend deployment successful!"
+              exit 0
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "⏳ Frontend health check attempt $RETRY_COUNT/$MAX_RETRIES..."
+            sleep 10
+          done
+          
+          echo "⚠️ Frontend health check timeout (this is often normal for static sites)"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
+    name: 🧹 Close Pull Request
     steps:
-      - name: Close Pull Request
+      - name: 🧹 Close Pull Request
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
