@@ -1,0 +1,1667 @@
+{
+  "timestamp": "2025-12-10T00:28:01.569Z",
+  "summary": {
+    "totalTables": 33,
+    "tablesWithData": 13,
+    "tablesWithRoutes": 16,
+    "totalRows": 3839
+  },
+  "tables": [
+    {
+      "name": "activity_log",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "action",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "entity_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "entity_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "details",
+          "data_type": "jsonb"
+        },
+        {
+          "column_name": "ip_address",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "user_agent",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "activity_logs",
+      "rowCount": 15,
+      "columnCount": 9,
+      "routes": [
+        "admin-activity.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "action",
+          "data_type": "text"
+        },
+        {
+          "column_name": "entity_type",
+          "data_type": "text"
+        },
+        {
+          "column_name": "entity_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "details",
+          "data_type": "text"
+        },
+        {
+          "column_name": "ip_address",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "user_agent",
+          "data_type": "text"
+        }
+      ]
+    },
+    {
+      "name": "admin_reports",
+      "rowCount": 0,
+      "columnCount": 6,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "report_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "generated_by",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "parameters",
+          "data_type": "jsonb"
+        },
+        {
+          "column_name": "result_data",
+          "data_type": "jsonb"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "ai_analytics",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [
+        "admin-ai.js"
+      ],
+      "hasData": false,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "total_requests",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "total_users",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "total_tokens",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "avg_response_time_ms",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "error_count",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "ai_conversations",
+      "rowCount": 0,
+      "columnCount": 8,
+      "routes": [
+        "ai.js"
+      ],
+      "hasData": false,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "response",
+          "data_type": "text"
+        },
+        {
+          "column_name": "context",
+          "data_type": "jsonb"
+        },
+        {
+          "column_name": "tokens",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "response_time_ms",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "ai_settings",
+      "rowCount": 1,
+      "columnCount": 10,
+      "routes": [
+        "admin-ai.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "enabled",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "provider",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "api_key_encrypted",
+          "data_type": "text"
+        },
+        {
+          "column_name": "daily_limit",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "hourly_limit",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "max_message_length",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "system_prompt",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "ai_usage",
+      "rowCount": 0,
+      "columnCount": 11,
+      "routes": [
+        "ai.js",
+        "admin-ai.js"
+      ],
+      "hasData": false,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "daily_count",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "hourly_count",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "total_requests",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "total_tokens",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "daily_reset_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "hourly_reset_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "last_request_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "announcements",
+      "rowCount": 6,
+      "columnCount": 8,
+      "routes": [
+        "announcements.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "content",
+          "data_type": "text"
+        },
+        {
+          "column_name": "is_featured",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "media_url",
+          "data_type": "text"
+        },
+        {
+          "column_name": "media_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "changelog_entries",
+      "rowCount": 0,
+      "columnCount": 7,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "version",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "release_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "is_current",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "changelog_items",
+      "rowCount": 8,
+      "columnCount": 7,
+      "routes": [
+        "changelog.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "version_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "category",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "sort_order",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "clients",
+      "rowCount": 0,
+      "columnCount": 10,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "email",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "phone",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "company",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "address",
+          "data_type": "text"
+        },
+        {
+          "column_name": "notes",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "data_export_requests",
+      "rowCount": 0,
+      "columnCount": 7,
+      "routes": [
+        "admin-gdpr.js"
+      ],
+      "hasData": false,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "export_url",
+          "data_type": "text"
+        },
+        {
+          "column_name": "expires_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "completed_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "feedback",
+      "rowCount": 2,
+      "columnCount": 10,
+      "routes": [
+        "feedback.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "screenshot_url",
+          "data_type": "text"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "admin_notes",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "file_metadata",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "file_name",
+          "data_type": "text"
+        },
+        {
+          "column_name": "cloud_provider",
+          "data_type": "text"
+        },
+        {
+          "column_name": "file_link",
+          "data_type": "text"
+        },
+        {
+          "column_name": "file_size",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "mime_type",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "files",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "filename",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "original_name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "file_path",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "file_size",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "mime_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "gdpr_requests",
+      "rowCount": 0,
+      "columnCount": 6,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "request_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "requested_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "completed_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "git_commits",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [
+        "changelog.js"
+      ],
+      "hasData": false,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "commit_hash",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "commit_message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "commit_date",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "author_name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "author_email",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "is_processed",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "version_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "git_sync_status",
+      "rowCount": 1,
+      "columnCount": 4,
+      "routes": [
+        "changelog.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "last_synced_commit",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "last_synced_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "invoice_items",
+      "rowCount": 0,
+      "columnCount": 11,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "invoice_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "task_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "quantity",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "unit_price",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "hours_worked",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "rate_per_hour",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "amount",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "invoices",
+      "rowCount": 0,
+      "columnCount": 16,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "client_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "invoice_number",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "issue_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "due_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "amount",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "tax",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "total",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "notes",
+          "data_type": "text"
+        },
+        {
+          "column_name": "sent_date",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "paid_date",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "legal_content",
+      "rowCount": 5,
+      "columnCount": 7,
+      "routes": [
+        "legal.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "content",
+          "data_type": "text"
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "updated_by",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "maintenance",
+      "rowCount": 0,
+      "columnCount": 4,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "is_enabled",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "maintenance_content",
+      "rowCount": 1,
+      "columnCount": 8,
+      "routes": [],
+      "hasData": true,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "subtitle",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "launch_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "updated_by",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "notifications",
+      "rowCount": 0,
+      "columnCount": 7,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "related_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "is_read",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "projects",
+      "rowCount": 0,
+      "columnCount": 11,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "client_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "budget",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "start_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "end_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "quotes",
+      "rowCount": 3,
+      "columnCount": 6,
+      "routes": [
+        "quotes.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "text",
+          "data_type": "text"
+        },
+        {
+          "column_name": "author",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "category",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "status_history",
+      "rowCount": 3744,
+      "columnCount": 7,
+      "routes": [],
+      "hasData": true,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "service_name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "response_time",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "checked_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "error_message",
+          "data_type": "text"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb"
+        }
+      ]
+    },
+    {
+      "name": "tasks",
+      "rowCount": 0,
+      "columnCount": 11,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "priority",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "due_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "assigned_to",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "time_entries",
+      "rowCount": 0,
+      "columnCount": 13,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "task_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "start_time",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "end_time",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "duration",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "is_billable",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "is_running",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "hourly_rate",
+          "data_type": "numeric"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "user_preferences",
+      "rowCount": 0,
+      "columnCount": 9,
+      "routes": [],
+      "hasData": false,
+      "hasRoutes": false,
+      "columns": [
+        {
+          "column_name": "user_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "email_marketing",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "email_notifications",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "email_updates",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "theme",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "language",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "timezone",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "rowCount": 5,
+      "columnCount": 37,
+      "routes": [
+        "auth.js",
+        "admin-activity.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "email",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "password",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "role",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "email_verified",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "email_verification_token",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "email_verification_code",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "email_verification_expires",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "password_reset_token",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "password_reset_expires",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "username",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "job_title",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "bio",
+          "data_type": "text"
+        },
+        {
+          "column_name": "profile_picture",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "location",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "website",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "linkedin",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "behance",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "instagram",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "facebook",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "twitter",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "github",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "dribbble",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "portfolio",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "profile_visibility",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "theme",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "last_login_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "last_activity_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "login_count",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "deleted_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "deletion_reason",
+          "data_type": "text"
+        },
+        {
+          "column_name": "last_login_ip",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "password_reset_code",
+          "data_type": "character varying"
+        }
+      ]
+    },
+    {
+      "name": "version_names",
+      "rowCount": 46,
+      "columnCount": 10,
+      "routes": [
+        "changelog.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "name_type",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "sort_order",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "is_used",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "used_at",
+          "data_type": "timestamp without time zone"
+        }
+      ]
+    },
+    {
+      "name": "versions",
+      "rowCount": 2,
+      "columnCount": 9,
+      "routes": [
+        "changelog.js"
+      ],
+      "hasData": true,
+      "hasRoutes": true,
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "version",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "release_date",
+          "data_type": "date"
+        },
+        {
+          "column_name": "is_published",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "created_by",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone"
+        },
+        {
+          "column_name": "version_name",
+          "data_type": "character varying"
+        },
+        {
+          "column_name": "is_major_release",
+          "data_type": "boolean"
+        }
+      ]
+    }
+  ],
+  "missingTables": [
+    "deleted_accounts",
+    "email_preferences",
+    "password_resets",
+    "verification_codes"
+  ],
+  "tablesWithoutRoutes": [
+    "activity_log",
+    "admin_reports",
+    "changelog_entries",
+    "clients",
+    "file_metadata",
+    "files",
+    "gdpr_requests",
+    "invoice_items",
+    "invoices",
+    "maintenance",
+    "maintenance_content",
+    "notifications",
+    "projects",
+    "status_history",
+    "tasks",
+    "time_entries",
+    "user_preferences"
+  ],
+  "dataWithoutRoutes": [
+    "maintenance_content",
+    "status_history"
+  ],
+  "emptyWithRoutes": [
+    "ai_analytics",
+    "ai_conversations",
+    "ai_usage",
+    "data_export_requests",
+    "git_commits"
+  ]
+}

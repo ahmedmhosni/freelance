@@ -26,7 +26,12 @@ router.get('/daily', async (req, res) => {
     });
   } catch (error) {
     console.error('Server error in daily quote:', error);
-    res.status(500).json({ error: 'Server error' });
+    // Return fallback quote instead of error
+    res.json({
+      text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.',
+      author: 'Winston Churchill',
+      category: 'motivation'
+    });
   }
 });
 
