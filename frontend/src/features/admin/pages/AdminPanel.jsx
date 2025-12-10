@@ -8,6 +8,7 @@ import LegalEditor from '../components/LegalEditor';
 import { ChangelogEditor } from '../../changelog';
 import VersionNamesManager from '../components/VersionNamesManager';
 import FeedbackManager from '../components/FeedbackManager';
+import AIAssistantManager from '../components/AIAssistantManager';
 import { AnnouncementsManager } from '../../announcements';
 import { MdCheckCircle, MdError, MdWarning, MdTrendingUp } from 'react-icons/md';
 import { FaUsers, FaFolder, FaFileInvoice, FaDollarSign, FaServer } from 'react-icons/fa';
@@ -216,6 +217,12 @@ const AdminPanel = () => {
           className={`view-toggle ${activeTab === 'announcements' ? 'active' : ''}`}
         >
           Announcements
+        </button>
+        <button
+          onClick={() => setActiveTab('ai-assistant')}
+          className={`view-toggle ${activeTab === 'ai-assistant' ? 'active' : ''}`}
+        >
+          AI Assistant
         </button>
         <Link to="/app/admin/gdpr" style={{ textDecoration: 'none' }}>
           <button className="view-toggle" style={{ width: '100%' }}>
@@ -560,6 +567,8 @@ const AdminPanel = () => {
       {activeTab === 'feedback' && <FeedbackManager />}
 
       {activeTab === 'announcements' && <AnnouncementsManager />}
+
+      {activeTab === 'ai-assistant' && <AIAssistantManager />}
     </div>
   );
 };

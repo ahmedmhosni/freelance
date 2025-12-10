@@ -12,7 +12,7 @@ class GeminiProvider {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(this.apiKey);
         this.client = genAI.getGenerativeModel({ 
-          model: this.settings.model || 'gemini-2.0-flash-exp'
+          model: this.settings.model || 'gemini-2.0-flash'
         });
       } catch (error) {
         console.error('Failed to initialize Gemini client:', error);
@@ -41,8 +41,19 @@ class GeminiProvider {
       const response = result.response;
       return response.text();
     } catch (error) {
-      console.error('Gemini API error:', error);
-      throw new Error('Failed to generate AI response');
+      console.error('Gemini API error details:', {
+        message: error.message,
+        status: error.status,
+        statusText: error.statusText,
+        errorDetails: error.errorDetails
+      });
+      
+      // Check for quota errors
+      if (error.status === 429 || error.message.includes('quota')) {
+        throw new Error('AI service temporarily unavailable due to quota limits. Please try again later.');
+      }
+      
+      throw new Error(`Failed to generate AI response: ${error.message}`);
     }
   }
 }

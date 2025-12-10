@@ -248,6 +248,10 @@ bootstrap({ createApp: false }).then(({ container }) => {
   const gdprController = container.resolve('gdprController');
   app.use('/api/gdpr', gdprController.router);
 
+  // AI module (new architecture)
+  const aiController = container.resolve('aiController');
+  app.use('/api/ai', aiController.router);
+
   // Additional routes that don't have new architecture equivalents yet
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/quotes', quotesRoutes);
@@ -305,8 +309,8 @@ bootstrap({ createApp: false }).then(({ container }) => {
   // Global error handler (must be last)
   app.use(errorHandler);
 
-  // Initialize AI Service
-  const aiService = require('./services/AIService');
+  // Initialize AI Service (new modular architecture)
+  const aiService = container.resolve('aiService');
   aiService.initialize().then(() => {
     if (aiService.isEnabled()) {
       logger.info('✅ AI Assistant initialized and enabled');

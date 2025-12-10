@@ -262,6 +262,155 @@ class AIService {
 
     return result.rows;
   }
+
+  async getUsageStats() {
+    try {
+      // Get total requests
+      const totalResult = await query(
+        `SELECT COALESCE(SUM(total_requests), 0) as total_requests
+         FROM ai_analytics`
+      );
+
+      // Get active users (users who made requests in last 30 days)
+      const activeUsersResult = await query(
+        `SELECT COUNT(DISTINCT user_id) as active_users
+         FROM ai_conversations
+         WHERE created_at >= NOW() - INTERVAL '30 days'`
+      );
+
+      // Get requests today
+      const todayResult = await query(
+        `SELECT COALESCE(total_requests, 0) as requests_today
+         FROM ai_analytics
+         WHERE date = CURRENT_DATE`
+      );
+
+      // Get average response time (mock data for now)
+      const avgResponseTime = 1200; // milliseconds
+
+      return {
+        total_requests: parseInt(totalResult.rows[0]?.total_requests || 0),
+        active_users: parseInt(activeUsersResult.rows[0]?.active_users || 0),
+        requests_today: parseInt(todayResult.rows[0]?.requests_today || 0),
+        avg_response_time: avgResponseTime
+      };
+    } catch (error) {
+      console.error('Error getting usage stats:', error);
+      return {
+        total_requests: 0,
+        active_users: 0,
+        requests_today: 0,
+        avg_response_time: 0
+      };
+    }
+  }
+
+  async testConnection() {
+    try {
+      if (!this.provider) {
+        return {
+          success: false,
+          error: 'AI provider not initialized. Check API key configuration.'
+        };
+      }
+
+      // Test with a simple message
+      const testMessage = 'Hello, this is a connection test. Please respond with "Connection successful".';
+      const response = await this.provider.generateResponse(testMessage, []);
+
+      if (response && response.length > 0) {
+        return {
+          success: true,
+          message: 'Connection test successful',
+          response: response.substring(0, 100) + '...'
+        };
+      } else {
+        return {
+          success: false,
+          error: 'No response received from AI provider'
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  async updateSettings(newSettings) {
+    try {
+      // Update settings in database
+      await query(
+        `INSERT INTO ai_settings (id, enabled, provider, model, max_tokens, temperature, 
+                                  system_prompt, rate_limit_per_user, rate_limit_window, welcome_message)
+         VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9)
+         ON CONFLICT (id) 
+         DO UPDATE SET 
+           enabled = $1,
+           provider = $2,
+           model = $3,
+           max_tokens = $4,
+           temperature = $5,
+           system_prompt = $6,
+           rate_limit_per_user = $7,
+           rate_limit_window = $8,
+           welcome_message = $9,
+           updated_at = NOW()`,
+        [
+          newSettings.enabled,
+          newSettings.provider || 'gemini',
+          newSettings.model || 'gemini-pro',
+          newSettings.max_tokens || 1000,
+          newSettings.temperature || 0.7,
+          newSettings.system_prompt || 'You are a helpful AI assistant.',
+          newSettings.rate_limit_per_user || 10,
+          newSettings.rate_limit_window || 3600,
+          newSettings.welcome_message || 'Hello! How can I help you today?'
+        ]
+      );
+
+      // Update local settings
+      this.settings = { ...this.settings, ...newSettings };
+
+      // Reinitialize provider if needed
+      if (newSettings.enabled && process.env.GEMINI_API_KEY) {
+        this.provider = new GeminiProvider(process.env.GEMINI_API_KEY, this.settings);
+      } else if (!newSettings.enabled) {
+        this.provider = null;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating AI settings:', error);
+      throw error;
+    }
+  }
+
+  async getSettings() {
+    try {
+      const result = await query('SELECT * FROM ai_settings WHERE id = 1');
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        // Return default settings
+        return {
+          enabled: false,
+          provider: 'gemini',
+          model: 'gemini-pro',
+          max_tokens: 1000,
+          temperature: 0.7,
+          system_prompt: 'You are a helpful AI assistant for a freelance management platform.',
+          rate_limit_per_user: 10,
+          rate_limit_window: 3600,
+          welcome_message: 'Hello! I\'m your AI assistant. How can I help you today?'
+        };
+      }
+    } catch (error) {
+      console.error('Error getting AI settings:', error);
+      throw error;
+    }
+  }
 }
 
 // Singleton instance

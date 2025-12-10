@@ -6,11 +6,10 @@ import {
   MdSmartToy, 
   MdClose, 
   MdSend, 
-  MdMinimize,
   MdExpandMore,
   MdExpandLess
 } from 'react-icons/md';
-import axios from 'axios';
+import api from '../utils/api';
 
 const AIAssistant = () => {
   const { isDark } = useTheme();
@@ -21,6 +20,7 @@ const AIAssistant = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -33,8 +33,7 @@ const AIAssistant = () => {
 
   const checkAIAvailability = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await axios.get(`${apiUrl}/ai/status`);
+      const response = await api.get('/ai/status');
       setIsEnabled(response.data.enabled);
     } catch (error) {
       logger.error('Failed to check AI availability:', error);
@@ -58,18 +57,26 @@ const AIAssistant = () => {
     setIsLoading(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await axios.post(`${apiUrl}/ai/chat`, {
+      const response = await api.post('/ai/chat', {
         message: userMessage,
-        context: 'assistant'
+        conversation_id: conversationId
       });
 
       // Add AI response
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: response.data.response, 
-        timestamp: new Date() 
-      }]);
+      if (response.data.success) {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: response.data.data.response, 
+          timestamp: new Date() 
+        }]);
+        
+        // Store conversation ID for future messages
+        if (response.data.data.conversation_id) {
+          setConversationId(response.data.data.conversation_id);
+        }
+      } else {
+        throw new Error(response.data.error || 'Failed to get AI response');
+      }
     } catch (error) {
       logger.error('AI chat error:', error);
       setMessages(prev => [...prev, { 
@@ -104,7 +111,7 @@ const AIAssistant = () => {
           title="AI Assistant"
           style={{
             position: 'fixed',
-            bottom: '20px',
+            bottom: '90px',
             right: '20px',
             width: '56px',
             height: '56px',
@@ -140,7 +147,7 @@ const AIAssistant = () => {
         <div
           style={{
             position: 'fixed',
-            bottom: '20px',
+            bottom: '90px',
             right: '20px',
             width: '380px',
             height: isMinimized ? '60px' : '500px',
@@ -323,7 +330,7 @@ const AIAssistant = () => {
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   placeholder="Type your message..."
                   disabled={isLoading}
                   style={{
@@ -376,7 +383,7 @@ const AIAssistant = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0%, 80%, 100% {
             opacity: 0.3;

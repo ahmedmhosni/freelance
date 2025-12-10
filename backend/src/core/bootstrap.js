@@ -26,6 +26,7 @@ const { registerAuthModule } = require('../modules/auth');
 const { registerAdminModule } = require('../modules/admin');
 const { registerUserPreferencesModule } = require('../modules/user-preferences');
 const { registerGDPRModule } = require('../modules/gdpr');
+const { registerAIModule } = require('../modules/ai');
 
 /**
  * Bootstrap the application
@@ -230,6 +231,10 @@ function registerModules(container) {
   // Register GDPR module
   registerGDPRModule(container);
   logger.info('GDPR module registered');
+
+  // Register AI module
+  registerAIModule(container);
+  logger.info('AI module registered');
 
   // Additional modules will be registered here as they are migrated
 }

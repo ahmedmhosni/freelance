@@ -138,21 +138,51 @@ router.get('/analytics', authenticateToken, requireAdmin, async (req, res) => {
  * @swagger
  * /api/admin/ai/usage:
  *   get:
- *     summary: Get all users' AI usage (Admin only)
+ *     summary: Get AI usage statistics (Admin only)
  *     tags: [Admin, AI]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Users' AI usage
+ *         description: AI usage statistics
  */
 router.get('/usage', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const users = await aiService.getAllUsage();
-    res.json({ users });
+    const usage = await aiService.getUsageStats();
+    res.json(usage);
   } catch (error) {
     console.error('Error fetching AI usage:', error);
-    res.json({ users: [] });
+    res.json({
+      total_requests: 0,
+      active_users: 0,
+      requests_today: 0,
+      avg_response_time: 0
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/admin/ai/test-connection:
+ *   post:
+ *     summary: Test AI service connection (Admin only)
+ *     tags: [Admin, AI]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Connection test result
+ */
+router.post('/test-connection', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const result = await aiService.testConnection();
+    res.json(result);
+  } catch (error) {
+    console.error('Error testing AI connection:', error);
+    res.json({
+      success: false,
+      error: error.message
+    });
   }
 });
 
