@@ -22,10 +22,19 @@ let config;
 if (isProduction || isAzure) {
   // Production: Use Azure PostgreSQL
   console.log('🌐 Environment: PRODUCTION (Azure PostgreSQL)');
+  // Debug: Log available DB environment variables
+  console.log('🔍 Available DB Environment Variables:', {
+    DB_HOST: process.env.DB_HOST ? 'SET' : 'MISSING',
+    DB_DATABASE: process.env.DB_DATABASE || 'UNDEFINED',
+    DB_NAME: process.env.DB_NAME || 'UNDEFINED',
+    DB_USER: process.env.DB_USER ? 'SET' : 'MISSING',
+    DB_PORT: process.env.DB_PORT || 'UNDEFINED'
+  });
+
   config = {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_DATABASE,
+    database: process.env.DB_DATABASE || process.env.DB_NAME || 'roastifydb',
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     ssl: {
