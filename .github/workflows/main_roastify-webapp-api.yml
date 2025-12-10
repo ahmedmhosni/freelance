@@ -19,9 +19,6 @@ jobs:
   deploy-backend:
     name: 🔧 Deploy Backend API
     runs-on: ubuntu-latest
-    environment: 
-      name: production
-      url: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net
     permissions:
       id-token: write
       contents: read

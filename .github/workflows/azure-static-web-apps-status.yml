@@ -20,8 +20,6 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: 🔧 Build and Deploy Status Page
-    environment: 
-      name: status-page
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4

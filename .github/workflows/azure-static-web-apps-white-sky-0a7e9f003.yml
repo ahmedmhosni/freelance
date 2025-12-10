@@ -26,9 +26,6 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: 🔧 Build and Deploy Frontend
-    environment: 
-      name: production
-      url: https://white-sky-0a7e9f003.4.azurestaticapps.net
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
