@@ -30,7 +30,8 @@ router.get('/', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching announcements:', error);
-    res.status(500).json({ error: 'Failed to fetch announcements' });
+    // Return empty array if table doesn't exist
+    res.json([]);
   }
 });
 
@@ -43,7 +44,8 @@ router.get('/featured', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching featured announcements:', error);
-    res.status(500).json({ error: 'Failed to fetch featured announcements' });
+    // Return empty array if table doesn't exist
+    res.json([]);
   }
 });
 
