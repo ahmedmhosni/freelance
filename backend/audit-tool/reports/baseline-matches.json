@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-12-06T08:39:34.766Z",
+  "timestamp": "2025-12-10T07:35:39.616Z",
   "statistics": {
-    "totalFrontend": 248,
-    "totalBackend": 85,
+    "totalFrontend": 199,
+    "totalBackend": 95,
     "matchedCount": 58,
-    "matchRate": 0.6823529411764706,
+    "matchRate": 0.6105263157894737,
     "improvementFromPrevious": 0
   },
   "matchedCount": 58,
@@ -660,20 +660,8 @@
     {
       "frontend": {
         "method": "get",
-        "path": "/profile",
-        "fullPath": "/api/profile"
-      },
-      "backend": {
-        "method": "GET",
-        "path": "/api/profile/"
-      },
-      "confidence": "exact"
-    },
-    {
-      "frontend": {
-        "method": "get",
-        "path": "/profile/:username",
-        "fullPath": "/api/profile/:username"
+        "path": "/profile/me",
+        "fullPath": "/api/profile/me"
       },
       "backend": {
         "method": "GET",
@@ -683,13 +671,13 @@
     },
     {
       "frontend": {
-        "method": "get",
-        "path": "/api/status/history",
-        "fullPath": "/api/status/history"
+        "method": "put",
+        "path": "/profile/me",
+        "fullPath": "/api/profile/me"
       },
       "backend": {
-        "method": "GET",
-        "path": "/api/status/history"
+        "method": "PUT",
+        "path": "/api/profile/me"
       },
       "confidence": "exact"
     },
@@ -702,6 +690,18 @@
       "backend": {
         "method": "GET",
         "path": "/api/profile/:username"
+      },
+      "confidence": "exact"
+    },
+    {
+      "frontend": {
+        "method": "get",
+        "path": "/api/status/history",
+        "fullPath": "/api/status/history"
+      },
+      "backend": {
+        "method": "GET",
+        "path": "/api/status/history"
       },
       "confidence": "exact"
     }

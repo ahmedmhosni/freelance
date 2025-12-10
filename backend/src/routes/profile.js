@@ -29,9 +29,29 @@ const upload = multer({
  *   description: User profile management
  */
 
-// Root route - redirect to /me
+// Root route - get current user's profile (same as /me)
 router.get('/', authenticateToken, asyncHandler(async (req, res) => {
-  res.redirect('/api/profile/me');
+  const profileQuery = `
+    SELECT 
+      id, name, email, username, role,
+      job_title, bio, profile_picture, location, website,
+      linkedin, behance, instagram, facebook, twitter, github, dribbble, portfolio,
+      profile_visibility,
+      created_at
+    FROM users 
+    WHERE id = $1
+  `;
+  
+  const result = await query(profileQuery, [req.user.id]);
+  
+  if (!result.rows || result.rows.length === 0) {
+    throw new AppError('Profile not found', 404);
+  }
+  
+  res.json({
+    message: 'Profile retrieved successfully',
+    profile: result.rows[0]
+  });
 }));
 
 /**

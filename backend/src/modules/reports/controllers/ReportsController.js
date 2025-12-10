@@ -17,6 +17,9 @@ class ReportsController extends BaseController {
     // Apply authentication to all routes
     this.router.use(authenticateToken);
 
+    // Root route - list available reports
+    this.router.get('/', this.getAvailableReports.bind(this));
+
     // Financial report
     this.router.get('/financial', this.getFinancialReport.bind(this));
 
@@ -33,8 +36,63 @@ class ReportsController extends BaseController {
   }
 
   /**
+   * Get available reports
+   * GET /api/reports
+   */
+  async getAvailableReports(req, res, next) {
+    try {
+      const reports = [
+        {
+          name: 'Financial Report',
+          endpoint: '/api/reports/financial',
+          description: 'Revenue, expenses, and profit analysis',
+          parameters: ['startDate', 'endDate']
+        },
+        {
+          name: 'Project Report',
+          endpoint: '/api/reports/projects',
+          description: 'Project status and completion analysis',
+          parameters: []
+        },
+        {
+          name: 'Client Report',
+          endpoint: '/api/reports/clients',
+          description: 'Client activity and revenue analysis',
+          parameters: []
+        },
+        {
+          name: 'Time Tracking by Tasks',
+          endpoint: '/api/reports/time-tracking/tasks',
+          description: 'Time spent on individual tasks',
+          parameters: ['start_date', 'end_date']
+        },
+        {
+          name: 'Time Tracking by Projects',
+          endpoint: '/api/reports/time-tracking/projects',
+          description: 'Time spent on projects',
+          parameters: ['start_date', 'end_date']
+        },
+        {
+          name: 'Time Tracking by Clients',
+          endpoint: '/api/reports/time-tracking/clients',
+          description: 'Time spent for each client',
+          parameters: ['start_date', 'end_date']
+        }
+      ];
+
+      res.json({
+        message: 'Available reports',
+        reports,
+        total: reports.length
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Get financial report
-   * GET /api/v2/reports/financial
+   * GET /api/reports/financial
    */
   async getFinancialReport(req, res, next) {
     try {

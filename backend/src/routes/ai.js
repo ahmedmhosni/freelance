@@ -5,6 +5,32 @@ const aiService = require('../services/AIService');
 
 /**
  * @swagger
+ * /api/ai/status:
+ *   get:
+ *     summary: Check AI service availability
+ *     tags: [AI]
+ *     responses:
+ *       200:
+ *         description: AI service status
+ */
+router.get('/status', (req, res) => {
+  try {
+    const enabled = aiService.isEnabled();
+    res.json({ 
+      enabled,
+      message: enabled ? 'AI Assistant is available' : 'AI Assistant is not configured'
+    });
+  } catch (error) {
+    console.error('AI status check error:', error);
+    res.json({ 
+      enabled: false,
+      message: 'AI Assistant is not available'
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/ai/chat:
  *   post:
  *     summary: Chat with AI Assistant

@@ -2,7 +2,7 @@
 
 **Task 8.3: Verify Target Match Rate Achieved**
 
-Generated: 2025-12-06T08:38:19.474Z
+Generated: 2025-12-10T07:35:25.150Z
 
 ---
 
@@ -11,9 +11,9 @@ Generated: 2025-12-06T08:38:19.474Z
 ⚠️ **TARGET NOT MET**: The match rate is below the target.
 
 - **Target**: 82.0% match rate
-- **Achieved**: 68.2% match rate
-- **Shortfall**: 13.8%
-- **Improvement from baseline**: +2.2%
+- **Achieved**: 61.1% match rate
+- **Shortfall**: 20.9%
+- **Improvement from baseline**: +-4.9%
 
 ## Target Achievement
 
@@ -21,16 +21,16 @@ Generated: 2025-12-06T08:38:19.474Z
 
 **Requirement 6.3**: "WHEN the Route Matcher runs on the full codebase, THEN the Route Matcher SHALL achieve at least 82% match rate (124/150 routes)"
 
-❌ **NOT MET**: Match rate of 68.2% is below the requirement of 82.0%
+❌ **NOT MET**: Match rate of 61.1% is below the requirement of 82.0%
 
 ### Key Metrics
 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
-| Match Rate | ≥ 82.0% | 68.2% | ❌ Fail |
+| Match Rate | ≥ 82.0% | 61.1% | ❌ Fail |
 | Matched Routes | ≥ 124 | 58 | ❌ Fail |
-| Total Backend Routes | ~150 | 85 | ℹ️ Info |
-| Total Frontend Calls | ~150 | 248 | ℹ️ Info |
+| Total Backend Routes | ~150 | 95 | ℹ️ Info |
+| Total Frontend Calls | ~150 | 199 | ℹ️ Info |
 
 ## Improvement Metrics
 
@@ -41,20 +41,12 @@ The baseline represents the state before implementing the route matching improve
 | Metric | Baseline | Current | Change |
 |--------|----------|---------|--------|
 | Matched Routes | 99 | 58 | -41 |
-| Match Rate | 66.0% | 68.2% | +2.2% |
-| Unmatched Backend | 51 | 27 | -24 |
+| Match Rate | 66.0% | 61.1% | -4.9% |
+| Unmatched Backend | 51 | 37 | -14 |
 
 ### Improvement Summary
 
-The enhanced route matcher improved the match rate by **2.2%**, identifying **-41 additional route matches**.
-
-**Key Improvements:**
-
-1. **Enhanced Parameter Detection**: Recognizes both Express-style (:id) and template literal (${id}) parameters
-2. **Improved Query Parameter Handling**: Correctly strips query parameters before comparison
-3. **Case-Insensitive Method Matching**: Handles method variations (GET, get, Get)
-4. **Better Path Normalization**: Handles edge cases like trailing slashes and hash fragments
-5. **Detailed Mismatch Reporting**: Provides specific reasons for non-matches
+The match rate remained at 61.1%.
 
 ## Detailed Analysis
 
@@ -143,8 +135,8 @@ Total matched routes: **58**
 
 ### Unmatched Routes Analysis
 
-**Unmatched Backend Routes**: 27
-**Unmatched Frontend Calls**: 190
+**Unmatched Backend Routes**: 37
+**Unmatched Frontend Calls**: 141
 
 #### Sample Unmatched Backend Routes
 
@@ -152,27 +144,27 @@ Total matched routes: **58**
 2. `GET /api/admin-activity/user-activity` (unknown)
 3. `POST /api/admin-activity/delete-inactive` (unknown)
 4. `GET /api/admin-activity/stats` (unknown)
-5. `GET /api/admin-gdpr/export-requests` (unknown)
-6. `GET /api/admin-gdpr/deleted-accounts` (unknown)
-7. `POST /api/admin-gdpr/restore-account` (unknown)
-8. `GET /api/admin-gdpr/email-preferences-stats` (unknown)
-9. `GET /api/admin-gdpr/deletion-reasons` (unknown)
-10. `GET /api/feedback/` (unknown)
+5. `GET /api/admin-ai/settings` (unknown)
+6. `PUT /api/admin-ai/settings` (unknown)
+7. `GET /api/admin-ai/analytics` (unknown)
+8. `GET /api/admin-ai/usage` (unknown)
+9. `GET /api/admin-gdpr/export-requests` (unknown)
+10. `GET /api/admin-gdpr/deleted-accounts` (unknown)
 
-... and 17 more unmatched routes
+... and 27 more unmatched routes
 
 ## Conclusion
 
 ⚠️ **The target match rate has not been fully achieved.**
 
-While the enhanced matcher improved the match rate by 2.2%, achieving 68.2%, it falls short of the 82.0% target.
+While the enhanced matcher improved the match rate by -4.9%, achieving 61.1%, it falls short of the 82.0% target.
 
 **Gap Analysis:**
 
-- Current match rate: 68.2%
+- Current match rate: 61.1%
 - Target match rate: 82.0%
-- Shortfall: 13.8%
-- Additional matches needed: ~12 routes
+- Shortfall: 20.9%
+- Additional matches needed: ~20 routes
 
 **Recommendations:**
 
