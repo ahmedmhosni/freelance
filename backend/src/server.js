@@ -74,7 +74,9 @@ app.set('trust proxy', true);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://roastify.online',
+  'https://white-sky-0a7e9f003.4.azurestaticapps.net'
 ];
 
 // Add production URLs from environment variable
