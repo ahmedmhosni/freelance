@@ -1,0 +1,100 @@
+# GitHub Actions Workflow for Backend Deployment to Azure App Service
+name: Deploy Backend to Azure App Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'package.json'
+      - '.github/workflows/deploy-backend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: roastify-webapp-api
+  AZURE_WEBAPP_PACKAGE_PATH: './backend'
+  NODE_VERSION: '18.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+
+    - name: 📦 Install root dependencies
+      run: npm ci
+
+    - name: 📦 Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+
+    - name: 🧪 Run backend tests
+      run: |
+        cd backend
+        npm run test --if-present
+
+    - name: 🔍 Security audit
+      run: |
+        cd backend
+        npm audit --audit-level=moderate
+
+    - name: 🏗️ Build backend (if build script exists)
+      run: |
+        cd backend
+        npm run build --if-present
+
+    - name: 📁 Prepare deployment package
+      run: |
+        cd backend
+        # Remove dev dependencies and test files for production
+        rm -rf node_modules
+        npm ci --only=production
+        # Remove unnecessary files
+        rm -rf src/**/*.test.js
+        rm -rf src/**/*.spec.js
+        rm -rf coverage/
+        rm -rf .nyc_output/
+
+    - name: 🚀 Deploy to Azure App Service
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+    - name: 🔍 Health check
+      run: |
+        echo "Waiting for deployment to complete..."
+        sleep 30
+        curl -f https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/health || exit 1
+        echo "✅ Backend deployment successful!"
+
+  notify:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📢 Deployment notification
+      run: |
+        if [ "${{ needs.build-and-deploy.result }}" == "success" ]; then
+          echo "✅ Backend deployment to Azure App Service completed successfully!"
+          echo "🔗 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+        else
+          echo "❌ Backend deployment failed!"
+          exit 1
+        fi
