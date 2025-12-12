@@ -70,7 +70,7 @@ jobs:
       run: |
         echo "Waiting for deployment to complete..."
         sleep 30
-        if curl -f https://${{ env.AZURE_WEBAPP_NAME }}.canadaeast-01.azurewebsites.net/api/health; then
+        if curl -f https://api.roastify.online/api/health; then
           echo "✅ Backend health check passed!"
         else
           echo "⚠️ Health check failed (DNS or app issue), but deployment step already completed."
