@@ -54,7 +54,6 @@ jobs:
         cd frontend
         npm run build
       env:
-        # Add any build-time environment variables here
         VITE_API_URL: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net/api
 
     - name: 🚀 Deploy to Azure Static Web Apps
@@ -63,10 +62,10 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         action: "upload"
-        app_location: "./frontend/build"   # only built static files
+        app_location: "./frontend/dist"   # <- your build output
         api_location: ""
-        output_location: "."               # files are directly in build folder
-        skip_app_build: true               # build already ran above [web:278][web:438]
+        output_location: "."              # files are directly in dist
+        skip_app_build: true              # build already done above [web:278][web:438]
 
     - name: 🔍 Health check
       run: |
