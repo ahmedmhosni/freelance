@@ -21,7 +21,7 @@
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
     "@google/generative-ai": "^0.24.1",
-    "axios": "^1.13.2",
+    "axios": "^1.7.7",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "pg": "^8.16.3"
