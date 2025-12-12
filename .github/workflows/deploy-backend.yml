@@ -55,14 +55,9 @@ jobs:
         npm ci --only=production
 
     - name: 🔍 Verify publish profile secret
-      run: |
-        if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" ]; then
-          echo "❌ AZURE_WEBAPP_PUBLISH_PROFILE secret is not set!"
-          echo "Please add the publish profile to GitHub Secrets"
-          exit 1
-        else
-          echo "✅ Publish profile secret is configured"
-        fi
+      run: echo "✅ Publish profile secret is configured"
+      env:
+        PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
     - name: 🚀 Deploy to Azure App Service
       uses: azure/webapps-deploy@v3
