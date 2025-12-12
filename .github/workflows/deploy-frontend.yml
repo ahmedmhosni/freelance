@@ -54,7 +54,7 @@ jobs:
         cd frontend
         npm run build
       env:
-        VITE_API_URL: https://roastify-webapp-api.azurewebsites.net/api
+        VITE_API_URL: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net/api
 
     - name: 🚀 Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1

@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: roastify-webapp-api
+  AZURE_WEBAPP_NAME: roastify-webapp-api-c0hgg2h4f4djcwaf
   AZURE_WEBAPP_PACKAGE_PATH: './backend'
   NODE_VERSION: '20.x'
 
