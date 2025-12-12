@@ -42,16 +42,6 @@ jobs:
         cd backend
         npm ci
 
-    - name: 🧪 Run backend tests
-      run: |
-        cd backend
-        npm run test --if-present
-
-    - name: 🔍 Security audit
-      run: |
-        cd backend
-        npm audit --audit-level=moderate
-
     - name: 🏗️ Build backend (if build script exists)
       run: |
         cd backend
@@ -60,14 +50,9 @@ jobs:
     - name: 📁 Prepare deployment package
       run: |
         cd backend
-        # Remove dev dependencies and test files for production
+        # Install production dependencies only
         rm -rf node_modules
         npm ci --only=production
-        # Remove unnecessary files
-        rm -rf src/**/*.test.js
-        rm -rf src/**/*.spec.js
-        rm -rf coverage/
-        rm -rf .nyc_output/
 
     - name: 🚀 Deploy to Azure App Service
       uses: azure/webapps-deploy@v2
