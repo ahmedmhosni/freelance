@@ -76,6 +76,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:5173',
   'https://roastify.online',
+  'https://white-sky-0a7e9f003.3.azurestaticapps.net',
   'https://white-sky-0a7e9f003.4.azurestaticapps.net'
 ];
 
