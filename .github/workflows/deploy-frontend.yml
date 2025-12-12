@@ -63,10 +63,10 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         action: "upload"
-        app_location: "./frontend"   # matches App location /frontend in portal [image:1][web:278]
+        app_location: "./frontend/build"   # only built static files
         api_location: ""
-        output_location: "build"     # matches App artifact location 'build' in portal [image:1][web:278]
-        skip_app_build: true
+        output_location: "."               # files are directly in build folder
+        skip_app_build: true               # build already ran above [web:278][web:438]
 
     - name: 🔍 Health check
       run: |
