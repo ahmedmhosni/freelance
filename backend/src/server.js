@@ -94,6 +94,71 @@ async function startServer() {
       res.json([]);
     });
 
+    // Admin endpoints
+    app.get('/api/admin/reports', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/admin/users', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/admin/activity/stats', (req, res) => {
+      res.json({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalProjects: 0,
+        totalTasks: 0
+      });
+    });
+
+    app.get('/api/admin/gdpr/export-requests', (req, res) => {
+      res.json([]);
+    });
+
+    // Legal endpoints
+    app.get('/api/legal/terms', (req, res) => {
+      res.json({
+        title: 'Terms of Service',
+        content: 'Terms of service content will be available soon.',
+        lastUpdated: new Date().toISOString()
+      });
+    });
+
+    app.get('/api/legal/privacy', (req, res) => {
+      res.json({
+        title: 'Privacy Policy',
+        content: 'Privacy policy content will be available soon.',
+        lastUpdated: new Date().toISOString()
+      });
+    });
+
+    // AI Admin endpoints (ignoring AI assistant as requested)
+    app.get('/api/ai/admin/settings', (req, res) => {
+      res.json({
+        enabled: false,
+        message: 'AI Assistant is currently disabled'
+      });
+    });
+
+    app.get('/api/ai/admin/usage', (req, res) => {
+      res.json({
+        totalRequests: 0,
+        dailyRequests: 0,
+        monthlyRequests: 0
+      });
+    });
+
+    // Status endpoint
+    app.get('/api/status', (req, res) => {
+      res.json({
+        status: 'operational',
+        version: '2.0.1',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+      });
+    });
+
     // Root endpoints
     app.get('/', (req, res) => {
       res.status(200).json({ 
