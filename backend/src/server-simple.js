@@ -348,6 +348,21 @@ async function testBootstrapComponents() {
           }
         }
         
+        // Test the problematic auto-connect behavior
+        console.log('🔍 Testing database auto-connect behavior...');
+        try {
+          // This is what bootstrap does - and it might cause the restart issue
+          await database.connect();
+          console.log('✅ Database auto-connect successful');
+        } catch (error) {
+          console.error('❌ Database auto-connect failed:', error.message);
+          // This is the problematic part in bootstrap:
+          // if (process.env.NODE_ENV !== 'test') {
+          //   process.exit(1);  // ← This causes Azure restarts!
+          // }
+          console.log('⚠️ In bootstrap, this would call process.exit(1) and cause restart');
+        }
+        
       } catch (error) {
         console.error('❌ Database class test failed:', error.message);
       }
