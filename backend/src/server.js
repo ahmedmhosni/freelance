@@ -87,6 +87,17 @@ async function startServer() {
       res.json({ running: false, entry: null });
     });
 
+    app.get('/api/time-tracking/summary', (req, res) => {
+      res.json({
+        totalHours: 0,
+        totalEntries: 0,
+        thisWeek: 0,
+        thisMonth: 0,
+        billableHours: 0,
+        nonBillableHours: 0
+      });
+    });
+
     app.get('/api/tasks', (req, res) => {
       res.json([]);
     });
@@ -108,6 +119,38 @@ async function startServer() {
     });
 
     app.get('/api/time-tracking', (req, res) => {
+      res.json([]);
+    });
+
+    // Reports endpoints
+    app.get('/api/reports/time-tracking/tasks', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/reports/financial', (req, res) => {
+      res.json({
+        totalRevenue: 0,
+        totalExpenses: 0,
+        netProfit: 0,
+        invoicesPaid: 0,
+        invoicesPending: 0,
+        monthlyRevenue: []
+      });
+    });
+
+    app.get('/api/reports/time-tracking/clients', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/reports/projects', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/reports/time-tracking/projects', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/reports/clients', (req, res) => {
       res.json([]);
     });
 
