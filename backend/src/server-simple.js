@@ -7,8 +7,9 @@ const morgan = require('morgan');
 const compression = require('compression');
 const { query } = require('./db/postgresql');
 
-// Import auth routes (with error handling)
-let authRoutes, profileRoutes;
+// Import routes (with error handling)
+let authRoutes, profileRoutes, dashboardRoutes, quotesRoutes, maintenanceRoutes, healthRoutes;
+
 try {
   authRoutes = require('./routes/auth');
   console.log('✅ Auth routes loaded');
@@ -21,6 +22,34 @@ try {
   console.log('✅ Profile routes loaded');
 } catch (error) {
   console.error('❌ Failed to load profile routes:', error.message);
+}
+
+try {
+  dashboardRoutes = require('./routes/dashboard');
+  console.log('✅ Dashboard routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load dashboard routes:', error.message);
+}
+
+try {
+  quotesRoutes = require('./routes/quotes');
+  console.log('✅ Quotes routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load quotes routes:', error.message);
+}
+
+try {
+  maintenanceRoutes = require('./routes/maintenance');
+  console.log('✅ Maintenance routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load maintenance routes:', error.message);
+}
+
+try {
+  healthRoutes = require('./routes/health');
+  console.log('✅ Health routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load health routes:', error.message);
 }
 
 const app = express();
@@ -134,12 +163,38 @@ if (profileRoutes) {
   console.log('✅ Profile routes registered');
 }
 
-// Always have a test endpoint
-app.get('/api/auth/test', (req, res) => {
+if (dashboardRoutes) {
+  app.use('/api/dashboard', dashboardRoutes);
+  console.log('✅ Dashboard routes registered');
+}
+
+if (quotesRoutes) {
+  app.use('/api/quotes', quotesRoutes);
+  console.log('✅ Quotes routes registered');
+}
+
+if (maintenanceRoutes) {
+  app.use('/api/maintenance', maintenanceRoutes);
+  console.log('✅ Maintenance routes registered');
+}
+
+if (healthRoutes) {
+  app.use('/api', healthRoutes);
+  console.log('✅ Health routes registered');
+}
+
+// Status endpoint showing all loaded routes
+app.get('/api/routes/status', (req, res) => {
   res.json({ 
-    message: 'Auth test endpoint', 
-    authLoaded: !!authRoutes,
-    profileLoaded: !!profileRoutes,
+    message: 'Route loading status', 
+    routes: {
+      auth: !!authRoutes,
+      profile: !!profileRoutes,
+      dashboard: !!dashboardRoutes,
+      quotes: !!quotesRoutes,
+      maintenance: !!maintenanceRoutes,
+      health: !!healthRoutes
+    },
     timestamp: new Date().toISOString() 
   });
 });
