@@ -271,6 +271,11 @@ bootstrap({ createApp: false }).then(({ container }) => {
   app.use('/api/version', versionRoutes);
   app.use('/api/changelog', changelogRoutes);
   app.use('/api/announcements', announcementsRoutes);
+  // Simple ping endpoint (no dependencies)
+  app.get('/api/ping', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+  
   app.use('/api', healthRoutes);
 
   // Public route aliases (without /api prefix for frontend compatibility)
@@ -320,6 +325,17 @@ bootstrap({ createApp: false }).then(({ container }) => {
     }
   }).catch(error => {
     logger.warn('AI Assistant initialization failed:', error.message);
+  });
+
+  // Add global error handlers to prevent crashes
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', error);
+    console.error('❌ Uncaught Exception:', error.message);
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    console.error('❌ Unhandled Rejection:', reason);
   });
 
   // Start server after all routes are registered
