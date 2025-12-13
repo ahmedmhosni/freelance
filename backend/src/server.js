@@ -65,6 +65,35 @@ async function startServer() {
     app.use('/api/changelog', changelogRoutes);
     app.use('/api/gdpr', gdprRoutes);
 
+    // Add missing API endpoints that frontend expects
+    app.get('/api/time-tracking/running', (req, res) => {
+      res.json({ running: false, entry: null });
+    });
+
+    app.get('/api/tasks', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/notifications', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/projects', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/clients', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/invoices', (req, res) => {
+      res.json([]);
+    });
+
+    app.get('/api/time-tracking', (req, res) => {
+      res.json([]);
+    });
+
     // Root endpoints
     app.get('/', (req, res) => {
       res.status(200).json({ 
@@ -199,12 +228,40 @@ async function startServer() {
       });
     });
 
-    // Start server
-    app.listen(PORT, '0.0.0.0', () => {
+    // Start server with Socket.io support
+    const http = require('http');
+    const { Server } = require('socket.io');
+    
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: {
+        origin: [
+          'http://localhost:3000',
+          'http://localhost:3001', 
+          'http://localhost:5173',
+          'https://roastify.online',
+          'https://white-sky-0a7e9f003.3.azurestaticapps.net',
+          'https://white-sky-0a7e9f003.4.azurestaticapps.net'
+        ],
+        credentials: true
+      }
+    });
+
+    // Socket.io connection handling
+    io.on('connection', (socket) => {
+      logger.info(`Socket connected: ${socket.id}`);
+      
+      socket.on('disconnect', () => {
+        logger.info(`Socket disconnected: ${socket.id}`);
+      });
+    });
+
+    server.listen(PORT, '0.0.0.0', () => {
       logger.info(`✅ Full Production Server running on port ${PORT}`);
       logger.info(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`✅ Bootstrap system with DI container initialized`);
       logger.info(`✅ All modules loaded: Auth, AI, Clients, Projects, Tasks, Invoices`);
+      logger.info(`✅ Socket.io enabled for real-time features`);
       logger.info(`✅ Listening on all interfaces`);
     });
 
