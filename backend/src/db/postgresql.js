@@ -40,11 +40,12 @@ if (isProduction || isAzure) {
     ssl: {
       rejectUnauthorized: false // Required for Azure PostgreSQL
     },
-    // Production pool settings
+    // Production pool settings - more resilient timeouts
     max: 20,
     min: 2,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
+    connectionTimeoutMillis: 15000, // Increased from 10s to 15s
+    acquireTimeoutMillis: 20000,    // Added: timeout for acquiring connection from pool
     maxUses: 7500,
     allowExitOnIdle: false,
   };
@@ -62,7 +63,8 @@ if (isProduction || isAzure) {
     max: 10,
     min: 1,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 8000,  // Increased from 5s to 8s
+    acquireTimeoutMillis: 10000,    // Added: timeout for acquiring connection from pool
   };
 }
 
@@ -101,16 +103,53 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Helper function to execute queries
+// Helper function to execute queries with retry logic
 async function query(text, params = []) {
-  try {
-    const result = await pool.query(text, params);
-    return result;
-  } catch (error) {
-    console.error('PostgreSQL query error:', error);
-    console.error('Query:', text);
-    console.error('Params:', params);
-    throw error;
+  const maxRetries = 3;
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await pool.query(text, params);
+      
+      // If we succeeded after retries, log it
+      if (attempt > 1) {
+        console.log(`✅ Query succeeded on attempt ${attempt}/${maxRetries}`);
+      }
+      
+      return result;
+    } catch (error) {
+      lastError = error;
+      
+      // Check if this is a connection timeout or connection error
+      const isConnectionError = 
+        error.message.includes('Connection terminated') ||
+        error.message.includes('connection timeout') ||
+        error.message.includes('ECONNRESET') ||
+        error.message.includes('ENOTFOUND') ||
+        error.code === 'ECONNABORTED';
+
+      if (isConnectionError && attempt < maxRetries) {
+        console.warn(`⚠️ Database connection error on attempt ${attempt}/${maxRetries}, retrying...`);
+        console.warn(`Error: ${error.message}`);
+        
+        // Wait before retrying (exponential backoff)
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // If it's not a connection error or we've exhausted retries, log and throw
+      console.error('PostgreSQL query error:', error);
+      console.error('Query:', text);
+      console.error('Params:', params);
+      
+      if (attempt === maxRetries) {
+        console.error(`❌ Query failed after ${maxRetries} attempts`);
+      }
+      
+      throw error;
+    }
   }
 }
 
