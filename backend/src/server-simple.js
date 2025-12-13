@@ -7,6 +7,10 @@ const morgan = require('morgan');
 const compression = require('compression');
 const { query } = require('./db/postgresql');
 
+// Import auth routes
+const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
+
 const app = express();
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
 
@@ -100,6 +104,15 @@ app.get('/api/announcements/featured', (req, res) => {
 
 app.get('/api/changelog/current-version', (req, res) => {
   res.json({ version: '1.0.3', date: new Date().toISOString() });
+});
+
+// Add authentication routes
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+
+// Test auth endpoint
+app.get('/api/auth/test', (req, res) => {
+  res.json({ message: 'Auth routes loaded', timestamp: new Date().toISOString() });
 });
 
 // Error handling
