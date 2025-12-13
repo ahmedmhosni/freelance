@@ -17,7 +17,7 @@ class Database {
       this.config = {
         host: config.host || process.env.DB_HOST,
         port: parseInt(config.port || process.env.DB_PORT || '5432'),
-        database: config.database || process.env.DB_NAME,
+        database: config.database || process.env.DB_DATABASE || process.env.DB_NAME,
         user: config.user || process.env.DB_USER,
         password: config.password || process.env.DB_PASSWORD,
         ssl: config.ssl || { rejectUnauthorized: false },

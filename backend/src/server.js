@@ -1,380 +1,152 @@
 require('dotenv').config();
 
-// Application Insights - Must be first!
-if (process.env.NODE_ENV === 'production' && process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
-  const appInsights = require('applicationinsights');
-  appInsights.setup(process.env.APPLICATIONINSIGHTS_CONNECTION_STRING)
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true, true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true, true)
-    .setUseDiskRetryCaching(true)
-    .setSendLiveMetrics(true)
-    .start();
-  console.log('✅ Application Insights initialized');
-}
+const { bootstrap } = require('./core/bootstrap');
+const logger = require('./core/logger');
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const compression = require('compression');
-const http = require('http');
-const socketIo = require('socket.io');
-const fs = require('fs');
-const path = require('path');
-
-// Old routes that are still needed (no new architecture equivalent yet)
-const fileRoutes = require('./routes/files');
+// Import legacy routes for backward compatibility
+const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
 const maintenanceRoutes = require('./routes/maintenance');
-const statusRoutes = require('./routes/status');
-const profileRoutes = require('./routes/profile');
-const userPreferencesRoutes = require('./routes/userPreferences');
-const legalRoutes = require('./routes/legal');
 const healthRoutes = require('./routes/health');
-const feedbackRoutes = require('./routes/feedback');
-const mediaRoutes = require('./routes/media');
-const preferencesRoutes = require('./routes/preferences');
-const gdprRoutes = require('./routes/gdpr');
-const adminGdprRoutes = require('./routes/admin-gdpr');
-const adminActivityRoutes = require('./routes/admin-activity');
-const versionRoutes = require('./routes/version');
-const changelogRoutes = require('./routes/changelog');
-const announcementsRoutes = require('./routes/announcements');
+const clientsRoutes = require('./routes/clients');
+const projectsRoutes = require('./routes/projects');
+const tasksRoutes = require('./routes/tasks');
+const invoicesRoutes = require('./routes/invoices');
+const timeTrackingRoutes = require('./routes/time-tracking');
+const reportsRoutes = require('./routes/reports');
+const notificationsRoutes = require('./routes/notifications');
+const adminRoutes = require('./routes/admin');
 const aiRoutes = require('./routes/ai');
-const adminAiRoutes = require('./routes/admin-ai');
-
-const { apiLimiter } = require('./middleware/rateLimiter');
-const { errorHandler } = require('./shared/middleware/errorHandler');
-const logger = require('./utils/logger');
-const { swaggerUi, specs } = require('./swagger');
-
-// New architecture imports
-const { bootstrap } = require('./core/bootstrap');
-const { loggingMiddleware } = require('./shared/middleware/loggingMiddleware');
-
-// Create logs directory if it doesn't exist
-const logsDir = path.join(__dirname, '../logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-const app = express();
-const server = http.createServer(app);
-
-// Trust proxy - Required for reverse proxies to get real client IP
-app.set('trust proxy', true);
-
-// Allowed origins for CORS - use environment variable or defaults
-// Allowed origins for CORS
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'https://roastify.online',
-  'https://white-sky-0a7e9f003.3.azurestaticapps.net',
-  'https://white-sky-0a7e9f003.4.azurestaticapps.net'
-];
-
-// Add production URLs from environment variable
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
-
-// Add additional allowed origins from environment (comma-separated)
-if (process.env.ALLOWED_ORIGINS) {
-  const additionalOrigins = process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim());
-  allowedOrigins.push(...additionalOrigins);
-}
-
-const io = socketIo(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
 
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
 
-// Apply comprehensive security middleware (HTTPS, HSTS, secure cookies, etc.)
-const { applySecurityMiddleware } = require('./middleware/securityHeaders');
-applySecurityMiddleware(app);
-
-// Middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true
-  }
-}));
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+async function startServer() {
+  try {
+    logger.info('Starting server with bootstrap system');
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    // Bootstrap the application with DI container and modular architecture
+    const { container, app } = await bootstrap();
+    
+    // Trust proxy for Azure
+    app.set('trust proxy', true);
+    
+    // Enhanced CORS for production
+    const cors = require('cors');
+    app.use(cors({
+      origin: [
+        'http://localhost:3000',
+        'http://localhost:3001', 
+        'http://localhost:5173',
+        'https://roastify.online',
+        'https://white-sky-0a7e9f003.3.azurestaticapps.net',
+        'https://white-sky-0a7e9f003.4.azurestaticapps.net'
+      ],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    }));
+
+    // Add legacy routes for backward compatibility (v1 API)
+    app.use('/api/auth', authRoutes);
+    app.use('/api/profile', profileRoutes);
+    app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/quotes', quotesRoutes);
+    app.use('/api/maintenance', maintenanceRoutes);
+    app.use('/api', healthRoutes);
+    app.use('/api/clients', clientsRoutes);
+    app.use('/api/projects', projectsRoutes);
+    app.use('/api/tasks', tasksRoutes);
+    app.use('/api/invoices', invoicesRoutes);
+    app.use('/api/time-tracking', timeTrackingRoutes);
+    app.use('/api/reports', reportsRoutes);
+    app.use('/api/notifications', notificationsRoutes);
+    app.use('/api/admin', adminRoutes);
+    app.use('/api/ai', aiRoutes);
+
+    // Root endpoints
+    app.get('/', (req, res) => {
+      res.status(200).json({ 
+        message: 'Roastify API Server',
+        version: '2.0.0',
+        status: 'running',
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    app.get('/status', (req, res) => {
+      res.status(200).json({ 
+        status: 'OK',
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+      });
+    });
+
+    // Azure health check endpoints
+    app.get('/robots933456.txt', (req, res) => {
+      res.status(200).send('User-agent: *\nDisallow:');
+    });
+
+    app.get('/robots.txt', (req, res) => {
+      res.status(200).send('User-agent: *\nDisallow:');
+    });
+
+    // Global error handler
+    app.use((err, req, res, next) => {
+      logger.error('Unhandled error:', err);
+      res.status(err.status || 500).json({
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Start server
+    app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`✅ Server running on port ${PORT}`);
+      logger.info(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`✅ Bootstrap system initialized successfully`);
+      logger.info(`✅ Listening on all interfaces`);
+    });
+
+  } catch (error) {
+    logger.error('❌ Failed to start server:', error);
+    
+    // In Azure, don't exit immediately - let the platform handle restarts
+    if (process.env.WEBSITE_INSTANCE_ID) {
+      logger.error('Azure environment detected - server will be restarted by platform');
+      // Keep process alive for a bit to allow logging
+      setTimeout(() => process.exit(1), 5000);
     } else {
-      logger.warn(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      process.exit(1);
     }
-  },
-  credentials: true
-}));
-
-// Request logging
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
   }
-}));
-
-// Compression middleware - compress all responses
-app.use(compression({
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    return compression.filter(req, res);
-  },
-  level: 6 // Compression level (0-9, 6 is default and good balance)
-}));
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Serve uploaded files
-const uploadsPath = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsPath)) {
-  fs.mkdirSync(uploadsPath, { recursive: true });
 }
-app.use('/uploads', express.static(uploadsPath));
 
-// Add logging middleware for new architecture routes
-app.use('/api/', loggingMiddleware);
-
-// Apply rate limiting to all API routes
-app.use('/api/', apiLimiter);
-
-// Make io accessible to routes
-app.set('io', io);
-
-// Socket.io connection
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
-  socket.on('join', (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`User ${userId} joined their room`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  process.exit(0);
 });
 
-// API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Roastify API Documentation'
-}));
-
-// CSRF token endpoint
-const { getCsrfToken } = require('./middleware/csrfProtection');
-app.get('/api/csrf-token', getCsrfToken);
-
-// Health check (must be before other routes)
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  process.exit(0);
 });
 
-// Bootstrap new architecture (DI container and modules) with timeout
-Promise.race([
-  bootstrap({ createApp: false }),
-  new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Bootstrap timeout after 30 seconds')), 30000)
-  )
-]).then(({ container }) => {
-  // New architecture routes (now default at /api/*)
-  const clientController = container.resolve('clientController');
-  app.use('/api/clients', clientController.router);
-
-  const projectController = container.resolve('projectController');
-  app.use('/api/projects', projectController.router);
-
-  const taskController = container.resolve('taskController');
-  app.use('/api/tasks', taskController.router);
-
-  const invoiceController = container.resolve('invoiceController');
-  app.use('/api/invoices', invoiceController.router);
-
-  const timeEntryController = container.resolve('timeEntryController');
-  app.use('/api/time-tracking', timeEntryController.router);
-
-  // Reports module (new architecture)
-  const reportsController = container.resolve('reportsController');
-  app.use('/api/reports', reportsController.router);
-
-  // Notifications module (new architecture)
-  const notificationController = container.resolve('notificationController');
-  app.use('/api/notifications', notificationController.router);
-
-  // Auth module (new architecture)
-  const authController = container.resolve('authController');
-  app.use('/api/auth', authController.router);
-
-  // Admin module (new architecture)
-  const adminController = container.resolve('adminController');
-  app.use('/api/admin', adminController.router);
-
-  // User Preferences module (new architecture)
-  const userPreferencesController = container.resolve('userPreferencesController');
-  app.use('/api/user', userPreferencesController.router);
-
-  // GDPR module (new architecture)
-  const gdprController = container.resolve('gdprController');
-  app.use('/api/gdpr', gdprController.router);
-
-  // AI module (new architecture)
-  const aiController = container.resolve('aiController');
-  app.use('/api/ai', aiController.router);
-
-  // Additional routes that don't have new architecture equivalents yet
-  app.use('/api/dashboard', dashboardRoutes);
-  app.use('/api/quotes', quotesRoutes);
-  app.use('/api/maintenance', maintenanceRoutes);
-  app.use('/api/status', statusRoutes);
-  app.use('/api/profile', profileRoutes);
-  app.use('/api/legal', legalRoutes);
-  app.use('/api/files', fileRoutes);
-  app.use('/api/feedback', feedbackRoutes);
-  app.use('/api/media', mediaRoutes);
-  app.use('/api/preferences', preferencesRoutes);
-  app.use('/api/admin/gdpr', adminGdprRoutes);
-  app.use('/api/admin/activity', adminActivityRoutes);
-  app.use('/api/admin/ai', adminAiRoutes);
-  app.use('/api/ai', aiRoutes);
-  app.use('/api/version', versionRoutes);
-  app.use('/api/changelog', changelogRoutes);
-  app.use('/api/announcements', announcementsRoutes);
-  // Root endpoint for Azure health checks
-  app.get('/', (req, res) => {
-    res.status(200).send('OK');
-  });
-
-  // Simple status endpoint
-  app.get('/status', (req, res) => {
-    res.status(200).json({ status: 'OK' });
-  });
-
-  // Simple ping endpoint (no dependencies)
-  app.get('/api/ping', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-  });
-
-  // Debug endpoint to check if server is receiving requests
-  app.get('/debug', (req, res) => {
-    res.json({ 
-      message: 'Debug endpoint working',
-      headers: req.headers,
-      url: req.url,
-      method: req.method
-    });
-  });
-  
-  app.use('/api', healthRoutes);
-
-  // Public route aliases (without /api prefix for frontend compatibility)
-  app.use('/maintenance', maintenanceRoutes);
-  app.use('/changelog', changelogRoutes);
-  app.use('/announcements', announcementsRoutes);
-
-  // Serve static files from frontend build in production
-  if (process.env.NODE_ENV === 'production') {
-    const path = require('path');
-    const frontendPath = path.join(__dirname, '../../frontend/dist');
-    
-    app.use(express.static(frontendPath));
-    
-    // Serve index.html for all non-API routes (SPA support)
-    // Only catch routes that don't start with /api, /maintenance, /changelog, or /announcements
-    app.get('*', (req, res, next) => {
-      if (req.path.startsWith('/api') || 
-          req.path.startsWith('/maintenance') || 
-          req.path.startsWith('/changelog') || 
-          req.path.startsWith('/announcements')) {
-        return next(); // Let it fall through to 404 handler
-      }
-      res.sendFile(path.join(frontendPath, 'index.html'));
-    });
-  }
-
-  // 404 handler
-  app.use((req, res, next) => {
-    res.status(404).json({
-      success: false,
-      error: 'Route not found',
-      code: 'NOT_FOUND'
-    });
-  });
-
-  // Global error handler (must be last)
-  app.use(errorHandler);
-
-  // Initialize AI Service (new modular architecture)
-  const aiService = container.resolve('aiService');
-  aiService.initialize().then(() => {
-    if (aiService.isEnabled()) {
-      logger.info('✅ AI Assistant initialized and enabled');
-    } else {
-      logger.info('ℹ️  AI Assistant disabled or not configured');
-    }
-  }).catch(error => {
-    logger.warn('AI Assistant initialization failed:', error.message);
-  });
-
-  // Add global error handlers to prevent crashes
-  process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception:', error);
-    console.error('❌ Uncaught Exception:', error.message);
-  });
-
-  process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    console.error('❌ Unhandled Rejection:', reason);
-  });
-
-  // Start server after all routes are registered
-  server.listen(PORT, '0.0.0.0', () => {
-    logger.info(`Server running on port ${PORT}`);
-    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`WebSocket server ready`);
-    console.log(`✅ Server running on port ${PORT} and listening on all interfaces`);
-  });
-}).catch(error => {
-  logger.error('Failed to bootstrap application', error);
-  console.error('❌ Bootstrap failed:', error.message);
-  // Don't exit immediately in production, let Azure handle restarts
-  if (process.env.NODE_ENV !== 'production') {
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', error);
+  if (!process.env.WEBSITE_INSTANCE_ID) {
     process.exit(1);
   }
 });
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled Rejection:', reason);
+  if (!process.env.WEBSITE_INSTANCE_AZURE) {
+    process.exit(1);
+  }
+});
+
+startServer();

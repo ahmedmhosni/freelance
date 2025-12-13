@@ -16,14 +16,15 @@ class Config {
       supportEmail: process.env.SUPPORT_EMAIL || 'support@example.com'
     };
 
-    // Database Configuration
+    // Database Configuration - Support both Azure (DB_*) and local (PG_*) variables
+    const isAzure = process.env.WEBSITE_INSTANCE_ID !== undefined;
     this.database = {
-      host: process.env.PG_HOST || 'localhost',
-      port: parseInt(process.env.PG_PORT || '5432', 10),
-      database: process.env.PG_DATABASE || 'freelancer_db',
-      user: process.env.PG_USER || 'postgres',
-      password: process.env.PG_PASSWORD || 'postgres',
-      ssl: process.env.PG_SSL === 'true',
+      host: process.env.DB_HOST || process.env.PG_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || process.env.PG_PORT || '5432', 10),
+      database: process.env.DB_DATABASE || process.env.DB_NAME || process.env.PG_DATABASE || 'freelancer_db',
+      user: process.env.DB_USER || process.env.PG_USER || 'postgres',
+      password: process.env.DB_PASSWORD || process.env.PG_PASSWORD || 'postgres',
+      ssl: isAzure || process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false,
       max: parseInt(process.env.PG_POOL_MAX || '20', 10),
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000

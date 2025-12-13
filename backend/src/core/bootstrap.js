@@ -169,10 +169,11 @@ function registerCoreServices(container) {
       logQueries: config.logging.logQueries
     });
     
-    // Connect to database (don't exit in test environment)
+    // Connect to database (don't exit in production Azure environment)
     database.connect().catch(error => {
       logger.error('Failed to connect to database', error);
-      if (process.env.NODE_ENV !== 'test') {
+      // Don't exit in test or Azure production environment to prevent restarts
+      if (process.env.NODE_ENV !== 'test' && !process.env.WEBSITE_INSTANCE_ID) {
         process.exit(1);
       }
     });

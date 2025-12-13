@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: roastify-webapp-api
+  AZURE_WEBAPP_NAME: roastify-webapp-api-c0hgg2h4f4djcwaf
   AZURE_WEBAPP_PACKAGE_PATH: './backend'
   NODE_VERSION: '20.x'
 
@@ -70,7 +70,7 @@ jobs:
       run: |
         echo "Waiting for deployment to complete..."
         sleep 30
-        if curl -f https://api.roastify.online/api/health; then
+        if curl -f https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net/api/health; then
           echo "✅ Backend health check passed!"
         else
           echo "⚠️ Health check failed (DNS or app issue), but deployment step already completed."
@@ -86,7 +86,7 @@ jobs:
       run: |
         if [ "${{ needs.build-and-deploy.result }}" == "success" ]; then
           echo "✅ Backend deployment to Azure App Service completed successfully!"
-          echo "🔗 URL: https://${{ env.AZURE_WEBAPP_NAME }}.canadaeast-01.azurewebsites.net"
+          echo "🔗 URL: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net"
         else
           echo "❌ Backend deployment failed!"
           exit 1
