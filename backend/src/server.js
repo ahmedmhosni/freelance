@@ -26,8 +26,14 @@ async function startServer() {
     // Bootstrap the application with DI container and modular architecture
     const { container, app } = await bootstrap();
     
-    // Trust proxy for Azure
-    app.set('trust proxy', true);
+    // Trust proxy for Azure - be more specific to avoid rate limiter warnings
+    if (process.env.WEBSITE_INSTANCE_ID) {
+      // In Azure, trust the first proxy (Azure Load Balancer)
+      app.set('trust proxy', 1);
+    } else {
+      // Local development
+      app.set('trust proxy', false);
+    }
     
     // Enhanced CORS for production
     const cors = require('cors');
