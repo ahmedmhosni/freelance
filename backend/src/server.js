@@ -121,6 +121,58 @@ async function startServer() {
       }
     });
 
+    // Debug endpoint to check user verification status
+    app.get('/api/debug/users', async (req, res) => {
+      try {
+        const { query } = require('./db/postgresql');
+        const result = await query('SELECT id, email, email_verified, created_at FROM users ORDER BY id DESC LIMIT 5');
+        res.json({
+          message: 'Recent users status',
+          success: true,
+          users: result.rows,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: 'Failed to fetch users',
+          success: false,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+
+    // Debug endpoint to verify a user (for testing)
+    app.post('/api/debug/verify-user', async (req, res) => {
+      try {
+        const { email } = req.body;
+        if (!email) {
+          return res.status(400).json({ error: 'Email is required' });
+        }
+        
+        const { query } = require('./db/postgresql');
+        const result = await query('UPDATE users SET email_verified = true WHERE email = $1 RETURNING id, email, email_verified', [email]);
+        
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json({
+          message: 'User verified successfully',
+          success: true,
+          user: result.rows[0],
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: 'Failed to verify user',
+          success: false,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+
     app.get('/status', (req, res) => {
       res.status(200).json({ 
         status: 'OK',
