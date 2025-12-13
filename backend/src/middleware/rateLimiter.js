@@ -28,9 +28,7 @@ const apiLimiter = rateLimit({
     if (req.user && req.user.id) {
       return `user_${req.user.id}`;
     }
-    // Use a safe fallback for Azure proxy IPs
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `ip_${ip.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    return undefined; // Use default IP-based limiting
   },
   message: 'Too many requests, please try again later.',
   standardHeaders: true,
@@ -64,11 +62,6 @@ const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: isDevelopment ? 1000 : 5, // 5 failed attempts per 15 min per IP
   skipSuccessfulRequests: true, // Don't count successful logins
-  keyGenerator: (req, res) => {
-    // Use a safe fallback for Azure proxy IPs
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `login_${ip.replace(/[^a-zA-Z0-9]/g, '_')}`;
-  },
   message: 'Too many login attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -98,11 +91,6 @@ const loginLimiter = rateLimit({
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: isDevelopment ? 1000 : 3, // 3 registrations per hour per IP
-  keyGenerator: (req, res) => {
-    // Use a safe fallback for Azure proxy IPs
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `register_${ip.replace(/[^a-zA-Z0-9]/g, '_')}`;
-  },
   message: 'Too many accounts created, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -131,11 +119,6 @@ const registerLimiter = rateLimit({
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: isDevelopment ? 1000 : 3, // 3 reset requests per hour per IP
-  keyGenerator: (req, res) => {
-    // Use a safe fallback for Azure proxy IPs
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `reset_${ip.replace(/[^a-zA-Z0-9]/g, '_')}`;
-  },
   message: 'Too many password reset requests, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
