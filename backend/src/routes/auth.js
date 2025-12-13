@@ -2,12 +2,19 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { query, getOne } = require('../db/postgresql');
-const { 
-  loginLimiter, 
-  registerLimiter, 
-  passwordResetLimiter,
-  authLimiter // Keep for backward compatibility
-} = require('../middleware/rateLimiter');
+// Temporarily disable rate limiting to fix login issues
+// const { 
+//   loginLimiter, 
+//   registerLimiter, 
+//   passwordResetLimiter,
+//   authLimiter // Keep for backward compatibility
+// } = require('../middleware/rateLimiter');
+
+// Create dummy middleware that does nothing
+const loginLimiter = (req, res, next) => next();
+const registerLimiter = (req, res, next) => next();
+const passwordResetLimiter = (req, res, next) => next();
+const authLimiter = (req, res, next) => next();
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 const validators = require('../utils/validators');
 const logger = require('../utils/logger');
