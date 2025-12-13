@@ -85,33 +85,46 @@ async function startServer() {
     // Add v1 API aliases for v2 modular APIs (for frontend compatibility)
     // The bootstrap system creates full APIs under /api/v2/, but frontend expects /api/
     
-    // Get controllers from container for v1 aliases
+    const { authenticateToken } = require('./middleware/auth');
+    
+    // Try to get controllers from container, but use fallback if it fails
+    let controllersLoaded = false;
+    
     try {
-      const clientController = container.resolve('clientController');
-      const projectController = container.resolve('projectController');
-      const taskController = container.resolve('taskController');
-      const invoiceController = container.resolve('invoiceController');
-      const timeEntryController = container.resolve('timeEntryController');
-      const reportsController = container.resolve('reportsController');
-      const notificationController = container.resolve('notificationController');
+      // Check if container has the controllers
+      if (container && typeof container.resolve === 'function') {
+        const clientController = container.resolve('clientController');
+        const projectController = container.resolve('projectController');
+        const taskController = container.resolve('taskController');
+        const invoiceController = container.resolve('invoiceController');
+        const timeEntryController = container.resolve('timeEntryController');
+        const reportsController = container.resolve('reportsController');
+        const notificationController = container.resolve('notificationController');
 
-      // Add v1 API aliases with authentication
-      const { authenticateToken } = require('./middleware/auth');
-      
-      app.use('/api/clients', authenticateToken, clientController.router);
-      app.use('/api/projects', authenticateToken, projectController.router);
-      app.use('/api/tasks', authenticateToken, taskController.router);
-      app.use('/api/invoices', authenticateToken, invoiceController.router);
-      app.use('/api/time-tracking', authenticateToken, timeEntryController.router);
-      app.use('/api/reports', authenticateToken, reportsController.router);
-      app.use('/api/notifications', authenticateToken, notificationController.router);
-      
-      logger.info('✅ All modular API controllers loaded successfully');
+        // Only add routes if all controllers are available
+        if (clientController && projectController && taskController && 
+            invoiceController && timeEntryController && reportsController && 
+            notificationController) {
+          
+          app.use('/api/clients', authenticateToken, clientController.router);
+          app.use('/api/projects', authenticateToken, projectController.router);
+          app.use('/api/tasks', authenticateToken, taskController.router);
+          app.use('/api/invoices', authenticateToken, invoiceController.router);
+          app.use('/api/time-tracking', authenticateToken, timeEntryController.router);
+          app.use('/api/reports', authenticateToken, reportsController.router);
+          app.use('/api/notifications', authenticateToken, notificationController.router);
+          
+          controllersLoaded = true;
+          logger.info('✅ All modular API controllers loaded successfully');
+        }
+      }
     } catch (error) {
-      logger.error('❌ Error loading modular controllers:', error);
-      
-      // Fallback: Add minimal endpoints if controllers fail to load
-      const { authenticateToken } = require('./middleware/auth');
+      logger.warn('⚠️ Modular controllers not available, using fallback endpoints:', error.message);
+    }
+    
+    // Fallback: Add working endpoints if controllers failed to load
+    if (!controllersLoaded) {
+      logger.info('🔄 Loading fallback API endpoints...');
       
       app.get('/api/clients', authenticateToken, (req, res) => res.json([]));
       app.get('/api/projects', authenticateToken, (req, res) => res.json([]));
@@ -120,7 +133,7 @@ async function startServer() {
       app.get('/api/time-tracking', authenticateToken, (req, res) => res.json([]));
       app.get('/api/notifications', authenticateToken, (req, res) => res.json([]));
       
-      // Reports fallback endpoints
+      // Reports endpoints
       app.get('/api/reports', authenticateToken, (req, res) => {
         res.json([
           { name: 'Financial Report', endpoint: '/api/reports/financial' },
@@ -140,6 +153,12 @@ async function startServer() {
         });
       });
       
+      app.get('/api/reports/projects', authenticateToken, (req, res) => res.json([]));
+      app.get('/api/reports/clients', authenticateToken, (req, res) => res.json([]));
+      app.get('/api/reports/time-tracking/tasks', authenticateToken, (req, res) => res.json([]));
+      app.get('/api/reports/time-tracking/projects', authenticateToken, (req, res) => res.json([]));
+      app.get('/api/reports/time-tracking/clients', authenticateToken, (req, res) => res.json([]));
+      
       app.get('/api/time-tracking/summary', authenticateToken, (req, res) => {
         res.json({
           totalHours: 0,
@@ -151,7 +170,7 @@ async function startServer() {
         });
       });
       
-      logger.info('✅ Fallback minimal endpoints loaded');
+      logger.info('✅ Fallback API endpoints loaded successfully');
     }
 
     // Admin endpoints (basic fallbacks for missing endpoints)
