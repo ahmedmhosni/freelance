@@ -1,5 +1,5 @@
-# GitHub Actions Workflow for Backend Deployment to Azure App Service
-name: Deploy Backend to Azure App Service
+# GitHub Actions Workflow for Backend Deployment to Azure App Service using Azure CLI
+name: Deploy Backend to Azure (CLI Method)
 
 on:
   push:
@@ -7,15 +7,11 @@ on:
     paths:
       - 'backend/**'
       - 'package.json'
-      - '.github/workflows/deploy-backend.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
+      - '.github/workflows/deploy-backend-cli.yml'
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: roastify-webapp-api
+  AZURE_WEBAPP_NAME: roastify-webapp-api-c0hgg2h4f4djcwaf
   AZURE_WEBAPP_PACKAGE_PATH: './backend'
   NODE_VERSION: '20.x'
 
@@ -53,27 +49,34 @@ jobs:
         # Install production dependencies only
         rm -rf node_modules
         npm ci --only=production
+        
+        # Create deployment zip
+        zip -r ../backend-deploy.zip . -x "*.git*" "node_modules/.cache/*" "*.log"
 
-    - name: 🔍 Verify publish profile secret
-      run: echo "✅ Publish profile secret is configured"
-      env:
-        PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    - name: 🔐 Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: 🚀 Deploy to Azure App Service
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      run: |
+        az webapp deployment source config-zip \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.AZURE_WEBAPP_NAME }} \
+          --src backend-deploy.zip
 
     - name: 🔍 Health check
       run: |
         echo "Waiting for deployment to complete..."
-        sleep 30
-        if curl -f https://api.roastify.online/api/health; then
-          echo "✅ Backend health check passed!"
+        sleep 45
+        
+        # Try both URLs
+        if curl -f https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net/api/health; then
+          echo "✅ Direct Azure URL health check passed!"
+        elif curl -f https://api.roastify.online/api/health; then
+          echo "✅ Custom domain health check passed!"
         else
-          echo "⚠️ Health check failed (DNS or app issue), but deployment step already completed."
+          echo "⚠️ Health check failed, but deployment completed. App may still be starting."
         fi
 
   notify:
@@ -86,7 +89,8 @@ jobs:
       run: |
         if [ "${{ needs.build-and-deploy.result }}" == "success" ]; then
           echo "✅ Backend deployment to Azure App Service completed successfully!"
-          echo "🔗 URL: https://api.roastify.online"
+          echo "🔗 Direct URL: https://roastify-webapp-api-c0hgg2h4f4djcwaf.canadaeast-01.azurewebsites.net"
+          echo "🔗 Custom URL: https://api.roastify.online"
         else
           echo "❌ Backend deployment failed!"
           exit 1
