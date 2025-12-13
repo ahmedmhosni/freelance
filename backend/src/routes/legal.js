@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db/postgresql');
+const { query } = require('../db/postgresql');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 // Get terms and conditions
 router.get('/terms', async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await query(
       'SELECT * FROM legal_content WHERE type = $1 AND is_active = true ORDER BY updated_at DESC LIMIT 1',
       ['terms']
     );
@@ -35,7 +35,7 @@ router.get('/terms', async (req, res) => {
 // Get privacy policy
 router.get('/privacy', async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await query(
       'SELECT * FROM legal_content WHERE type = $1 AND is_active = true ORDER BY updated_at DESC LIMIT 1',
       ['privacy']
     );
@@ -72,13 +72,13 @@ router.put('/:type', authenticateToken, requireAdmin, async (req, res) => {
 
   try {
     // Deactivate old versions
-    await pool.query(
+    await query(
       'UPDATE legal_content SET is_active = false WHERE type = $1',
       [type]
     );
 
     // Insert new version
-    const result = await pool.query(
+    const result = await query(
       `INSERT INTO legal_content (type, content, updated_by, is_active)
        VALUES ($1, $2, $3, true)
        RETURNING *`,
@@ -100,7 +100,7 @@ router.get('/:type/versions', authenticateToken, requireAdmin, async (req, res) 
   const { type } = req.params;
 
   try {
-    const result = await pool.query(
+    const result = await query(
       `SELECT lc.*, u.username as updated_by_name
        FROM legal_content lc
        LEFT JOIN users u ON lc.updated_by = u.id
