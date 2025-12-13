@@ -207,8 +207,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Bootstrap new architecture (DI container and modules)
-bootstrap({ createApp: false }).then(({ container }) => {
+// Bootstrap new architecture (DI container and modules) with timeout
+Promise.race([
+  bootstrap({ createApp: false }),
+  new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Bootstrap timeout after 30 seconds')), 30000)
+  )
+]).then(({ container }) => {
   // New architecture routes (now default at /api/*)
   const clientController = container.resolve('clientController');
   app.use('/api/clients', clientController.router);
@@ -273,12 +278,12 @@ bootstrap({ createApp: false }).then(({ container }) => {
   app.use('/api/announcements', announcementsRoutes);
   // Root endpoint for Azure health checks
   app.get('/', (req, res) => {
-    res.json({ 
-      message: 'Roastify API Server', 
-      status: 'running',
-      timestamp: new Date().toISOString(),
-      version: '1.0.3'
-    });
+    res.status(200).send('OK');
+  });
+
+  // Simple status endpoint
+  app.get('/status', (req, res) => {
+    res.status(200).json({ status: 'OK' });
   });
 
   // Simple ping endpoint (no dependencies)
