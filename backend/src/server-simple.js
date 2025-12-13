@@ -7,7 +7,14 @@ const morgan = require('morgan');
 const compression = require('compression');
 const { query } = require('./db/postgresql');
 
-// Bootstrap system causes Azure restart issues - keeping it disabled for now
+// Test bootstrap components one by one to find the issue
+let Container;
+try {
+  Container = require('./core/container/Container');
+  console.log('✅ Container class loaded');
+} catch (error) {
+  console.error('❌ Failed to load Container:', error.message);
+}
 
 // Import routes (with error handling)
 let authRoutes, profileRoutes, dashboardRoutes, quotesRoutes, maintenanceRoutes, healthRoutes;
@@ -198,7 +205,7 @@ app.get('/api/routes/status', (req, res) => {
       health: !!healthRoutes
     },
     bootstrap: {
-      status: 'Disabled - causes Azure restart issues'
+      status: 'Testing components individually'
     },
     timestamp: new Date().toISOString() 
   });
@@ -235,16 +242,43 @@ app.get('/robots.txt', (req, res) => {
   res.status(200).send('User-agent: *\nDisallow:');
 });
 
+// Test bootstrap components
+async function testBootstrapComponents() {
+  if (!Container) {
+    console.log('⚠️ Container not available');
+    return null;
+  }
+
+  try {
+    console.log('🔍 Testing DI Container creation...');
+    const container = new Container();
+    console.log('✅ DI Container created successfully');
+    
+    // Test basic registration
+    container.registerSingleton('test', () => ({ message: 'test service' }));
+    const testService = container.resolve('test');
+    console.log('✅ DI Container registration/resolution works');
+    
+    return container;
+  } catch (error) {
+    console.error('❌ DI Container test failed:', error.message);
+    return null;
+  }
+}
+
 // Start server
 async function startServer() {
   // Test database first
   const dbConnected = await testDatabaseConnection();
   
+  // Test bootstrap components
+  const containerTest = await testBootstrapComponents();
+  
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Stable server running on port ${PORT}`);
+    console.log(`✅ Investigation server running on port ${PORT}`);
     console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`✅ Database: ${dbConnected ? 'Connected' : 'Failed'}`);
-    console.log(`✅ Bootstrap: Disabled (causes Azure restarts)`);
+    console.log(`✅ Container: ${containerTest ? 'Working' : 'Failed'}`);
     console.log(`✅ Listening on all interfaces`);
   });
 }
