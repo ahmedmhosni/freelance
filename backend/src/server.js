@@ -62,7 +62,7 @@ async function startServer() {
     // Root endpoints
     app.get('/', (req, res) => {
       res.status(200).json({ 
-        message: 'Roastify API Server - Full Production',
+        message: 'Roastify API Server - Full Production v2.1',
         version: '2.0.0',
         status: 'running',
         features: ['Bootstrap System', 'DI Container', 'All Modules', 'AI Assistant'],
