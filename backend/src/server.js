@@ -82,77 +82,28 @@ async function startServer() {
     app.use('/api/legal', legalRoutes);
     app.use('/api/status', statusRoutes);
 
-    // Add missing API endpoints that frontend expects
-    app.get('/api/time-tracking/running', (req, res) => {
-      res.json({ running: false, entry: null });
-    });
+    // Add v1 API aliases for v2 modular APIs (for frontend compatibility)
+    // The bootstrap system creates full APIs under /api/v2/, but frontend expects /api/
+    
+    // Get controllers from container for v1 aliases
+    const clientController = container.resolve('clientController');
+    const projectController = container.resolve('projectController');
+    const taskController = container.resolve('taskController');
+    const invoiceController = container.resolve('invoiceController');
+    const timeEntryController = container.resolve('timeEntryController');
+    const reportsController = container.resolve('reportsController');
+    const notificationController = container.resolve('notificationController');
 
-    app.get('/api/time-tracking/summary', (req, res) => {
-      res.json({
-        totalHours: 0,
-        totalEntries: 0,
-        thisWeek: 0,
-        thisMonth: 0,
-        billableHours: 0,
-        nonBillableHours: 0
-      });
-    });
-
-    app.get('/api/tasks', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/notifications', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/projects', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/clients', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/invoices', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/time-tracking', (req, res) => {
-      res.json([]);
-    });
-
-    // Reports endpoints
-    app.get('/api/reports/time-tracking/tasks', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/reports/financial', (req, res) => {
-      res.json({
-        totalRevenue: 0,
-        totalExpenses: 0,
-        netProfit: 0,
-        invoicesPaid: 0,
-        invoicesPending: 0,
-        monthlyRevenue: []
-      });
-    });
-
-    app.get('/api/reports/time-tracking/clients', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/reports/projects', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/reports/time-tracking/projects', (req, res) => {
-      res.json([]);
-    });
-
-    app.get('/api/reports/clients', (req, res) => {
-      res.json([]);
-    });
+    // Add v1 API aliases with authentication
+    const { authenticateToken } = require('./middleware/auth');
+    
+    app.use('/api/clients', authenticateToken, clientController.router);
+    app.use('/api/projects', authenticateToken, projectController.router);
+    app.use('/api/tasks', authenticateToken, taskController.router);
+    app.use('/api/invoices', authenticateToken, invoiceController.router);
+    app.use('/api/time-tracking', authenticateToken, timeEntryController.router);
+    app.use('/api/reports', authenticateToken, reportsController.router);
+    app.use('/api/notifications', authenticateToken, notificationController.router);
 
     // Admin endpoints (basic fallbacks for missing endpoints)
     app.get('/api/admin/reports', (req, res) => {
