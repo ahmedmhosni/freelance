@@ -8,12 +8,26 @@ const compression = require('compression');
 const { query } = require('./db/postgresql');
 
 // Test bootstrap components one by one to find the issue
-let Container;
+let Container, Database, config;
 try {
   Container = require('./core/container/Container');
   console.log('✅ Container class loaded');
 } catch (error) {
   console.error('❌ Failed to load Container:', error.message);
+}
+
+try {
+  Database = require('./core/database/Database');
+  console.log('✅ Database class loaded');
+} catch (error) {
+  console.error('❌ Failed to load Database class:', error.message);
+}
+
+try {
+  config = require('./core/config/config');
+  console.log('✅ Config loaded');
+} catch (error) {
+  console.error('❌ Failed to load config:', error.message);
 }
 
 // Import routes (with error handling)
@@ -259,9 +273,33 @@ async function testBootstrapComponents() {
     const testService = container.resolve('test');
     console.log('✅ DI Container registration/resolution works');
     
+    // Test Database class (the likely culprit)
+    if (Database && config) {
+      console.log('🔍 Testing Database class creation...');
+      
+      try {
+        const dbConfig = config.getDatabaseConfig();
+        console.log('✅ Database config retrieved');
+        
+        // Create database instance WITHOUT connecting (to avoid process.exit)
+        const database = new Database({
+          ...dbConfig,
+          logQueries: false
+        });
+        console.log('✅ Database instance created (not connected)');
+        
+        // Register in container
+        container.registerSingleton('database', () => database);
+        console.log('✅ Database registered in container');
+        
+      } catch (error) {
+        console.error('❌ Database class test failed:', error.message);
+      }
+    }
+    
     return container;
   } catch (error) {
-    console.error('❌ DI Container test failed:', error.message);
+    console.error('❌ Bootstrap component test failed:', error.message);
     return null;
   }
 }
