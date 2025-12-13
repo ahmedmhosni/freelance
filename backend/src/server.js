@@ -17,6 +17,15 @@ const announcementsRoutes = require('./routes/announcements');
 const changelogRoutes = require('./routes/changelog');
 const gdprRoutes = require('./routes/gdpr');
 
+// Import admin routes
+const adminActivityRoutes = require('./routes/admin-activity');
+const adminAiRoutes = require('./routes/admin-ai');
+const adminGdprRoutes = require('./routes/admin-gdpr');
+
+// Import additional routes
+const legalRoutes = require('./routes/legal');
+const statusRoutes = require('./routes/status');
+
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
 
 async function startServer() {
@@ -64,6 +73,15 @@ async function startServer() {
     app.use('/api/changelog', changelogRoutes);
     app.use('/api/gdpr', gdprRoutes);
 
+    // Add admin routes with authentication
+    app.use('/api/admin/activity', adminActivityRoutes);
+    app.use('/api/admin/ai', adminAiRoutes);
+    app.use('/api/admin/gdpr', adminGdprRoutes);
+
+    // Add additional routes
+    app.use('/api/legal', legalRoutes);
+    app.use('/api/status', statusRoutes);
+
     // Add missing API endpoints that frontend expects
     app.get('/api/time-tracking/running', (req, res) => {
       res.json({ running: false, entry: null });
@@ -93,69 +111,13 @@ async function startServer() {
       res.json([]);
     });
 
-    // Admin endpoints
+    // Admin endpoints (basic fallbacks for missing endpoints)
     app.get('/api/admin/reports', (req, res) => {
       res.json([]);
     });
 
     app.get('/api/admin/users', (req, res) => {
       res.json([]);
-    });
-
-    app.get('/api/admin/activity/stats', (req, res) => {
-      res.json({
-        totalUsers: 0,
-        activeUsers: 0,
-        totalProjects: 0,
-        totalTasks: 0
-      });
-    });
-
-    app.get('/api/admin/gdpr/export-requests', (req, res) => {
-      res.json([]);
-    });
-
-    // Legal endpoints
-    app.get('/api/legal/terms', (req, res) => {
-      res.json({
-        title: 'Terms of Service',
-        content: 'Terms of service content will be available soon.',
-        lastUpdated: new Date().toISOString()
-      });
-    });
-
-    app.get('/api/legal/privacy', (req, res) => {
-      res.json({
-        title: 'Privacy Policy',
-        content: 'Privacy policy content will be available soon.',
-        lastUpdated: new Date().toISOString()
-      });
-    });
-
-    // AI Admin endpoints (ignoring AI assistant as requested)
-    app.get('/api/ai/admin/settings', (req, res) => {
-      res.json({
-        enabled: false,
-        message: 'AI Assistant is currently disabled'
-      });
-    });
-
-    app.get('/api/ai/admin/usage', (req, res) => {
-      res.json({
-        totalRequests: 0,
-        dailyRequests: 0,
-        monthlyRequests: 0
-      });
-    });
-
-    // Status endpoint
-    app.get('/api/status', (req, res) => {
-      res.json({
-        status: 'operational',
-        version: '2.0.1',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-      });
     });
 
     // Add health routes last to avoid conflicts
