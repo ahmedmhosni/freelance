@@ -76,6 +76,30 @@ async function startServer() {
       });
     });
 
+    // Temporary debug endpoint to check environment variables
+    app.get('/api/debug/env', (req, res) => {
+      const envVars = {
+        NODE_ENV: process.env.NODE_ENV,
+        WEBSITE_INSTANCE_ID: process.env.WEBSITE_INSTANCE_ID ? 'SET' : 'MISSING',
+        DB_HOST: process.env.DB_HOST ? 'SET' : 'MISSING',
+        DB_PORT: process.env.DB_PORT || 'MISSING',
+        DB_DATABASE: process.env.DB_DATABASE ? 'SET' : 'MISSING',
+        DB_NAME: process.env.DB_NAME ? 'SET' : 'MISSING',
+        DB_USER: process.env.DB_USER ? 'SET' : 'MISSING',
+        DB_PASSWORD: process.env.DB_PASSWORD ? 'SET' : 'MISSING',
+        JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'MISSING',
+        JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || 'MISSING'
+      };
+      
+      res.json({
+        message: 'Environment Variables Status',
+        environment: process.env.NODE_ENV || 'development',
+        isAzure: !!process.env.WEBSITE_INSTANCE_ID,
+        variables: envVars,
+        timestamp: new Date().toISOString()
+      });
+    });
+
     app.get('/status', (req, res) => {
       res.status(200).json({ 
         status: 'OK',
