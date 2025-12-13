@@ -51,13 +51,12 @@ async function startServer() {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 
-    // Add existing routes only (v1 API)
+    // Add existing routes only (v1 API) - specific routes first
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
     app.use('/api/dashboard', dashboardRoutes);
     app.use('/api/quotes', quotesRoutes);
     app.use('/api/maintenance', maintenanceRoutes);
-    app.use('/api', healthRoutes);
     app.use('/api/ai', aiRoutes);
     app.use('/api/preferences', preferencesRoutes);
     app.use('/api/feedback', feedbackRoutes);
@@ -158,6 +157,9 @@ async function startServer() {
         timestamp: new Date().toISOString()
       });
     });
+
+    // Add health routes last to avoid conflicts
+    app.use('/api', healthRoutes);
 
     // Root endpoints
     app.get('/', (req, res) => {
