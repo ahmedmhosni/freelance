@@ -31,6 +31,42 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
   try {
     const { status, limit = 50 } = req.query;
 
+    // First check if the table exists
+    const tableCheck = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'data_export_requests'
+      )
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      return res.json({
+        requests: [],
+        stats: {
+          total: 0,
+          pending: 0,
+          processing: 0,
+          completed: 0,
+          failed: 0
+        },
+        message: 'GDPR export requests table not yet created'
+      });
+    }
+
+    // Check what columns exist in the table
+    const columnsCheck = await query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'data_export_requests'
+    `);
+    
+    const columns = columnsCheck.rows.map(row => row.column_name);
+    const hasRequestedAt = columns.includes('requested_at');
+    const hasCreatedAt = columns.includes('created_at');
+    
+    // Use appropriate timestamp column
+    const timestampColumn = hasRequestedAt ? 'requested_at' : (hasCreatedAt ? 'created_at' : 'id');
+
     let sql = `
       SELECT 
         der.id,
@@ -38,37 +74,37 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
         u.name as user_name,
         u.email as user_email,
         der.status,
-        der.requested_at,
-        der.completed_at,
-        der.expires_at,
-        der.error_message,
-        CASE 
-          WHEN der.expires_at < NOW() THEN true 
-          ELSE false 
-        END as is_expired
+        ${hasRequestedAt ? 'der.requested_at' : hasCreatedAt ? 'der.created_at as requested_at' : 'NULL as requested_at'},
+        ${columns.includes('completed_at') ? 'der.completed_at' : 'NULL as completed_at'},
+        ${columns.includes('expires_at') ? 'der.expires_at' : 'NULL as expires_at'},
+        ${columns.includes('error_message') ? 'der.error_message' : 'NULL as error_message'},
+        ${columns.includes('expires_at') ? 'CASE WHEN der.expires_at < NOW() THEN true ELSE false END' : 'false'} as is_expired
       FROM data_export_requests der
       JOIN users u ON der.user_id = u.id
     `;
 
     const params = [];
-    if (status) {
+    if (status && columns.includes('status')) {
       sql += ' WHERE der.status = $1';
       params.push(status);
     }
 
-    sql += ' ORDER BY der.requested_at DESC LIMIT $' + (params.length + 1);
+    sql += ` ORDER BY ${timestampColumn} DESC LIMIT $${params.length + 1}`;
     params.push(limit);
 
     const result = await query(sql, params);
 
     // Get stats
-    const statsResult = await query(`
-      SELECT 
-        status,
-        COUNT(*) as count
-      FROM data_export_requests
-      GROUP BY status
-    `);
+    let statsResult = { rows: [] };
+    if (columns.includes('status')) {
+      statsResult = await query(`
+        SELECT 
+          status,
+          COUNT(*) as count
+        FROM data_export_requests
+        GROUP BY status
+      `);
+    }
 
     const stats = {
       total: 0,
@@ -89,7 +125,7 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
     });
   } catch (error) {
     console.error('Error fetching GDPR export requests:', error);
-    // Return empty data if table doesn't exist
+    // Return empty data if table doesn't exist or has issues
     res.json({
       requests: [],
       stats: {
@@ -98,7 +134,8 @@ router.get('/export-requests', authenticateToken, requireAdmin, asyncHandler(asy
         processing: 0,
         completed: 0,
         failed: 0
-      }
+      },
+      error: 'Unable to fetch export requests'
     });
   }
 }));
