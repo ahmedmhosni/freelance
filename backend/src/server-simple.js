@@ -7,6 +7,16 @@ const morgan = require('morgan');
 const compression = require('compression');
 const { query } = require('./db/postgresql');
 
+// Try to import bootstrap system
+let bootstrap;
+try {
+  const bootstrapModule = require('./core/bootstrap');
+  bootstrap = bootstrapModule.bootstrap;
+  console.log('✅ Bootstrap system loaded');
+} catch (error) {
+  console.error('❌ Failed to load bootstrap system:', error.message);
+}
+
 // Import routes (with error handling)
 let authRoutes, profileRoutes, dashboardRoutes, quotesRoutes, maintenanceRoutes, healthRoutes;
 
@@ -195,6 +205,10 @@ app.get('/api/routes/status', (req, res) => {
       maintenance: !!maintenanceRoutes,
       health: !!healthRoutes
     },
+    bootstrap: {
+      loaded: !!bootstrap,
+      initialized: 'Check server logs'
+    },
     timestamp: new Date().toISOString() 
   });
 });
@@ -221,15 +235,56 @@ async function testDatabaseConnection() {
   }
 }
 
+// Try to initialize bootstrap system
+async function initializeBootstrap() {
+  if (!bootstrap) {
+    console.log('⚠️ Bootstrap system not available, skipping DI container');
+    return null;
+  }
+
+  try {
+    console.log('🔍 Initializing bootstrap system...');
+    const result = await Promise.race([
+      bootstrap({ createApp: false }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Bootstrap timeout after 15 seconds')), 15000)
+      )
+    ]);
+    console.log('✅ Bootstrap system initialized');
+    return result;
+  } catch (error) {
+    console.error('❌ Bootstrap initialization failed:', error.message);
+    return null;
+  }
+}
+
 // Start server
 async function startServer() {
   // Test database first
   const dbConnected = await testDatabaseConnection();
   
+  // Try to initialize bootstrap system
+  const bootstrapResult = await initializeBootstrap();
+  
+  // Add bootstrap routes if available
+  if (bootstrapResult && bootstrapResult.container) {
+    try {
+      // Try to add new architecture routes
+      const clientController = bootstrapResult.container.resolve('clientController');
+      if (clientController) {
+        app.use('/api/clients', clientController.router);
+        console.log('✅ Client controller registered');
+      }
+    } catch (error) {
+      console.error('❌ Failed to register bootstrap routes:', error.message);
+    }
+  }
+  
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Simplified server running on port ${PORT}`);
     console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`✅ Database: ${dbConnected ? 'Connected' : 'Failed'}`);
+    console.log(`✅ Bootstrap: ${bootstrapResult ? 'Initialized' : 'Skipped'}`);
     console.log(`✅ Listening on all interfaces`);
   });
 }
