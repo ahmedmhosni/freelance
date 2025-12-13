@@ -100,6 +100,27 @@ async function startServer() {
       });
     });
 
+    // Debug endpoint to test database connection used by auth routes
+    app.get('/api/debug/db', async (req, res) => {
+      try {
+        const { query } = require('./db/postgresql');
+        const result = await query('SELECT COUNT(*) as user_count FROM users');
+        res.json({
+          message: 'Database connection test',
+          success: true,
+          userCount: result.rows[0].user_count,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: 'Database connection failed',
+          success: false,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+
     app.get('/status', (req, res) => {
       res.status(200).json({ 
         status: 'OK',
