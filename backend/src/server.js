@@ -271,9 +271,29 @@ bootstrap({ createApp: false }).then(({ container }) => {
   app.use('/api/version', versionRoutes);
   app.use('/api/changelog', changelogRoutes);
   app.use('/api/announcements', announcementsRoutes);
+  // Root endpoint for Azure health checks
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'Roastify API Server', 
+      status: 'running',
+      timestamp: new Date().toISOString(),
+      version: '1.0.3'
+    });
+  });
+
   // Simple ping endpoint (no dependencies)
   app.get('/api/ping', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Debug endpoint to check if server is receiving requests
+  app.get('/debug', (req, res) => {
+    res.json({ 
+      message: 'Debug endpoint working',
+      headers: req.headers,
+      url: req.url,
+      method: req.method
+    });
   });
   
   app.use('/api', healthRoutes);
@@ -339,11 +359,11 @@ bootstrap({ createApp: false }).then(({ container }) => {
   });
 
   // Start server after all routes are registered
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.info(`WebSocket server ready`);
-    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`✅ Server running on port ${PORT} and listening on all interfaces`);
   });
 }).catch(error => {
   logger.error('Failed to bootstrap application', error);
