@@ -3,22 +3,19 @@ require('dotenv').config();
 const { bootstrap } = require('./core/bootstrap');
 const logger = require('./core/logger');
 
-// Import legacy routes for backward compatibility
+// Import existing routes only (avoid missing module errors)
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const dashboardRoutes = require('./routes/dashboard');
 const quotesRoutes = require('./routes/quotes');
 const maintenanceRoutes = require('./routes/maintenance');
 const healthRoutes = require('./routes/health');
-const clientsRoutes = require('./routes/clients');
-const projectsRoutes = require('./routes/projects');
-const tasksRoutes = require('./routes/tasks');
-const invoicesRoutes = require('./routes/invoices');
-const timeTrackingRoutes = require('./routes/time-tracking');
-const reportsRoutes = require('./routes/reports');
-const notificationsRoutes = require('./routes/notifications');
-const adminRoutes = require('./routes/admin');
 const aiRoutes = require('./routes/ai');
+const preferencesRoutes = require('./routes/preferences');
+const feedbackRoutes = require('./routes/feedback');
+const announcementsRoutes = require('./routes/announcements');
+const changelogRoutes = require('./routes/changelog');
+const gdprRoutes = require('./routes/gdpr');
 
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
 
@@ -48,22 +45,19 @@ async function startServer() {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 
-    // Add legacy routes for backward compatibility (v1 API)
+    // Add existing routes only (v1 API)
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
     app.use('/api/dashboard', dashboardRoutes);
     app.use('/api/quotes', quotesRoutes);
     app.use('/api/maintenance', maintenanceRoutes);
     app.use('/api', healthRoutes);
-    app.use('/api/clients', clientsRoutes);
-    app.use('/api/projects', projectsRoutes);
-    app.use('/api/tasks', tasksRoutes);
-    app.use('/api/invoices', invoicesRoutes);
-    app.use('/api/time-tracking', timeTrackingRoutes);
-    app.use('/api/reports', reportsRoutes);
-    app.use('/api/notifications', notificationsRoutes);
-    app.use('/api/admin', adminRoutes);
     app.use('/api/ai', aiRoutes);
+    app.use('/api/preferences', preferencesRoutes);
+    app.use('/api/feedback', feedbackRoutes);
+    app.use('/api/announcements', announcementsRoutes);
+    app.use('/api/changelog', changelogRoutes);
+    app.use('/api/gdpr', gdprRoutes);
 
     // Root endpoints
     app.get('/', (req, res) => {
