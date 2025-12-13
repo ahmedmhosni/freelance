@@ -30,6 +30,32 @@ try {
   console.error('❌ Failed to load config:', error.message);
 }
 
+// Test module registrations
+let registerClientsModule, registerAuthModule, registerAIModule;
+try {
+  const clientsModule = require('./modules/clients');
+  registerClientsModule = clientsModule.registerClientsModule;
+  console.log('✅ Clients module loaded');
+} catch (error) {
+  console.error('❌ Failed to load clients module:', error.message);
+}
+
+try {
+  const authModule = require('./modules/auth');
+  registerAuthModule = authModule.registerAuthModule;
+  console.log('✅ Auth module loaded');
+} catch (error) {
+  console.error('❌ Failed to load auth module:', error.message);
+}
+
+try {
+  const aiModule = require('./modules/ai');
+  registerAIModule = aiModule.registerAIModule;
+  console.log('✅ AI module loaded');
+} catch (error) {
+  console.error('❌ Failed to load AI module:', error.message);
+}
+
 // Import routes (with error handling)
 let authRoutes, profileRoutes, dashboardRoutes, quotesRoutes, maintenanceRoutes, healthRoutes;
 
@@ -291,6 +317,36 @@ async function testBootstrapComponents() {
         // Register in container
         container.registerSingleton('database', () => database);
         console.log('✅ Database registered in container');
+        
+        // Test module registrations
+        console.log('🔍 Testing module registrations...');
+        
+        if (registerClientsModule) {
+          try {
+            registerClientsModule(container);
+            console.log('✅ Clients module registered');
+          } catch (error) {
+            console.error('❌ Clients module registration failed:', error.message);
+          }
+        }
+        
+        if (registerAuthModule) {
+          try {
+            registerAuthModule(container);
+            console.log('✅ Auth module registered');
+          } catch (error) {
+            console.error('❌ Auth module registration failed:', error.message);
+          }
+        }
+        
+        if (registerAIModule) {
+          try {
+            registerAIModule(container);
+            console.log('✅ AI module registered');
+          } catch (error) {
+            console.error('❌ AI module registration failed:', error.message);
+          }
+        }
         
       } catch (error) {
         console.error('❌ Database class test failed:', error.message);
