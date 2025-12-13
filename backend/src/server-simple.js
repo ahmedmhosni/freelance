@@ -7,9 +7,21 @@ const morgan = require('morgan');
 const compression = require('compression');
 const { query } = require('./db/postgresql');
 
-// Import auth routes
-const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
+// Import auth routes (with error handling)
+let authRoutes, profileRoutes;
+try {
+  authRoutes = require('./routes/auth');
+  console.log('✅ Auth routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load auth routes:', error.message);
+}
+
+try {
+  profileRoutes = require('./routes/profile');
+  console.log('✅ Profile routes loaded');
+} catch (error) {
+  console.error('❌ Failed to load profile routes:', error.message);
+}
 
 const app = express();
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
@@ -106,13 +118,30 @@ app.get('/api/changelog/current-version', (req, res) => {
   res.json({ version: '1.0.3', date: new Date().toISOString() });
 });
 
-// Add authentication routes
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
+// Add authentication routes (with safety checks)
+if (authRoutes) {
+  app.use('/api/auth', authRoutes);
+  console.log('✅ Auth routes registered');
+} else {
+  // Fallback auth test endpoint
+  app.get('/api/auth/test', (req, res) => {
+    res.json({ message: 'Auth routes failed to load', error: 'Module import failed' });
+  });
+}
 
-// Test auth endpoint
+if (profileRoutes) {
+  app.use('/api/profile', profileRoutes);
+  console.log('✅ Profile routes registered');
+}
+
+// Always have a test endpoint
 app.get('/api/auth/test', (req, res) => {
-  res.json({ message: 'Auth routes loaded', timestamp: new Date().toISOString() });
+  res.json({ 
+    message: 'Auth test endpoint', 
+    authLoaded: !!authRoutes,
+    profileLoaded: !!profileRoutes,
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Error handling
