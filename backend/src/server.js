@@ -331,5 +331,9 @@ bootstrap({ createApp: false }).then(({ container }) => {
   });
 }).catch(error => {
   logger.error('Failed to bootstrap application', error);
-  process.exit(1);
+  console.error('❌ Bootstrap failed:', error.message);
+  // Don't exit immediately in production, let Azure handle restarts
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
 });
