@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const { query } = require('./db/postgresql');
 
 const app = express();
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
@@ -50,13 +51,35 @@ app.get('/api/ping', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({
+app.get('/api/health', async (req, res) => {
+  const health = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+    environment: process.env.NODE_ENV || 'development',
+    checks: {}
+  };
+
+  try {
+    // Test database connection
+    const dbStart = Date.now();
+    await query('SELECT 1 as health_check');
+    const dbResponseTime = Date.now() - dbStart;
+    
+    health.checks.database = {
+      status: dbResponseTime < 1000 ? 'healthy' : 'slow',
+      responseTime: `${dbResponseTime}ms`
+    };
+  } catch (error) {
+    health.status = 'unhealthy';
+    health.checks.database = {
+      status: 'unhealthy',
+      error: 'Database connection failed'
+    };
+  }
+
+  const statusCode = health.status === 'healthy' ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // Basic API routes (without database for now)
@@ -88,9 +111,32 @@ process.on('unhandledRejection', (reason) => {
   console.error('❌ Unhandled Rejection:', reason);
 });
 
+// Test database connection on startup
+async function testDatabaseConnection() {
+  try {
+    console.log('🔍 Testing database connection...');
+    await query('SELECT 1 as test');
+    console.log('✅ Database connection successful');
+    return true;
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    return false;
+  }
+}
+
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Simplified server running on port ${PORT}`);
-  console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ Listening on all interfaces`);
+async function startServer() {
+  // Test database first
+  const dbConnected = await testDatabaseConnection();
+  
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Simplified server running on port ${PORT}`);
+    console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Database: ${dbConnected ? 'Connected' : 'Failed'}`);
+    console.log(`✅ Listening on all interfaces`);
+  });
+}
+
+startServer().catch(error => {
+  console.error('❌ Failed to start server:', error);
 });
