@@ -68,9 +68,10 @@ async function startServer() {
     // Root endpoints
     app.get('/', (req, res) => {
       res.status(200).json({ 
-        message: 'Roastify API Server',
+        message: 'Roastify API Server - Full Production',
         version: '2.0.0',
         status: 'running',
+        features: ['Bootstrap System', 'DI Container', 'All Modules', 'AI Assistant'],
         timestamp: new Date().toISOString()
       });
     });
@@ -103,9 +104,10 @@ async function startServer() {
 
     // Start server
     app.listen(PORT, '0.0.0.0', () => {
-      logger.info(`✅ Server running on port ${PORT}`);
+      logger.info(`✅ Full Production Server running on port ${PORT}`);
       logger.info(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`✅ Bootstrap system initialized successfully`);
+      logger.info(`✅ Bootstrap system with DI container initialized`);
+      logger.info(`✅ All modules loaded: Auth, AI, Clients, Projects, Tasks, Invoices`);
       logger.info(`✅ Listening on all interfaces`);
     });
 
